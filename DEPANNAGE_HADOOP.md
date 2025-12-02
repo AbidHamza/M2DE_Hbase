@@ -66,6 +66,21 @@ docker-compose logs hadoop
   docker-compose up -d
   ```
 
+**Si HBase est "unhealthy" alors que Hadoop et ZooKeeper sont "Healthy" :**
+- Regardez les logs HBase pour voir l'erreur exacte :
+  ```bash
+  docker-compose logs hbase
+  ```
+- Causes possibles :
+  - HBase ne peut pas se connecter à Hadoop HDFS
+  - HBase ne peut pas se connecter à ZooKeeper
+  - Problème JAVA_HOME dans HBase
+- Solution :
+  ```bash
+  docker-compose logs hbase > hbase_erreur.txt
+  # Envoyez le fichier hbase_erreur.txt pour diagnostic
+  ```
+
 ### Solution 2 : Reconstruire l'Image Hadoop
 
 Si le problème persiste, reconstruisez l'image :

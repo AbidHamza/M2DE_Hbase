@@ -74,6 +74,7 @@ cd rooms/room-0_introduction
 - **Structure du dépôt** → [STRUCTURE_DEPOT.md](STRUCTURE_DEPOT.md) 📁 **Comprendre l'organisation complète**
 - **Questions fréquentes** → [FAQ.md](FAQ.md)
 - **Erreur Hadoop** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
+- **Erreur HBase "unhealthy"** → [DIAGNOSTIC_HBASE.md](DIAGNOSTIC_HBASE.md)
 - **Scripts d'aide** → [scripts/README.md](scripts/README.md)
 - **Débuter une room** → Allez dans `rooms/room-X_nom/` et lisez le README.md
 
