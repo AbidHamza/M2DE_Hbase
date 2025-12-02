@@ -4,17 +4,23 @@
 
 echo "Démarrage de l'environnement HBase & Hive..."
 
-# Vérifier que Docker est installé
-if ! command -v docker &> /dev/null; then
-    echo "ERREUR: Docker n'est pas installé ou pas dans le PATH"
-    echo "Téléchargez Docker depuis: https://www.docker.com/get-started"
-    exit 1
-fi
+# Exécuter la vérification complète AVANT de démarrer
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHECK_SCRIPT="$SCRIPT_DIR/check-before-start.sh"
 
-# Vérifier que docker-compose est disponible
-if ! command -v docker-compose &> /dev/null; then
-    echo "ERREUR: docker-compose n'est pas disponible"
-    exit 1
+if [ -f "$CHECK_SCRIPT" ]; then
+    echo ""
+    echo "⚠️  VÉRIFICATION PRÉ-LANCEMENT OBLIGATOIRE"
+    echo "=========================================="
+    bash "$CHECK_SCRIPT"
+    CHECK_EXIT=$?
+    
+    if [ $CHECK_EXIT -ne 0 ]; then
+        echo ""
+        echo "❌ La vérification a échoué. Corrigez les erreurs avant de continuer."
+        exit 1
+    fi
+    echo ""
 fi
 
 # Démarrer les services

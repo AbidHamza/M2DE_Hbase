@@ -66,10 +66,47 @@ docker-compose ps
 ```
 Tous doivent être "Up".
 
-### 5. Commencer
+### 5. Commencer les Rooms
+
+**IMPORTANT :** Les rooms sont des parcours guidés. Suivez-les dans l'ordre !
+
+**Étape 1 :** Allez dans la première room
 ```bash
 cd rooms/room-0_introduction
-# Lisez le README.md de cette room
+```
+
+**Étape 2 :** Lisez le README.md de cette room
+```bash
+# Windows
+notepad README.md
+# Ou ouvrez-le avec votre éditeur préféré
+
+# Linux/Mac
+cat README.md
+# Ou ouvrez-le avec votre éditeur préféré
+```
+
+**Étape 3 :** Suivez les instructions du README :
+- Lisez les rappels théoriques
+- Exécutez les commandes demandées
+- Créez les fichiers demandés dans la room
+- Documentez votre travail
+
+**Étape 4 :** Une fois la room terminée :
+```bash
+# Retournez à la racine du projet
+cd ../..
+
+# Enregistrez votre travail
+git add rooms/room-0_introduction/*
+git commit -m "Room 0 terminée"
+git push origin main
+```
+
+**Étape 5 :** Passez à la room suivante
+```bash
+cd rooms/room-1_hbase_basics
+# Répétez les étapes 2-4
 ```
 
 **C'est tout !** Continuez ci-dessous pour plus de détails.
