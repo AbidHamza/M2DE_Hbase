@@ -71,6 +71,7 @@ cd rooms/room-0_introduction
 
 - **Installation complète (débutant)** → [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md) 📚 **Si vous ne savez pas installer Docker/Git**
 - **Checklist de départ** → [CHECKLIST_DEPART.md](CHECKLIST_DEPART.md) ⚠️ **À LIRE EN PREMIER !**
+- **Structure du dépôt** → [STRUCTURE_DEPOT.md](STRUCTURE_DEPOT.md) 📁 **Comprendre l'organisation complète**
 - **Questions fréquentes** → [FAQ.md](FAQ.md)
 - **Erreur Hadoop** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
 - **Scripts d'aide** → [scripts/README.md](scripts/README.md)
