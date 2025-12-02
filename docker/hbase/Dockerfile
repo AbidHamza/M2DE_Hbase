@@ -8,6 +8,7 @@ ENV JAVA_HOME=/opt/java/openjdk
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and install HBase
