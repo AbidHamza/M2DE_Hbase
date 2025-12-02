@@ -2,7 +2,7 @@ FROM eclipse-temurin:8-jdk
 
 ENV HIVE_VERSION=3.1.3
 ENV HIVE_HOME=/opt/hive
-ENV JAVA_HOME=/opt/java/openjdk
+ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
 ENV PATH=${HIVE_HOME}/bin:${PATH}
 
 # Install dependencies

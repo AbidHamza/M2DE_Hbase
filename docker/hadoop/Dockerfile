@@ -1,8 +1,11 @@
 FROM eclipse-temurin:8-jdk
 
+# Find and set JAVA_HOME
+RUN echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> /etc/profile
+
 ENV HADOOP_VERSION=3.3.4
 ENV HADOOP_HOME=/opt/hadoop
-ENV JAVA_HOME=/opt/java/openjdk
+ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
 ENV HDFS_NAMENODE_USER=root
 ENV HDFS_DATANODE_USER=root
 ENV HDFS_SECONDARYNAMENODE_USER=root
