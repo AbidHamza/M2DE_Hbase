@@ -2,25 +2,28 @@
 
 **Parcours d'apprentissage complet et guidé pour maîtriser HBase et Hive**
 
-**NOUVEAU : Consultez [COMMENCER.md](COMMENCER.md) pour un guide ultra-simple en 5 étapes !**
-
 ---
 
-## Démarrage Rapide (3 Étapes)
+## Démarrage en 5 Minutes
 
-### 1. Cloner le dépôt
+### 1. Installer Docker et Git
+- **Docker** : https://www.docker.com/get-started
+- **Git** : https://git-scm.com/downloads
+
+Vérifiez : `docker --version` et `git --version`
+
+### 2. Cloner le Dépôt
 ```bash
 git clone https://github.com/AbidHamza/M2DE_Hbase.git
 cd M2DE_Hbase
 ```
 
-### 2. Lancer l'environnement
+### 3. Lancer l'Environnement
 
 **Windows :**
 ```powershell
 .\scripts\start.ps1
-# Ou si PowerShell indisponible :
-scripts\start.bat
+# Ou : scripts\start.bat
 ```
 
 **Linux/Mac :**
@@ -34,7 +37,15 @@ chmod +x scripts/*.sh
 docker-compose up -d
 ```
 
-### 3. Commencer les rooms
+Attendez 2-3 minutes.
+
+### 4. Vérifier
+```bash
+docker-compose ps
+```
+Tous doivent être "Up".
+
+### 5. Commencer
 ```bash
 cd rooms/room-0_introduction
 # Lisez le README.md de cette room
@@ -44,12 +55,12 @@ cd rooms/room-0_introduction
 
 ---
 
-## 📚 Table des Matières
+## Table des Matières
 
 1. [Bienvenue](#bienvenue)
 2. [Objectifs](#objectifs)
-3. [Mise en Route Détaillée](#mise-en-route-détaillée)
-4. [Référence des Commandes](#référence-des-commandes)
+3. [Commandes Essentielles](#commandes-essentielles)
+4. [Mise en Route Détaillée](#mise-en-route-détaillée)
 5. [Fonctionnement des Rooms](#fonctionnement-des-rooms)
 6. [Instructions Git](#instructions-git)
 7. [Règles de Travail](#règles-de-travail)
@@ -83,17 +94,111 @@ Ce module vous accompagne pas à pas dans l'apprentissage de **HBase** et **Hive
 
 ---
 
+## Commandes Essentielles
+
+### Docker
+
+```bash
+docker-compose up -d          # Démarrer
+docker-compose down           # Arrêter
+docker-compose ps             # Vérifier l'état
+docker-compose logs           # Voir les logs
+```
+
+### Accès aux Services
+
+**HBase Shell :**
+```bash
+docker exec -it hbase-hive-learning-lab-hbase-1 hbase shell
+```
+
+**Hive CLI :**
+```bash
+docker exec -it hbase-hive-learning-lab-hive-1 hive
+```
+
+**Hadoop Bash :**
+```bash
+docker exec -it hbase-hive-learning-lab-hadoop-1 bash
+```
+
+### Scripts d'Aide (Windows/Linux/Mac)
+
+**Windows PowerShell :**
+```powershell
+.\scripts\start.ps1
+.\scripts\stop.ps1
+.\scripts\status.ps1
+.\scripts\hbase-shell.ps1
+.\scripts\hive-cli.ps1
+```
+
+**Windows Batch :**
+```batch
+scripts\start.bat
+scripts\stop.bat
+scripts\status.bat
+scripts\hbase-shell.bat
+scripts\hive-cli.bat
+```
+
+**Linux/Mac :**
+```bash
+chmod +x scripts/*.sh  # Première fois seulement
+./scripts/start.sh
+./scripts/stop.sh
+./scripts/status.sh
+./scripts/hbase-shell.sh
+./scripts/hive-cli.sh
+```
+
+### Commandes HBase de Base
+
+```hbase
+list                                    # Lister les tables
+create 'table', 'famille'              # Créer une table
+put 'table', 'row', 'colonne', 'valeur' # Insérer des données
+get 'table', 'row'                     # Récupérer une ligne
+scan 'table'                           # Voir toutes les données
+count 'table'                          # Compter les lignes
+delete 'table', 'row'                  # Supprimer une ligne
+exit                                    # Quitter
+```
+
+### Commandes Hive de Base
+
+```sql
+SHOW DATABASES;                        # Lister les bases
+CREATE DATABASE nom_db;                # Créer une base
+USE nom_db;                            # Utiliser une base
+SHOW TABLES;                           # Lister les tables
+CREATE TABLE nom_table (...);          # Créer une table
+SELECT * FROM table;                   # Voir les données
+DROP TABLE table;                      # Supprimer une table
+exit;                                  # Quitter (avec ;)
+```
+
+**Note importante :** Hive nécessite un point-virgule `;` à la fin. HBase non.
+
+### Interfaces Web
+
+- **HDFS** : http://localhost:9870
+- **YARN** : http://localhost:8088
+- **HBase** : http://localhost:16010
+
+---
+
 ## Mise en Route Détaillée
 
 ### Étape 1 : Vérifier les Prérequis
 
-**Docker est-il installé ?**
+**Docker :**
 ```bash
 docker --version
 ```
 Si ça ne fonctionne pas : https://www.docker.com/get-started
 
-**Git est-il installé ?**
+**Git :**
 ```bash
 git --version
 ```
@@ -151,79 +256,12 @@ docker exec -it hbase-hive-learning-lab-hive-1 hive
 # Puis : exit;
 ```
 
-### Étape 5 : Accéder aux Interfaces Web
-
-Ouvrez dans votre navigateur :
-- **HDFS** : http://localhost:9870
-- **YARN** : http://localhost:8088
-- **HBase** : http://localhost:16010
-
-### Étape 6 : Commencer les Rooms
+### Étape 5 : Commencer les Rooms
 
 ```bash
 cd rooms/room-0_introduction
 # Ouvrez et lisez le README.md
 ```
-
----
-
-## Référence des Commandes
-
-### Commandes Docker Essentielles
-
-```bash
-docker-compose up -d          # Démarrer
-docker-compose down           # Arrêter
-docker-compose ps             # Vérifier l'état
-docker-compose logs           # Voir les logs
-```
-
-### Accès aux Services
-
-**HBase Shell :**
-```bash
-docker exec -it hbase-hive-learning-lab-hbase-1 hbase shell
-```
-
-**Hive CLI :**
-```bash
-docker exec -it hbase-hive-learning-lab-hive-1 hive
-```
-
-**Hadoop Bash :**
-```bash
-docker exec -it hbase-hive-learning-lab-hadoop-1 bash
-```
-
-### Commandes HBase de Base
-
-```hbase
-list                                    # Lister les tables
-create 'table', 'famille'              # Créer une table
-put 'table', 'row', 'colonne', 'valeur' # Insérer des données
-get 'table', 'row'                     # Récupérer une ligne
-scan 'table'                           # Voir toutes les données
-count 'table'                          # Compter les lignes
-delete 'table', 'row'                  # Supprimer une ligne
-exit                                    # Quitter
-```
-
-### Commandes Hive de Base
-
-```sql
-SHOW DATABASES;                        # Lister les bases
-CREATE DATABASE nom_db;                # Créer une base
-USE nom_db;                            # Utiliser une base
-SHOW TABLES;                           # Lister les tables
-CREATE TABLE nom_table (...);          # Créer une table
-SELECT * FROM table;                   # Voir les données
-DROP TABLE table;                      # Supprimer une table
-exit;                                  # Quitter (avec ;)
-```
-
-**Note importante :** Hive nécessite un point-virgule `;` à la fin de chaque commande. HBase non.
-
-**Pour la référence complète, consultez [COMMANDES_RAPIDES.md](COMMANDES_RAPIDES.md)**
 
 ---
 
@@ -357,8 +395,7 @@ docker-compose up -d
 ### Aide Supplémentaire
 
 - **FAQ** : Consultez [FAQ.md](FAQ.md) pour les questions fréquentes
-- **Commandes** : Consultez [COMMANDES_RAPIDES.md](COMMANDES_RAPIDES.md)
-- **Plateformes** : Consultez [PLATEFORMES.md](PLATEFORMES.md) pour Windows/Linux/Mac
+- **Scripts** : Consultez [scripts/README.md](scripts/README.md) pour les scripts d'aide
 
 ---
 
@@ -366,21 +403,19 @@ docker-compose up -d
 
 ```
 M2DE_Hbase/
-├── README.md              ← Vous êtes ici
-├── COMMANDES_RAPIDES.md    ← Référence des commandes
-├── FAQ.md                  ← Questions fréquentes
-├── PLATEFORMES.md          ← Instructions par plateforme
+├── README.md              ← Vous êtes ici (tout est dedans)
+├── FAQ.md                 ← Questions fréquentes
 │
-├── docker-compose.yml      ← Configuration Docker
+├── docker-compose.yml     ← Configuration Docker
 │
-├── rooms/                  ← Vos travaux ici
+├── rooms/                 ← Vos travaux ici
 │   ├── room-0_introduction/
 │   ├── room-1_hbase_basics/
 │   └── ...
 │
-├── resources/              ← Datasets pour les exercices
-├── docker/                 ← Configuration (ne pas modifier)
-└── scripts/                ← Scripts d'aide (Windows/Linux/Mac)
+├── resources/             ← Datasets pour les exercices
+├── docker/                ← Configuration (ne pas modifier)
+└── scripts/               ← Scripts d'aide (Windows/Linux/Mac)
 ```
 
 ---
@@ -389,19 +424,10 @@ M2DE_Hbase/
 
 1. ✅ Vérifiez que Docker et Git sont installés
 2. ✅ Clonez le dépôt
-3. ✅ Lancez l'environnement (`docker-compose up -d` ou scripts)
+3. ✅ Lancez l'environnement
 4. ✅ Vérifiez que tout fonctionne
 5. ✅ Allez dans `rooms/room-0_introduction`
 6. ✅ Lisez le README.md de cette room
 7. ✅ Commencez les exercices
 
 **Bon apprentissage !**
-
----
-
-## Ressources Utiles
-
-- **Commandes rapides** : [COMMANDES_RAPIDES.md](COMMANDES_RAPIDES.md)
-- **FAQ** : [FAQ.md](FAQ.md)
-- **Support multi-plateforme** : [PLATEFORMES.md](PLATEFORMES.md)
-- **Scripts d'aide** : [scripts/README.md](scripts/README.md)
