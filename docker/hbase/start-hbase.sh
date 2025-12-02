@@ -61,14 +61,25 @@ echo "HBase will create /hbase directory in HDFS if needed..."
 echo "Starting HBase..."
 ${HBASE_HOME}/bin/start-hbase.sh
 
-# Wait a bit for HBase to start
-sleep 10
+# Wait for HBase to fully start (give it more time)
+echo "Waiting for HBase processes to start..."
+for i in {1..30}; do
+    if pgrep -f "hbase.*master" > /dev/null 2>&1 || pgrep -f "HMaster" > /dev/null 2>&1; then
+        echo "HBase Master is running!"
+        break
+    fi
+    if [ $i -eq 30 ]; then
+        echo "WARNING: HBase Master process not found after 60 seconds, but continuing..."
+    else
+        sleep 2
+    fi
+done
 
-# Check if HBase started successfully
-if pgrep -f "hbase.*master" > /dev/null || pgrep -f "HMaster" > /dev/null; then
-    echo "HBase Master is running!"
+# Also check RegionServer
+if pgrep -f "hbase.*regionserver" > /dev/null 2>&1 || pgrep -f "HRegionServer" > /dev/null 2>&1; then
+    echo "HBase RegionServer is running!"
 else
-    echo "WARNING: HBase Master process not found, but continuing..."
+    echo "WARNING: HBase RegionServer process not found, but continuing..."
 fi
 
 # Keep container running
