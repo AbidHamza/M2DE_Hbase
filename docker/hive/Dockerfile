@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk
+FROM eclipse-temurin:8-jdk
 
 ENV HIVE_VERSION=3.1.3
 ENV HIVE_HOME=/opt/hive

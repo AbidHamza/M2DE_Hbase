@@ -28,6 +28,23 @@ docker-compose logs hbase
 docker-compose logs hive
 ```
 
+### Q: "TLS handshake timeout" ou "failed to resolve source metadata"
+**R:** Problème de connexion réseau avec Docker Hub. Solutions :
+
+1. **Vérifiez votre connexion Internet**
+2. **Réessayez après quelques minutes** (Docker Hub peut être temporairement indisponible)
+3. **Utilisez un VPN** si vous êtes derrière un pare-feu
+4. **Configurez un proxy Docker** si nécessaire
+5. **Videz le cache Docker** :
+   ```bash
+   docker system prune -a
+   docker-compose build --no-cache
+   docker-compose up -d
+   ```
+
+### Q: "the attribute 'version' is obsolete"
+**R:** C'est juste un avertissement. Le champ `version` a été supprimé du `docker-compose.yml` dans les versions récentes. Vous pouvez l'ignorer ou mettre à jour votre dépôt.
+
 ### Q: Comment réinitialiser complètement ?
 **R:** 
 ```bash

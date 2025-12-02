@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk
+FROM eclipse-temurin:8-jdk
 
 ENV HBASE_VERSION=2.5.0
 ENV HBASE_HOME=/opt/hbase
