@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     netcat-openbsd \
     dos2unix \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and install HBase

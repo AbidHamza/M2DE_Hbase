@@ -55,6 +55,7 @@ services:
         condition: service_healthy
       zookeeper:
         condition: service_healthy
+    restart: unless-stopped
     ports:
       # HBase Master Web UI - Port changé à 16011 pour éviter conflit Windows
       # Si 16011 est aussi bloqué, changez-le par un autre port libre (ex: 16012)
