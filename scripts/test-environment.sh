@@ -28,7 +28,8 @@ fi
 
 # Test HBase
 echo "3. Test HBase..."
-if docker exec hbase-hive-learning-lab-hbase-1 hbase shell -n version > /dev/null 2>&1; then
+HBASE_CONTAINER=$(docker-compose ps -q hbase)
+if [ -n "$HBASE_CONTAINER" ] && docker exec $HBASE_CONTAINER hbase shell -n version > /dev/null 2>&1; then
     echo -e "${GREEN}✓ HBase est opérationnel${NC}"
 else
     echo -e "${RED}✗ HBase n'est pas accessible${NC}"
@@ -63,6 +64,6 @@ echo "- YARN Web UI: http://localhost:8088"
 echo "- HBase Web UI: http://localhost:16011"
 echo ""
 echo "Pour accéder aux shells :"
-echo "- HBase: docker exec -it hbase-hive-learning-lab-hbase-1 hbase shell"
+echo "- HBase: ./scripts/hbase-shell.sh (ou utilisez docker-compose exec hbase hbase shell)"
 echo "- Hive: docker exec -it hbase-hive-learning-lab-hive-1 hive"
 
