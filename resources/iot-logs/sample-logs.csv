@@ -1,0 +1,22 @@
+timestamp,device_id,temperature,humidity,location,status
+2024-01-01 10:00:00,DEV001,22.5,65.2,Paris,active
+2024-01-01 10:05:00,DEV002,23.1,63.8,Lyon,active
+2024-01-01 10:10:00,DEV001,22.8,65.5,Paris,active
+2024-01-01 10:15:00,DEV003,21.9,67.1,Marseille,active
+2024-01-01 10:20:00,DEV002,23.3,64.1,Lyon,active
+2024-01-01 10:25:00,DEV001,22.6,65.8,Paris,active
+2024-01-01 10:30:00,DEV004,24.2,62.3,Toulouse,active
+2024-01-01 10:35:00,DEV003,22.1,67.3,Marseille,active
+2024-01-01 10:40:00,DEV002,23.5,64.5,Lyon,active
+2024-01-01 10:45:00,DEV001,22.9,66.1,Paris,active
+2024-01-01 10:50:00,DEV005,20.8,68.9,Nice,active
+2024-01-01 10:55:00,DEV004,24.5,62.8,Toulouse,active
+2024-01-01 11:00:00,DEV001,23.1,66.3,Paris,active
+2024-01-01 11:05:00,DEV002,23.7,64.9,Lyon,active
+2024-01-01 11:10:00,DEV003,22.3,67.6,Marseille,active
+2024-01-01 11:15:00,DEV001,23.2,66.5,Paris,active
+2024-01-01 11:20:00,DEV006,25.1,61.5,Bordeaux,active
+2024-01-01 11:25:00,DEV002,23.9,65.2,Lyon,active
+2024-01-01 11:30:00,DEV004,24.8,63.1,Toulouse,active
+2024-01-01 11:35:00,DEV001,23.4,66.8,Paris,active
+

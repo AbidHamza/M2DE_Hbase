@@ -1,0 +1,17 @@
+customer_id,name,email,city,country,registration_date,status
+CUST001,Jean Dupont,jean.dupont@email.com,Paris,France,2023-01-15,active
+CUST002,Marie Martin,marie.martin@email.com,Lyon,France,2023-02-20,active
+CUST003,Pierre Durand,pierre.durand@email.com,Marseille,France,2023-03-10,active
+CUST004,Sophie Bernard,sophie.bernard@email.com,Toulouse,France,2023-01-25,inactive
+CUST005,Luc Moreau,luc.moreau@email.com,Nice,France,2023-04-05,active
+CUST006,Julie Petit,julie.petit@email.com,Bordeaux,France,2023-02-14,active
+CUST007,Antoine Roux,antoine.roux@email.com,Paris,France,2023-05-12,active
+CUST008,Emma Laurent,emma.laurent@email.com,Lyon,France,2023-03-22,inactive
+CUST009,Thomas Simon,thomas.simon@email.com,Marseille,France,2023-01-08,active
+CUST010,Clara Michel,clara.michel@email.com,Toulouse,France,2023-06-18,active
+CUST011,Alexandre Girard,alexandre.girard@email.com,Paris,France,2023-04-30,active
+CUST012,Léa Rousseau,lea.rousseau@email.com,Nice,France,2023-02-05,active
+CUST013,Hugo Vincent,hugo.vincent@email.com,Bordeaux,France,2023-05-25,active
+CUST014,Chloé Fournier,chloe.fournier@email.com,Paris,France,2023-03-15,inactive
+CUST015,Maxime Lefebvre,maxime.lefebvre@email.com,Lyon,France,2023-01-20,active
+

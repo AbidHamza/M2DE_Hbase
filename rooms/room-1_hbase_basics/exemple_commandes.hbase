@@ -1,0 +1,137 @@
+# Exemple de commandes HBase pour Room 1
+# Ce fichier contient des exemples que vous pouvez copier et adapter
+
+# ============================================
+# EXERCICE 1 : Création de la table
+# ============================================
+
+# Créer la table customers avec 2 familles de colonnes
+create 'customers', 'info', 'contact'
+
+# Vérifier la structure
+describe 'customers'
+
+# Vérifier que la table est vide
+scan 'customers'
+count 'customers'
+
+# ============================================
+# EXERCICE 2 : Insertion de données
+# ============================================
+
+# Client 1 : CUST001
+put 'customers', 'CUST001', 'info:name', 'Jean Dupont'
+put 'customers', 'CUST001', 'info:city', 'Paris'
+put 'customers', 'CUST001', 'info:country', 'France'
+put 'customers', 'CUST001', 'contact:email', 'jean.dupont@email.com'
+
+# Client 2 : CUST002
+put 'customers', 'CUST002', 'info:name', 'Marie Martin'
+put 'customers', 'CUST002', 'info:city', 'Lyon'
+put 'customers', 'CUST002', 'info:country', 'France'
+put 'customers', 'CUST002', 'contact:email', 'marie.martin@email.com'
+
+# Client 3 : CUST003
+put 'customers', 'CUST003', 'info:name', 'Pierre Durand'
+put 'customers', 'CUST003', 'info:city', 'Marseille'
+put 'customers', 'CUST003', 'info:country', 'France'
+put 'customers', 'CUST003', 'contact:email', 'pierre.durand@email.com'
+
+# Client 4 : CUST004
+put 'customers', 'CUST004', 'info:name', 'Sophie Bernard'
+put 'customers', 'CUST004', 'info:city', 'Toulouse'
+put 'customers', 'CUST004', 'info:country', 'France'
+put 'customers', 'CUST004', 'contact:email', 'sophie.bernard@email.com'
+
+# Client 5 : CUST005
+put 'customers', 'CUST005', 'info:name', 'Luc Moreau'
+put 'customers', 'CUST005', 'info:city', 'Nice'
+put 'customers', 'CUST005', 'info:country', 'France'
+put 'customers', 'CUST005', 'contact:email', 'luc.moreau@email.com'
+
+# Vérifier l'insertion
+count 'customers'
+scan 'customers'
+
+# ============================================
+# EXERCICE 3 : Interrogation des données
+# ============================================
+
+# Voir toutes les données
+scan 'customers'
+
+# Récupérer un client spécifique
+get 'customers', 'CUST002'
+
+# Récupérer une colonne spécifique
+get 'customers', 'CUST003', {COLUMN => 'contact:email'}
+
+# Récupérer toutes les colonnes d'une famille
+get 'customers', 'CUST001', {COLUMN => 'info'}
+
+# Compter le nombre de lignes
+count 'customers'
+
+# ============================================
+# EXERCICE 4 : Mise à jour et suppression
+# ============================================
+
+# Mettre à jour l'email de CUST001
+put 'customers', 'CUST001', 'contact:email', 'nouveau.email@email.com'
+
+# Vérifier la mise à jour
+get 'customers', 'CUST001', {COLUMN => 'contact:email'}
+
+# Ajouter un numéro de téléphone
+put 'customers', 'CUST002', 'contact:phone', '0612345678'
+
+# Vérifier l'ajout
+get 'customers', 'CUST002'
+
+# Supprimer une colonne spécifique
+delete 'customers', 'CUST002', 'contact:phone'
+
+# Vérifier la suppression
+get 'customers', 'CUST002', {COLUMN => 'contact:phone'}
+
+# Supprimer un client entier
+delete 'customers', 'CUST004'
+
+# Vérifier la suppression
+get 'customers', 'CUST004'
+count 'customers'
+
+# ============================================
+# EXERCICE 5 : Filtres
+# ============================================
+
+# Filtrer par valeur (clients de Paris)
+scan 'customers', {FILTER => "ValueFilter(=, 'binary:Paris')"}
+
+# Filtrer par famille de colonnes (seulement info)
+scan 'customers', {COLUMNS => 'info'}
+
+# Limiter le nombre de résultats
+scan 'customers', {LIMIT => 3}
+
+# Combiner plusieurs filtres
+scan 'customers', {COLUMNS => 'info', LIMIT => 2}
+
+# ============================================
+# COMMANDES UTILES
+# ============================================
+
+# Lister toutes les tables
+list
+
+# Voir la structure d'une table
+describe 'customers'
+
+# Obtenir de l'aide
+help
+help 'put'
+help 'scan'
+
+# Quitter le shell
+exit
+

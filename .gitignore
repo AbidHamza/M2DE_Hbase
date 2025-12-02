@@ -1,0 +1,50 @@
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Hive metastore (local)
+metastore_db/
+derby.log
+
+# HBase data (local)
+hbase-data/
+
+# HDFS data (local)
+hadoop-data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# Node
+node_modules/
+
+# Room work files (students will add their own)
+# rooms/*/room-*_exercices.md
+# rooms/*/room-*_commandes.*
+# rooms/*/room-*_requetes.*
+# rooms/*/room-*_observations.md
+

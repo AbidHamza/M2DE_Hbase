@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  hadoop:
+    build:
+      context: ./docker/hadoop
+      dockerfile: Dockerfile
+    container_name: hbase-hive-learning-lab-hadoop
+    hostname: hadoop
+    ports:
+      - "9870:9870"   # NameNode Web UI
+      - "8088:8088"   # ResourceManager Web UI
+      - "9000:9000"   # HDFS
+    environment:
+      - HADOOP_HEAPSIZE=512
+    volumes:
+      - hadoop-data:/hadoop/dfs/name
+      - hadoop-tmp:/tmp/hadoop
+      - ./resources:/data/resources:ro
+      - ./scripts:/opt/scripts:ro
+    networks:
+      - hbase-hive-network
+    healthcheck:
+      test: ["CMD", "hdfs", "dfsadmin", "-report"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  zookeeper:
+    image: zookeeper:3.7
+    container_name: hbase-hive-learning-lab-zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
+    volumes:
+      - zookeeper-data:/data
+      - zookeeper-logs:/datalog
+    networks:
+      - hbase-hive-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  hbase:
+    build:
+      context: ./docker/hbase
+      dockerfile: Dockerfile
+    container_name: hbase-hive-learning-lab-hbase
+    hostname: hbase
+    depends_on:
+      hadoop:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "16010:16010"  # HBase Master Web UI
+      - "16020:16020"  # HBase RegionServer Web UI
+      - "16030:16030"  # HBase REST API
+    environment:
+      - HBASE_HEAPSIZE=512
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+      - HBASE_CONF_DIR=/opt/hbase/conf
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    volumes:
+      - hbase-data:/opt/hbase/data
+      - ./resources:/data/resources:ro
+    networks:
+      - hbase-hive-network
+    healthcheck:
+      test: ["CMD", "hbase", "shell", "-n", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  hive:
+    build:
+      context: ./docker/hive
+      dockerfile: Dockerfile
+    container_name: hbase-hive-learning-lab-hive
+    hostname: hive
+    depends_on:
+      hadoop:
+        condition: service_healthy
+      hbase:
+        condition: service_healthy
+    ports:
+      - "10000:10000"  # HiveServer2
+      - "10002:10002"  # Hive Web UI
+    environment:
+      - HIVE_SITE_CONF_hive_metastore_uris=thrift://hive-metastore:9083
+      - HIVE_SITE_CONF_hive_metastore_warehouse_dir=/user/hive/warehouse
+      - HIVE_SITE_CONF_hive_exec_scratchdir=/tmp/hive
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    volumes:
+      - hive-data:/opt/hive/warehouse
+      - ./resources:/data/resources:ro
+      - ./scripts:/opt/scripts:ro
+    networks:
+      - hbase-hive-network
+    healthcheck:
+      test: ["CMD", "hive", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  hive-metastore:
+    build:
+      context: ./docker/hive
+      dockerfile: Dockerfile
+    container_name: hbase-hive-learning-lab-hive-metastore
+    hostname: hive-metastore
+    command: ["/opt/hive/bin/hive", "--service", "metastore"]
+    depends_on:
+      hadoop:
+        condition: service_healthy
+    environment:
+      - SERVICE_NAME=metastore
+      - DB_DRIVER=derby
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    volumes:
+      - hive-metastore-data:/opt/hive/metastore_db
+    networks:
+      - hbase-hive-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9083"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  hadoop-data:
+  hadoop-tmp:
+  zookeeper-data:
+  zookeeper-logs:
+  hbase-data:
+  hive-data:
+  hive-metastore-data:
+
+networks:
+  hbase-hive-network:
+    driver: bridge
+

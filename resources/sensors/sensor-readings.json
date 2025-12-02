@@ -1,0 +1,11 @@
+{"sensor_id": "SENSOR001", "timestamp": "2024-01-01T10:00:00Z", "temperature": 22.5, "pressure": 1013.25, "location": {"lat": 48.8566, "lon": 2.3522}}
+{"sensor_id": "SENSOR002", "timestamp": "2024-01-01T10:00:00Z", "temperature": 23.1, "pressure": 1012.80, "location": {"lat": 45.7640, "lon": 4.8357}}
+{"sensor_id": "SENSOR001", "timestamp": "2024-01-01T10:05:00Z", "temperature": 22.8, "pressure": 1013.30, "location": {"lat": 48.8566, "lon": 2.3522}}
+{"sensor_id": "SENSOR003", "timestamp": "2024-01-01T10:05:00Z", "temperature": 21.9, "pressure": 1014.10, "location": {"lat": 43.2965, "lon": 5.3698}}
+{"sensor_id": "SENSOR002", "timestamp": "2024-01-01T10:10:00Z", "temperature": 23.3, "pressure": 1012.75, "location": {"lat": 45.7640, "lon": 4.8357}}
+{"sensor_id": "SENSOR004", "timestamp": "2024-01-01T10:10:00Z", "temperature": 24.2, "pressure": 1011.50, "location": {"lat": 43.6047, "lon": 1.4442}}
+{"sensor_id": "SENSOR001", "timestamp": "2024-01-01T10:15:00Z", "temperature": 22.6, "pressure": 1013.35, "location": {"lat": 48.8566, "lon": 2.3522}}
+{"sensor_id": "SENSOR003", "timestamp": "2024-01-01T10:15:00Z", "temperature": 22.1, "pressure": 1014.15, "location": {"lat": 43.2965, "lon": 5.3698}}
+{"sensor_id": "SENSOR005", "timestamp": "2024-01-01T10:15:00Z", "temperature": 20.8, "pressure": 1015.20, "location": {"lat": 43.7102, "lon": 7.2620}}
+{"sensor_id": "SENSOR002", "timestamp": "2024-01-01T10:20:00Z", "temperature": 23.5, "pressure": 1012.70, "location": {"lat": 45.7640, "lon": 4.8357}}
+
