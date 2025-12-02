@@ -4,7 +4,20 @@
 
 ---
 
-## Démarrage Complet - Guide Étape par Étape
+## 📋 Table des Matières
+
+1. [Démarrage Complet - Guide Étape par Étape](#démarrage-complet)
+2. [Comment Travailler dans les Rooms](#comment-travailler-dans-les-rooms)
+3. [Structure du Dépôt](#structure-du-dépôt)
+4. [Scripts Utilitaires](#scripts-utilitaires)
+5. [Ressources et Datasets](#ressources-et-datasets)
+6. [En Cas de Problème](#en-cas-de-problème)
+7. [Commandes Essentielles](#commandes-essentielles)
+8. [Instructions Git](#instructions-git)
+
+---
+
+## 🚀 Démarrage Complet - Guide Étape par Étape
 
 ### ⚠️ IMPORTANT : Lisez cette section ENTIÈREMENT avant de commencer !
 
@@ -13,9 +26,6 @@
 ### ÉTAPE 0 : Prérequis (À faire UNE SEULE FOIS)
 
 **1. Installer Docker et Git**
-
-**Vous ne savez pas comment installer ?** 
-→ Consultez le guide complet : [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md)
 
 **Installation rapide :**
 - **Docker** : https://www.docker.com/get-started
@@ -156,8 +166,6 @@ Si ça fonctionne, Hive est opérationnel ! ✅
 
 ### ÉTAPE 4 : Commencer les Rooms
 
-**IMPORTANT :** Les rooms sont des parcours guidés. Suivez-les dans l'ordre !
-
 **1. Aller dans la première room :**
 ```bash
 cd rooms/room-0_introduction
@@ -216,267 +224,21 @@ cd rooms/room-1_hbase_basics
 # Répétez les étapes 2-5
 ```
 
-**C'est tout !** Continuez ci-dessous pour plus de détails.
-
 ---
 
-## Navigation du Dépôt
+## 📚 Comment Travailler dans les Rooms
 
-**Ce README** contient toutes les informations essentielles. Pour plus de détails :
+### Qu'est-ce qu'une Room ?
 
-- **Installation complète (débutant)** → [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md) 📚 **Si vous ne savez pas installer Docker/Git**
-- **Checklist de départ** → [CHECKLIST_DEPART.md](CHECKLIST_DEPART.md) ⚠️ **À LIRE EN PREMIER !**
-- **Structure du dépôt** → [STRUCTURE_DEPOT.md](STRUCTURE_DEPOT.md) 📁 **Comprendre l'organisation complète**
-- **Questions fréquentes** → [FAQ.md](FAQ.md)
-- **Erreur Hadoop** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
-- **Erreur HBase "unhealthy"** → [DIAGNOSTIC_HBASE.md](DIAGNOSTIC_HBASE.md)
-- **Port bloqué sur Windows** → [PROBLEME_PORT_WINDOWS.md](PROBLEME_PORT_WINDOWS.md)
-- **Scripts d'aide** → [scripts/README.md](scripts/README.md)
-- **Débuter une room** → Allez dans `rooms/room-X_nom/` et lisez le README.md
+Une **room** est un parcours d'apprentissage guidé qui vous apprend progressivement HBase et Hive. Chaque room contient :
+- Un **README.md** avec les instructions complètes, les rappels théoriques, et les exercices
+- Des **explications détaillées** de chaque commande (pour débutants)
+- Des **exercices pratiques** à réaliser étape par étape
+- Des **datasets** fournis dans `/resources` (accessibles depuis les conteneurs Docker)
 
----
+### Ordre des Rooms
 
-## Table des Matières
-
-1. [Bienvenue](#bienvenue)
-2. [Objectifs](#objectifs)
-3. [Commandes Essentielles](#commandes-essentielles)
-4. [Mise en Route Détaillée](#mise-en-route-détaillée)
-5. [Fonctionnement des Rooms](#fonctionnement-des-rooms)
-6. [Instructions Git](#instructions-git)
-7. [Règles de Travail](#règles-de-travail)
-8. [En Cas de Problème](#en-cas-de-problème)
-
----
-
-## Bienvenue
-
-Ce module vous accompagne pas à pas dans l'apprentissage de **HBase** et **Hive**, deux technologies essentielles de l'écosystème Hadoop.
-
-**Ce que vous allez apprendre :**
-- Comment stocker et interroger des données avec HBase
-- Comment analyser des données avec Hive (SQL sur Hadoop)
-- Comment intégrer HBase et Hive dans un workflow complet
-- Comment appliquer ces technologies à des cas réels
-
-**Aucun prérequis avancé nécessaire** - Tout est fourni et expliqué étape par étape.
-
----
-
-## Objectifs
-
-À la fin de ce parcours, vous serez capable de :
-
-- Comprendre Hadoop, HBase et Hive et leur rôle dans le Big Data
-- Créer et manipuler des tables HBase (CRUD complet)
-- Analyser des données avec Hive (requêtes SQL)
-- Intégrer HBase et Hive dans un workflow analytique
-- Appliquer ces notions à des datasets réels
-
----
-
-## Commandes Essentielles
-
-### Docker
-
-```bash
-docker-compose up -d          # Démarrer
-docker-compose down           # Arrêter
-docker-compose ps             # Vérifier l'état
-docker-compose logs           # Voir les logs
-```
-
-### Accès aux Services
-
-**HBase Shell :**
-```bash
-docker exec -it hbase-hive-learning-lab-hbase-1 hbase shell
-```
-
-**Hive CLI :**
-```bash
-docker exec -it hbase-hive-learning-lab-hive-1 hive
-```
-
-**Hadoop Bash :**
-```bash
-docker exec -it hbase-hive-learning-lab-hadoop-1 bash
-```
-
-### Scripts d'Aide
-
-**Windows PowerShell :**
-```powershell
-.\scripts\start.ps1
-.\scripts\stop.ps1
-.\scripts\status.ps1
-.\scripts\hbase-shell.ps1
-.\scripts\hive-cli.ps1
-```
-
-**Windows Batch :**
-```batch
-scripts\start.bat
-scripts\stop.bat
-scripts\status.bat
-scripts\hbase-shell.bat
-scripts\hive-cli.bat
-```
-
-**Linux/Mac :**
-```bash
-chmod +x scripts/*.sh  # Première fois seulement
-./scripts/start.sh
-./scripts/stop.sh
-./scripts/status.sh
-./scripts/hbase-shell.sh
-./scripts/hive-cli.sh
-```
-
-**Pour plus de détails sur les scripts → [scripts/README.md](scripts/README.md)**
-
-### Commandes HBase de Base
-
-```hbase
-list                                    # Lister les tables
-create 'table', 'famille'              # Créer une table
-put 'table', 'row', 'colonne', 'valeur' # Insérer des données
-get 'table', 'row'                     # Récupérer une ligne
-scan 'table'                           # Voir toutes les données
-count 'table'                          # Compter les lignes
-delete 'table', 'row'                  # Supprimer une ligne
-exit                                    # Quitter
-```
-
-### Commandes Hive de Base
-
-```sql
-SHOW DATABASES;                        # Lister les bases
-CREATE DATABASE nom_db;                # Créer une base
-USE nom_db;                            # Utiliser une base
-SHOW TABLES;                           # Lister les tables
-CREATE TABLE nom_table (...);          # Créer une table
-SELECT * FROM table;                   # Voir les données
-DROP TABLE table;                      # Supprimer une table
-exit;                                  # Quitter (avec ;)
-```
-
-**Note importante :** Hive nécessite un point-virgule `;` à la fin. HBase non.
-
-### Interfaces Web
-
-- **HDFS** : http://localhost:9870
-- **YARN** : http://localhost:8088
-- **HBase** : http://localhost:16011 (port changé pour éviter conflit Windows)
-
----
-
-## Mise en Route Détaillée
-
-### Étape 1 : Vérifier les Prérequis
-
-**IMPORTANT - Windows et Mac :**
-**Docker Desktop DOIT être lancé avant d'utiliser Docker !**
-- Windows : Lancez "Docker Desktop" depuis le menu Démarrer
-- Mac : Lancez Docker Desktop depuis Applications
-- Attendez que l'icône Docker apparaisse dans la barre des tâches
-- Vérifiez que Docker Desktop est complètement démarré (1-2 minutes)
-
-**Docker :**
-```bash
-docker --version
-```
-Si ça ne fonctionne pas :
-- Windows/Mac : Vérifiez que Docker Desktop est lancé
-- Sinon : https://www.docker.com/get-started
-
-**Git :**
-```bash
-git --version
-```
-Si ça ne fonctionne pas : https://git-scm.com/downloads
-
-### Étape 2 : Cloner le Dépôt
-
-```bash
-git clone https://github.com/AbidHamza/M2DE_Hbase.git
-cd M2DE_Hbase
-```
-
-### Étape 3 : Lancer l'Environnement
-
-**Méthode Simple (Recommandée) :**
-
-**Windows :**
-- PowerShell : `.\scripts\start.ps1`
-- Batch : `scripts\start.bat`
-
-**Linux/Mac :**
-```bash
-chmod +x scripts/*.sh
-./scripts/start.sh
-```
-
-**Méthode Manuelle :**
-```bash
-docker-compose up -d
-```
-
-**Attendez 2-3 minutes** que tous les services démarrent.
-
-### Étape 4 : Vérifier que Tout Fonctionne
-
-```bash
-docker-compose ps
-```
-
-Tous les services doivent être "Up".
-
-**Test rapide :**
-
-**HBase :**
-```bash
-docker exec -it hbase-hive-learning-lab-hbase-1 hbase shell
-# Tapez : version
-# Puis : exit
-```
-
-**Hive :**
-```bash
-docker exec -it hbase-hive-learning-lab-hive-1 hive
-# Tapez : SHOW DATABASES;
-# Puis : exit;
-```
-
-### Étape 5 : Commencer les Rooms
-
-```bash
-cd rooms/room-0_introduction
-# Ouvrez et lisez le README.md
-```
-
----
-
-## Fonctionnement des Rooms
-
-### Structure Simple
-
-Chaque room est un dossier avec un **README.md** qui contient :
-- Les objectifs de la room
-- Les rappels théoriques nécessaires
-- Les exercices pratiques étape par étape
-- Les fichiers à créer
-
-### Progression Guidée
-
-1. **Lire** le README de la room
-2. **Comprendre** les concepts expliqués
-3. **Faire** les exercices dans l'ordre
-4. **Créer** les fichiers demandés
-5. **Valider** que vous avez tout fait
-6. **Passer** à la room suivante
-
-### Liste des Rooms (Dans l'Ordre)
+Suivez les rooms dans l'ordre numérique :
 
 1. **Room 0** : `rooms/room-0_introduction/` - Introduction - Prise en main
 2. **Room 1** : `rooms/room-1_hbase_basics/` - HBase Basics - Opérations de base
@@ -489,20 +251,370 @@ Chaque room est un dossier avec un **README.md** qui contient :
 
 **Règle d'or :** Ne passez pas à la room suivante tant que vous n'avez pas terminé la précédente.
 
+### Structure d'une Room
+
+Chaque room contient :
+- **README.md** : instructions complètes, rappels théoriques, exercices
+- **Vos fichiers de travail** : vous les créez au fur et à mesure
+
 ### Fichiers à Créer
 
-Dans chaque room, vous créerez des fichiers comme :
-- `room-X_exercices.md` - Documentation de vos exercices
-- `room-X_commandes.hbase` ou `.hql` - Vos commandes
-- `room-X_observations.md` - Vos réflexions
+Dans chaque room, vous devrez créer des fichiers comme :
+- `room-X_exercices.md` : documentation de vos exercices
+- `room-X_commandes.hbase` ou `.hql` : vos commandes
+- `room-X_observations.md` : vos réflexions
 
 **Template disponible :** `rooms/template_exercices.md` - Copiez-le pour commencer.
 
+Les noms exacts sont indiqués dans le README de chaque room.
+
+### Règles Importantes
+
+⚠️ **RÈGLE ABSOLUE :** Ne modifiez JAMAIS les fichiers en dehors des dossiers `/rooms`. Vous travaillez uniquement dans les rooms.
+
+✅ **Ce que vous POUVEZ faire :**
+- Créer des fichiers dans les dossiers `/rooms/room-X_*/`
+- Modifier vos propres fichiers de travail
+- Documenter votre progression
+
+❌ **Ce que vous NE POUVEZ PAS faire :**
+- Modifier les fichiers Docker (`/docker/`)
+- Modifier les scripts (`/scripts/`)
+- Modifier les ressources (`/resources/`)
+- Modifier le README principal ou autres fichiers de documentation
+
 ---
 
-## Instructions Git
+## 📁 Structure du Dépôt
 
-### Configuration Initiale (Une Seule Fois)
+```
+M2DE_Hbase/
+├── README.md              ← Vous êtes ici (tout l'essentiel)
+├── docker-compose.yml     ← Configuration Docker (NE PAS MODIFIER)
+│
+├── docker/                ← Configurations Docker (NE PAS MODIFIER)
+│   ├── hadoop/           ← Configuration Hadoop
+│   ├── hbase/            ← Configuration HBase
+│   └── hive/             ← Configuration Hive
+│
+├── scripts/              ← Scripts d'aide (utilisez-les !)
+│   ├── start.ps1/.sh/.bat    ← Démarrer l'environnement
+│   ├── stop.ps1/.sh/.bat     ← Arrêter l'environnement
+│   ├── status.ps1/.sh/.bat   ← Vérifier l'état
+│   ├── hbase-shell.ps1/.sh/.bat  ← Ouvrir HBase Shell
+│   └── hive-cli.ps1/.sh/.bat     ← Ouvrir Hive CLI
+│
+├── resources/            ← Datasets pour les exercices (NE PAS MODIFIER)
+│   ├── customers/       ← Données clients (CSV)
+│   ├── iot-logs/        ← Logs IoT (CSV)
+│   ├── sales/           ← Données de ventes (CSV)
+│   └── sensors/         ← Données de capteurs (JSON)
+│
+└── rooms/                ← VOS TRAVAUX ICI !
+    ├── room-0_introduction/
+    ├── room-1_hbase_basics/
+    ├── room-2_hbase_advanced/
+    ├── room-3_hive_introduction/
+    ├── room-4_hive_advanced/
+    ├── room-5_hbase_hive_integration/
+    ├── room-6_real_world_scenarios/
+    └── room-7_final_project/
+```
+
+---
+
+## 🛠️ Scripts Utilitaires
+
+### Scripts de Démarrage/Arrêt
+
+**Démarrer l'environnement :**
+```bash
+# Windows PowerShell
+.\scripts\start.ps1
+
+# Linux/Mac
+./scripts/start.sh
+```
+
+**Arrêter l'environnement :**
+```bash
+# Windows PowerShell
+.\scripts\stop.ps1
+
+# Linux/Mac
+./scripts/stop.sh
+```
+
+**Vérifier l'état :**
+```bash
+# Windows PowerShell
+.\scripts\status.ps1
+
+# Linux/Mac
+./scripts/status.sh
+```
+
+### Scripts d'Accès aux Shells
+
+**HBase Shell :**
+```bash
+# Windows PowerShell
+.\scripts\hbase-shell.ps1
+
+# Linux/Mac
+./scripts/hbase-shell.sh
+```
+
+**Hive CLI :**
+```bash
+# Windows PowerShell
+.\scripts\hive-cli.ps1
+
+# Linux/Mac
+./scripts/hive-cli.sh
+```
+
+### Script de Vérification Pré-Lancement
+
+**Exécutez ce script AVANT de lancer l'environnement pour éviter les erreurs :**
+
+```bash
+# Windows PowerShell
+.\scripts\check-before-start.ps1
+
+# Linux/Mac
+./scripts/check-before-start.sh
+```
+
+**Ce script vérifie automatiquement :**
+- ✅ Docker et docker-compose installés
+- ✅ Docker Desktop lancé (Windows/Mac)
+- ✅ Fichiers de configuration présents
+- ✅ Syntaxe docker-compose.yml valide
+- ✅ JAVA_HOME configuré correctement
+- ✅ Ports disponibles
+- ✅ Dépôt Git à jour
+- ✅ Espace disque et mémoire suffisants
+- ✅ Aucun conflit de conteneurs
+
+**Note :** Les scripts `start.ps1`, `start.sh`, et `start.bat` exécutent automatiquement cette vérification avant de démarrer.
+
+---
+
+## 📊 Ressources et Datasets
+
+Les datasets sont automatiquement montés dans les conteneurs Docker et accessibles via `/data/resources/`.
+
+**Datasets disponibles :**
+- **customers/** : Données clients (CSV) - Utilisé dans Room 1, 3, 4
+- **iot-logs/** : Logs IoT (CSV) - Utilisé dans Room 2, 6
+- **sales/** : Données de ventes (CSV) - Utilisé dans Room 4, 6
+- **sensors/** : Données de capteurs (JSON) - Utilisé dans Room 2, 5, 6
+
+**Accès depuis un conteneur :**
+```bash
+# Depuis le conteneur Hadoop
+docker exec -it hbase-hive-learning-lab-hadoop-1 ls /data/resources/
+
+# Depuis HBase Shell ou Hive CLI
+# Les fichiers sont accessibles via /data/resources/
+```
+
+---
+
+## 🔧 En Cas de Problème
+
+### Problèmes Courants
+
+**1. Docker Desktop n'est pas lancé (Windows/Mac)**
+
+**Symptôme :** `docker: command not found` ou `Cannot connect to Docker`
+
+**Solution :**
+- Lancez Docker Desktop depuis le menu Démarrer
+- Attendez que l'icône Docker apparaisse dans la barre des tâches
+- Vérifiez : `docker info`
+
+**2. Les conteneurs ne démarrent pas**
+
+**Solution :**
+```bash
+docker-compose down
+docker-compose ps
+docker-compose up -d
+```
+
+**3. Conteneur "unhealthy"**
+
+**Si Hadoop est "unhealthy" :**
+```bash
+# Regardez les logs
+docker-compose logs hadoop
+
+# Réinitialisez complètement
+docker-compose down -v
+docker-compose up -d
+```
+
+**Si HBase est "unhealthy" :**
+```bash
+# Regardez les logs
+docker-compose logs hbase
+
+# Vérifiez que Hadoop et ZooKeeper sont "Healthy"
+docker-compose ps
+
+# Si Hadoop et ZooKeeper sont OK, attendez encore 2-3 minutes
+# Le healthcheck HBase peut prendre jusqu'à 3 minutes
+```
+
+**4. "Port already in use" ou "access forbidden by its access permissions"**
+
+**Sur Windows :**
+```powershell
+# Vérifier quel programme utilise le port
+netstat -ano | findstr :16011
+
+# Arrêter le processus (remplacez <PID> par le numéro trouvé)
+taskkill /PID <PID> /F
+```
+
+**Ou changer le port dans docker-compose.yml :**
+- Trouvez la section `hbase` → `ports`
+- Changez `"16011:16010"` par `"16012:16010"` (ou un autre port libre)
+
+**5. "JAVA_HOME is not set"**
+
+**Solution :**
+```bash
+# Mettez à jour le dépôt
+git pull origin main
+
+# Reconstruisez les conteneurs
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+**6. Les conteneurs sont "Exited" (arrêtés)**
+
+**Solution :**
+```bash
+# Regardez les logs pour voir pourquoi
+docker-compose logs
+
+# Redémarrez
+docker-compose restart
+```
+
+**7. Git pull échoue avec "Your local changes would be overwritten"**
+
+**Solution :**
+```bash
+# Sauvegarder vos modifications (si importantes)
+git stash
+
+# OU réinitialiser complètement (ATTENTION : supprime vos modifications locales)
+git reset --hard origin/main
+
+# Puis mettre à jour
+git pull origin main
+```
+
+### Diagnostic Détaillé
+
+**Vérifier les logs d'un service spécifique :**
+```bash
+docker-compose logs hadoop
+docker-compose logs hbase
+docker-compose logs hive
+docker-compose logs zookeeper
+```
+
+**Vérifier l'état de tous les conteneurs :**
+```bash
+docker-compose ps
+```
+
+**Tester HBase manuellement :**
+```bash
+# Si le healthcheck échoue mais que HBase fonctionne
+.\scripts\hbase-shell.ps1    # Windows
+./scripts/hbase-shell.sh      # Linux/Mac
+
+# Tapez : version
+# Si ça fonctionne, HBase est opérationnel même si marqué "unhealthy"
+```
+
+**Réinitialiser complètement (ATTENTION : supprime les données) :**
+```bash
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+---
+
+## 💻 Commandes Essentielles
+
+### Docker
+
+```bash
+docker-compose up -d          # Démarrer
+docker-compose down            # Arrêter
+docker-compose ps              # Vérifier l'état
+docker-compose logs            # Voir les logs
+docker-compose restart         # Redémarrer
+docker-compose down -v         # Arrêter et supprimer les volumes
+```
+
+### HBase Shell
+
+```bash
+# Accéder au shell
+.\scripts\hbase-shell.ps1     # Windows
+./scripts/hbase-shell.sh        # Linux/Mac
+
+# Commandes HBase de base
+create 'table', 'cf'           # Créer une table
+put 'table', 'row', 'cf:col', 'value'  # Insérer une donnée
+get 'table', 'row'             # Récupérer une ligne
+scan 'table'                   # Voir toutes les données
+count 'table'                  # Compter les lignes
+delete 'table', 'row'          # Supprimer une ligne
+exit                           # Quitter
+```
+
+### Hive CLI
+
+```bash
+# Accéder au CLI
+.\scripts\hive-cli.ps1         # Windows
+./scripts/hive-cli.sh           # Linux/Mac
+
+# Commandes Hive de base
+SHOW DATABASES;                # Lister les bases
+CREATE DATABASE nom_db;        # Créer une base
+USE nom_db;                    # Utiliser une base
+SHOW TABLES;                   # Lister les tables
+CREATE TABLE nom_table (...);  # Créer une table
+SELECT * FROM table;           # Voir les données
+DROP TABLE table;              # Supprimer une table
+exit;                          # Quitter (avec ;)
+```
+
+**Note importante :** Hive nécessite un point-virgule `;` à la fin. HBase non.
+
+### Interfaces Web
+
+- **HDFS** : http://localhost:9870
+- **YARN** : http://localhost:8088
+- **HBase** : http://localhost:16011 (port changé pour éviter conflit Windows)
+
+---
+
+## 📝 Instructions Git
+
+### Configuration Initiale (Première fois uniquement)
 
 ```bash
 git config --global user.name "Votre Nom"
@@ -537,9 +649,27 @@ git push origin main
 
 **Conseil :** Faites un commit après chaque room terminée.
 
+### Mettre à Jour le Dépôt
+
+```bash
+git pull origin main
+```
+
+**Si conflit :**
+```bash
+# Sauvegarder vos modifications
+git stash
+
+# OU réinitialiser (ATTENTION : supprime vos modifications locales)
+git reset --hard origin/main
+
+# Puis mettre à jour
+git pull origin main
+```
+
 ---
 
-## Règles de Travail
+## ✅ Règles de Travail
 
 ### Règles Importantes
 
@@ -557,88 +687,18 @@ git push origin main
 
 ---
 
-## En Cas de Problème
+## 🎯 Objectifs du Module
 
-### Problèmes Courants
+À la fin de ce parcours, vous serez capable de :
 
-**Les conteneurs ne démarrent pas :**
-```bash
-docker-compose down
-docker-compose ps
-docker-compose up -d
-```
+- Comprendre Hadoop, HBase et Hive et leur rôle dans le Big Data
+- Créer et manipuler des tables HBase (CRUD complet)
+- Analyser des données avec Hive (requêtes SQL)
+- Intégrer HBase et Hive dans un workflow analytique
+- Appliquer ces notions à des datasets réels
 
-**Erreur "Port already in use" :**
-- Un autre programme utilise le port
-- Arrêtez-le ou modifiez les ports dans `docker-compose.yml`
-
-**Les conteneurs sont "Exited" :**
-```bash
-docker-compose logs
-```
-Cela vous dira pourquoi ils se sont arrêtés.
-
-**Réinitialiser complètement (ATTENTION : supprime les données) :**
-```bash
-docker-compose down -v
-docker-compose up -d
-```
-
-### Aide Supplémentaire
-
-**Pour plus de solutions :**
-- **Problèmes généraux** → [FAQ.md](FAQ.md)
-- **Erreur Hadoop "unhealthy"** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
-
-La FAQ contient :
-- Problèmes Docker courants
-- Erreurs HBase et Hive
-- Questions Git
-- Solutions détaillées
+**Aucun prérequis avancé nécessaire** - Tout est fourni et expliqué étape par étape.
 
 ---
 
-## Structure du Dépôt
-
-```
-M2DE_Hbase/
-├── README.md              ← Vous êtes ici (tout l'essentiel)
-├── FAQ.md                 ← Questions fréquentes (consultez si problème)
-│
-├── docker-compose.yml     ← Configuration Docker
-│
-├── rooms/                 ← Vos travaux ici
-│   ├── room-0_introduction/
-│   │   └── README.md     ← Instructions de la room
-│   ├── room-1_hbase_basics/
-│   │   └── README.md
-│   └── ...
-│
-├── resources/             ← Datasets pour les exercices
-├── docker/                ← Configuration (ne pas modifier)
-└── scripts/               ← Scripts d'aide
-    └── README.md          ← Documentation des scripts
-```
-
----
-
-## Prochaines Étapes
-
-1. ✅ Vérifiez que Docker et Git sont installés
-2. ✅ Clonez le dépôt
-3. ✅ Lancez l'environnement
-4. ✅ Vérifiez que tout fonctionne
-5. ✅ Allez dans `rooms/room-0_introduction`
-6. ✅ Lisez le README.md de cette room
-7. ✅ Commencez les exercices
-
-**Bon apprentissage !**
-
----
-
-## Navigation Rapide
-
-- **Problème ?** → [FAQ.md](FAQ.md)
-- **Scripts d'aide ?** → [scripts/README.md](scripts/README.md)
-- **Commencer Room 0 ?** → `rooms/room-0_introduction/README.md`
-- **Commencer Room 1 ?** → `rooms/room-1_hbase_basics/README.md`
+**Bon apprentissage ! 🚀**
