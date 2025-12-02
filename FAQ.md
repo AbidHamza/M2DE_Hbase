@@ -8,8 +8,12 @@
 
 ## Docker
 
-### Q: "docker-compose : command not found"
-**R:** Vérifiez que Docker Desktop est bien lancé sur Windows/Mac. Sur Linux, installez docker-compose séparément.
+### Q: "docker-compose : command not found" ou "Cannot connect to Docker"
+**R:** 
+- **Windows/Mac :** Docker Desktop DOIT être lancé ! Ouvrez Docker Desktop et attendez qu'il soit complètement démarré (icône visible dans la barre des tâches)
+- **Linux :** Installez docker-compose séparément ou utilisez `docker compose` (sans tiret)
+
+**Vérification :** Tapez `docker --version`. Si ça ne fonctionne pas, Docker Desktop n'est pas lancé.
 
 ### Q: Les conteneurs ne démarrent pas
 **R:** 

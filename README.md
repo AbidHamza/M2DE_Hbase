@@ -10,6 +10,11 @@
 - **Docker** : https://www.docker.com/get-started
 - **Git** : https://git-scm.com/downloads
 
+**IMPORTANT - Windows/Mac :** Lancez Docker Desktop avant de continuer !
+- Windows : Menu Démarrer → Docker Desktop
+- Mac : Applications → Docker Desktop
+- Attendez l'icône Docker dans la barre des tâches
+
 Vérifiez : `docker --version` et `git --version`
 
 ### 2. Cloner le Dépôt
@@ -204,11 +209,20 @@ exit;                                  # Quitter (avec ;)
 
 ### Étape 1 : Vérifier les Prérequis
 
+**IMPORTANT - Windows et Mac :**
+**Docker Desktop DOIT être lancé avant d'utiliser Docker !**
+- Windows : Lancez "Docker Desktop" depuis le menu Démarrer
+- Mac : Lancez Docker Desktop depuis Applications
+- Attendez que l'icône Docker apparaisse dans la barre des tâches
+- Vérifiez que Docker Desktop est complètement démarré (1-2 minutes)
+
 **Docker :**
 ```bash
 docker --version
 ```
-Si ça ne fonctionne pas : https://www.docker.com/get-started
+Si ça ne fonctionne pas :
+- Windows/Mac : Vérifiez que Docker Desktop est lancé
+- Sinon : https://www.docker.com/get-started
 
 **Git :**
 ```bash
