@@ -73,10 +73,11 @@ services:
     networks:
       - hbase-hive-network
     healthcheck:
-      test: ["CMD", "hbase", "shell", "-n", "version"]
+      test: ["CMD", "/bin/bash", "/healthcheck.sh"]
       interval: 30s
-      timeout: 10s
-      retries: 5
+      timeout: 15s
+      retries: 10
+      start_period: 60s
 
   hive:
     build:

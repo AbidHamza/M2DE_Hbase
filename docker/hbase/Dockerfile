@@ -36,10 +36,11 @@ EXPOSE 16010 16020 16030
 
 # Start HBase
 COPY start-hbase.sh /start-hbase.sh
-RUN chmod +x /start-hbase.sh && \
-    sed -i 's/\r$//' /start-hbase.sh && \
-    dos2unix /start-hbase.sh 2>/dev/null || true && \
-    chmod +x /start-hbase.sh
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /start-hbase.sh /healthcheck.sh && \
+    sed -i 's/\r$//' /start-hbase.sh /healthcheck.sh && \
+    dos2unix /start-hbase.sh /healthcheck.sh 2>/dev/null || true && \
+    chmod +x /start-hbase.sh /healthcheck.sh
 
 ENTRYPOINT []
 CMD ["/bin/bash", "-c", "/start-hbase.sh"]
