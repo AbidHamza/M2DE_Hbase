@@ -4,12 +4,18 @@ REM Usage: scripts\start.bat
 
 echo Démarrage de l'environnement HBase ^& Hive...
 
-REM Vérifier que Docker est disponible
-docker --version >nul 2>&1
-if errorlevel 1 (
-    echo ERREUR: Docker n'est pas installé ou pas dans le PATH
-    echo Téléchargez Docker depuis: https://www.docker.com/get-started
-    exit /b 1
+REM Exécuter la vérification complète AVANT de démarrer
+if exist "scripts\check-before-start.bat" (
+    echo.
+    echo ⚠️  VÉRIFICATION PRÉ-LANCEMENT OBLIGATOIRE
+    echo ==========================================
+    call scripts\check-before-start.bat
+    if errorlevel 1 (
+        echo.
+        echo ❌ La vérification a échoué. Corrigez les erreurs avant de continuer.
+        exit /b 1
+    )
+    echo.
 )
 
 REM Démarrer les services

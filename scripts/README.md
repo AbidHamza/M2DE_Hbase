@@ -8,6 +8,39 @@
 
 ## Scripts Disponibles
 
+### ⚠️ Vérification avant démarrage (RECOMMANDÉ)
+
+**Exécutez ce script AVANT de lancer l'environnement pour éviter les erreurs :**
+
+**Windows PowerShell :**
+```powershell
+.\scripts\check-before-start.ps1
+```
+
+**Windows Batch :**
+```batch
+scripts\check-before-start.bat
+```
+
+**Linux/Mac :**
+```bash
+chmod +x scripts/check-before-start.sh  # Première fois seulement
+./scripts/check-before-start.sh
+```
+
+**Ce script vérifie automatiquement :**
+- ✅ Docker et docker-compose installés
+- ✅ Docker Desktop lancé (Windows/Mac)
+- ✅ Fichiers de configuration présents
+- ✅ Syntaxe docker-compose.yml valide
+- ✅ JAVA_HOME configuré correctement
+- ✅ Ports disponibles
+- ✅ Dépôt Git à jour
+- ✅ Espace disque et mémoire suffisants
+- ✅ Aucun conflit de conteneurs
+
+**Note :** Les scripts `start.ps1`, `start.sh`, et `start.bat` exécutent automatiquement cette vérification avant de démarrer.
+
 ### Démarrer l'environnement
 
 **Windows PowerShell :**

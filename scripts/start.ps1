@@ -3,17 +3,22 @@
 
 Write-Host "Démarrage de l'environnement HBase & Hive..." -ForegroundColor Green
 
-# Vérifier que Docker est installé
-if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-    Write-Host "ERREUR: Docker n'est pas installé ou pas dans le PATH" -ForegroundColor Red
-    Write-Host "Téléchargez Docker depuis: https://www.docker.com/get-started" -ForegroundColor Yellow
-    exit 1
-}
+# Exécuter la vérification complète AVANT de démarrer
+$checkScript = Join-Path $PSScriptRoot "check-before-start.ps1"
 
-# Vérifier que docker-compose est disponible
-if (-not (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
-    Write-Host "ERREUR: docker-compose n'est pas disponible" -ForegroundColor Red
-    exit 1
+if (Test-Path $checkScript) {
+    Write-Host ""
+    Write-Host "⚠️  VÉRIFICATION PRÉ-LANCEMENT OBLIGATOIRE" -ForegroundColor Yellow
+    Write-Host "==========================================" -ForegroundColor Yellow
+    & $checkScript
+    $checkExit = $LASTEXITCODE
+    
+    if ($checkExit -ne 0) {
+        Write-Host ""
+        Write-Host "❌ La vérification a échoué. Corrigez les erreurs avant de continuer." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host ""
 }
 
 # Démarrer les services

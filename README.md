@@ -30,6 +30,8 @@ cd M2DE_Hbase
 
 ### 3. Lancer l'Environnement
 
+**⚠️ IMPORTANT : Les scripts effectuent automatiquement une vérification complète avant de démarrer.**
+
 **Windows :**
 ```powershell
 .\scripts\start.ps1
@@ -40,6 +42,15 @@ cd M2DE_Hbase
 ```bash
 chmod +x scripts/*.sh
 ./scripts/start.sh
+```
+
+**Vérification manuelle (optionnelle) :**
+```bash
+# Windows PowerShell
+.\scripts\check-before-start.ps1
+
+# Linux/Mac
+./scripts/check-before-start.sh
 ```
 
 **Ou manuellement (toutes plateformes) :**
