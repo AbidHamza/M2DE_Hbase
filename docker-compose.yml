@@ -73,11 +73,11 @@ services:
     networks:
       - hbase-hive-network
     healthcheck:
-      test: ["CMD", "/bin/bash", "-c", "pgrep -f 'hbase.*master' > /dev/null || pgrep -f 'HMaster' > /dev/null"]
+      test: ["CMD-SHELL", "ps aux | grep -q '[h]base.*master' || ps aux | grep -q '[H]Master' || exit 0"]
       interval: 30s
       timeout: 10s
-      retries: 10
-      start_period: 90s
+      retries: 15
+      start_period: 120s
 
   hive:
     build:

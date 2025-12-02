@@ -4,9 +4,15 @@
 
 ---
 
-## Démarrage en 5 Minutes
+## Démarrage Complet - Guide Étape par Étape
 
-### 1. Installer Docker et Git
+### ⚠️ IMPORTANT : Lisez cette section ENTIÈREMENT avant de commencer !
+
+---
+
+### ÉTAPE 0 : Prérequis (À faire UNE SEULE FOIS)
+
+**1. Installer Docker et Git**
 
 **Vous ne savez pas comment installer ?** 
 → Consultez le guide complet : [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md)
@@ -15,27 +21,74 @@
 - **Docker** : https://www.docker.com/get-started
 - **Git** : https://git-scm.com/downloads
 
-**IMPORTANT - Windows/Mac :** Lancez Docker Desktop avant de continuer !
-- Windows : Menu Démarrer → Docker Desktop
-- Mac : Applications → Docker Desktop
-- Attendez l'icône Docker dans la barre des tâches
+**2. Vérifier l'installation**
+```bash
+docker --version
+git --version
+```
 
-Vérifiez : `docker --version` et `git --version`
+Si ces commandes ne fonctionnent pas, installez Docker et Git d'abord.
 
-### 2. Cloner le Dépôt
+**3. Lancer Docker Desktop (Windows/Mac UNIQUEMENT)**
+
+⚠️ **OBLIGATOIRE** : Docker Desktop DOIT être lancé avant toute commande Docker !
+
+- **Windows** : Menu Démarrer → Rechercher "Docker Desktop" → Lancer
+- **Mac** : Applications → Docker Desktop → Lancer
+- **Attendez** que l'icône Docker apparaisse dans la barre des tâches (1-2 minutes)
+
+**Vérifiez que Docker fonctionne :**
+```bash
+docker info
+```
+
+Si ça affiche une erreur, Docker Desktop n'est pas lancé. Relancez-le.
+
+---
+
+### ÉTAPE 1 : Cloner le Dépôt (Première fois uniquement)
+
+**Si vous n'avez PAS encore cloné le dépôt :**
+
 ```bash
 git clone https://github.com/AbidHamza/M2DE_Hbase.git
 cd M2DE_Hbase
 ```
 
-### 3. Lancer l'Environnement
+**Si vous avez DÉJÀ cloné le dépôt :**
+
+```bash
+cd M2DE_Hbase
+git pull origin main
+```
+
+**Si vous avez des modifications locales non commitées et que git pull échoue :**
+
+```bash
+# Sauvegarder vos modifications (si importantes)
+git stash
+
+# OU réinitialiser complètement (ATTENTION : supprime vos modifications locales)
+git reset --hard origin/main
+
+# Puis mettre à jour
+git pull origin main
+```
+
+---
+
+### ÉTAPE 2 : Lancer l'Environnement
 
 **⚠️ IMPORTANT : Les scripts effectuent automatiquement une vérification complète avant de démarrer.**
 
-**Windows :**
+**Windows PowerShell :**
 ```powershell
 .\scripts\start.ps1
-# Ou : scripts\start.bat
+```
+
+**Windows Batch (si PowerShell ne fonctionne pas) :**
+```batch
+scripts\start.bat
 ```
 
 **Linux/Mac :**
@@ -44,69 +97,123 @@ chmod +x scripts/*.sh
 ./scripts/start.sh
 ```
 
-**Vérification manuelle (optionnelle) :**
-```bash
-# Windows PowerShell
-.\scripts\check-before-start.ps1
+**Ce qui se passe :**
+1. ✅ Vérification automatique de 15 points (Docker, ports, fichiers, etc.)
+2. ✅ Si tout est OK → démarrage automatique des conteneurs
+3. ✅ Si erreur → message clair pour corriger
 
-# Linux/Mac
-./scripts/check-before-start.sh
-```
+**Attendez 3-5 minutes** que tous les services démarrent complètement.
 
-**Ou manuellement (toutes plateformes) :**
-```bash
-docker-compose up -d
-```
+---
 
-Attendez 2-3 minutes.
+### ÉTAPE 3 : Vérifier que Tout Fonctionne
 
-### 4. Vérifier
+**1. Vérifier l'état des conteneurs :**
 ```bash
 docker-compose ps
 ```
-Tous doivent être "Up".
 
-### 5. Commencer les Rooms
+**Résultat attendu :**
+- Tous les conteneurs doivent être "Up" (pas "unhealthy" ou "Exited")
+- Si un conteneur est "unhealthy", attendez encore 1-2 minutes
+- Si après 5 minutes c'est toujours "unhealthy", voir la section "En Cas de Problème"
+
+**2. Tester HBase Shell :**
+```bash
+# Windows PowerShell
+.\scripts\hbase-shell.ps1
+
+# Linux/Mac
+./scripts/hbase-shell.sh
+```
+
+Dans le shell HBase, tapez :
+```
+version
+exit
+```
+
+Si ça fonctionne, HBase est opérationnel ! ✅
+
+**3. Tester Hive CLI :**
+```bash
+# Windows PowerShell
+.\scripts\hive-cli.ps1
+
+# Linux/Mac
+./scripts/hive-cli.sh
+```
+
+Dans le shell Hive, tapez :
+```sql
+SHOW DATABASES;
+exit;
+```
+
+Si ça fonctionne, Hive est opérationnel ! ✅
+
+---
+
+### ÉTAPE 4 : Commencer les Rooms
 
 **IMPORTANT :** Les rooms sont des parcours guidés. Suivez-les dans l'ordre !
 
-**Étape 1 :** Allez dans la première room
+**1. Aller dans la première room :**
 ```bash
 cd rooms/room-0_introduction
 ```
 
-**Étape 2 :** Lisez le README.md de cette room
-```bash
-# Windows
-notepad README.md
-# Ou ouvrez-le avec votre éditeur préféré
+**2. Lire le README.md de cette room :**
+- Ouvrez le fichier `README.md` avec votre éditeur de texte préféré
+- Lisez-le **ENTIÈREMENT** avant de commencer
+- Comprenez les objectifs et les prérequis
 
-# Linux/Mac
-cat README.md
-# Ou ouvrez-le avec votre éditeur préféré
-```
-
-**Étape 3 :** Suivez les instructions du README :
+**3. Suivre les instructions étape par étape :**
 - Lisez les rappels théoriques
-- Exécutez les commandes demandées
-- Créez les fichiers demandés dans la room
+- Exécutez les commandes **UNE PAR UNE** dans l'ordre
+- Ne sautez pas d'étapes
+- Créez les fichiers demandés dans le dossier de la room
 - Documentez votre travail
 
-**Étape 4 :** Une fois la room terminée :
+**4. Utiliser les scripts pour accéder aux shells :**
+
+**Pour HBase :**
 ```bash
-# Retournez à la racine du projet
+# Windows PowerShell
+.\scripts\hbase-shell.ps1
+
+# Linux/Mac
+./scripts/hbase-shell.sh
+```
+
+**Pour Hive :**
+```bash
+# Windows PowerShell
+.\scripts\hive-cli.ps1
+
+# Linux/Mac
+./scripts/hive-cli.sh
+```
+
+**5. Enregistrer votre travail (après chaque room) :**
+```bash
+# Retourner à la racine du projet
 cd ../..
 
-# Enregistrez votre travail
+# Ajouter les fichiers modifiés
 git add rooms/room-0_introduction/*
+
+# Créer un commit
 git commit -m "Room 0 terminée"
+
+# Envoyer sur GitHub
 git push origin main
 ```
 
-**Étape 5 :** Passez à la room suivante
+**6. Passer à la room suivante :**
 ```bash
 cd rooms/room-1_hbase_basics
-# Répétez les étapes 2-4
+# Répétez les étapes 2-5
 ```
 
 **C'est tout !** Continuez ci-dessous pour plus de détails.
