@@ -9,5 +9,5 @@ echo.
 echo Interfaces Web disponibles:
 echo   - HDFS NameNode: http://localhost:9870
 echo   - YARN ResourceManager: http://localhost:8088
-echo   - HBase Master: http://localhost:16010
+echo   - HBase Master: http://localhost:16011
 

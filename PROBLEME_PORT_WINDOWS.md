@@ -12,7 +12,7 @@ Sur Windows, certains ports peuvent être **réservés par le système** ou bloq
 
 **Dans PowerShell (en tant qu'administrateur) :**
 ```powershell
-netstat -ano | findstr :16010
+netstat -ano | findstr :16011
 ```
 
 Cela vous dira quel processus utilise le port. Notez le PID (dernier nombre).
@@ -44,7 +44,7 @@ docker-compose down
 docker-compose up -d
 ```
 
-**Note :** Après ce changement, l'interface HBase sera accessible sur http://localhost:16011 au lieu de http://localhost:16010
+**Note :** Le port a été changé par défaut à 16011 dans le dépôt. L'interface HBase est maintenant accessible sur http://localhost:16011
 
 ### Solution 3 : Redémarrer Docker Desktop en Administrateur
 
@@ -64,7 +64,7 @@ Parfois Windows libère les ports réservés après un redémarrage.
 netsh interface ipv4 show excludedportrange protocol=tcp
 ```
 
-Cela montre les plages de ports réservés par Windows. Si 16010 est dans une plage réservée, utilisez la Solution 2 pour changer le port.
+Cela montre les plages de ports réservés par Windows. Si 16011 est dans une plage réservée, utilisez la Solution 2 pour changer le port.
 
 ## Ports Utilisés par le Dépôt
 
@@ -74,7 +74,7 @@ Si plusieurs ports posent problème, voici tous les ports utilisés :
 - **8088** : YARN ResourceManager Web UI
 - **9000** : HDFS
 - **2181** : ZooKeeper
-- **16010** : HBase Master Web UI ← **Celui qui pose problème**
+- **16011** : HBase Master Web UI (changé de 16010 pour éviter conflit Windows)
 - **16020** : HBase RegionServer Web UI
 - **16030** : HBase REST API
 - **10000** : HiveServer2

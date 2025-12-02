@@ -27,11 +27,11 @@
 **Solution 1 : Vérifier quel programme utilise le port**
 ```bash
 # Windows PowerShell
-netstat -ano | findstr :16010
+netstat -ano | findstr :16011
 ```
 
 **Solution 2 : Changer le port dans docker-compose.yml**
-Modifiez la ligne `"16010:16010"` par `"16011:16010"` (ou un autre port libre)
+Le port est déjà changé à 16011 par défaut. Si 16011 est aussi bloqué, modifiez `"16011:16010"` par `"16012:16010"` (ou un autre port libre)
 
 **Solution 3 : Redémarrer Docker Desktop**
 - Fermez Docker Desktop complètement

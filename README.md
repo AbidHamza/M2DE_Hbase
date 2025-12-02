@@ -212,7 +212,7 @@ exit;                                  # Quitter (avec ;)
 
 - **HDFS** : http://localhost:9870
 - **YARN** : http://localhost:8088
-- **HBase** : http://localhost:16010
+- **HBase** : http://localhost:16011 (port changé pour éviter conflit Windows)
 
 ---
 

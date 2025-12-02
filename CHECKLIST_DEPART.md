@@ -44,7 +44,7 @@ Les ports suivants doivent être libres :
 - 8088 (YARN)
 - 9000 (HDFS)
 - 2181 (ZooKeeper)
-- 16010, 16020, 16030 (HBase)
+- 16011, 16020, 16030 (HBase) - Note: 16011 au lieu de 16010 pour éviter conflit Windows
 - 10000, 10002 (Hive)
 
 Si un port est utilisé, arrêtez le programme qui l'utilise.

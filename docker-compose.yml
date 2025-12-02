@@ -56,7 +56,9 @@ services:
       zookeeper:
         condition: service_healthy
     ports:
-      - "16010:16010"  # HBase Master Web UI
+      # HBase Master Web UI - Port changé à 16011 pour éviter conflit Windows
+      # Si 16011 est aussi bloqué, changez-le par un autre port libre (ex: 16012)
+      - "16011:16010"  # HBase Master Web UI (port externe:interne)
       - "16020:16020"  # HBase RegionServer Web UI
       - "16030:16030"  # HBase REST API
     environment:
