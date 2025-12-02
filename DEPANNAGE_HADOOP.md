@@ -48,6 +48,15 @@ docker-compose logs hadoop
 - Le système de fichiers HDFS est corrompu
 - Solution : `docker-compose down -v` puis `docker-compose up -d`
 
+**Si vous voyez "/start-hadoop.sh: cannot execute: required file not found" :**
+- Problème de fin de ligne Windows (CRLF vs LF)
+- Solution : Mettez à jour le dépôt avec `git pull origin main`, puis :
+  ```bash
+  docker-compose down
+  docker-compose build --no-cache hadoop
+  docker-compose up -d
+  ```
+
 ### Solution 2 : Reconstruire l'Image Hadoop
 
 Si le problème persiste, reconstruisez l'image :

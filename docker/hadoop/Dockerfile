@@ -43,7 +43,10 @@ EXPOSE 9870 8088 9000 9864
 
 # Start Hadoop services
 COPY start-hadoop.sh /start-hadoop.sh
-RUN chmod +x /start-hadoop.sh
+RUN chmod +x /start-hadoop.sh && \
+    sed -i 's/\r$//' /start-hadoop.sh && \
+    chmod +x /start-hadoop.sh
 
-CMD ["/start-hadoop.sh"]
+ENTRYPOINT []
+CMD ["/bin/bash", "/start-hadoop.sh"]
 

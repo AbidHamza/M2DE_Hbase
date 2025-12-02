@@ -28,7 +28,10 @@ EXPOSE 16010 16020 16030
 
 # Start HBase
 COPY start-hbase.sh /start-hbase.sh
-RUN chmod +x /start-hbase.sh
+RUN chmod +x /start-hbase.sh && \
+    sed -i 's/\r$//' /start-hbase.sh && \
+    chmod +x /start-hbase.sh
 
-CMD ["/start-hbase.sh"]
+ENTRYPOINT []
+CMD ["/bin/bash", "/start-hbase.sh"]
 
