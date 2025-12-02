@@ -96,18 +96,20 @@ $requiredFiles = @(
     "docker/hbase/hbase-env.sh",
     "docker/hive/hive-env.sh"
 )
-$missingFiles = 0
+$missingFiles = @()
 foreach ($file in $requiredFiles) {
     if (-not (Test-Path $file)) {
         Write-Host "  ❌ Fichier manquant: $file" -ForegroundColor Red
-        $missingFiles++
+        $missingFiles += $file
     }
 }
-if ($missingFiles -eq 0) {
+if ($missingFiles.Count -eq 0) {
     Write-Host "  ✅ Tous les fichiers Docker sont présents" -ForegroundColor Green
 } else {
-    Write-Host "  ❌ ERREUR: $missingFiles fichier(s) manquant(s)" -ForegroundColor Red
-    Write-Host "     → Faites: git pull origin main" -ForegroundColor Yellow
+    Write-Host "  ❌ ERREUR: $($missingFiles.Count) fichier(s) manquant(s)" -ForegroundColor Red
+    Write-Host "     → Solution: git pull origin main" -ForegroundColor Yellow
+    Write-Host "     → Si ça ne fonctionne pas: git reset --hard origin/main" -ForegroundColor Yellow
+    Write-Host "     → Puis: git pull origin main" -ForegroundColor Yellow
     $Errors++
 }
 Write-Host ""
