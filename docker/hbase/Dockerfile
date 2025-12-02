@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     curl \
     netcat-openbsd \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and install HBase
@@ -31,8 +32,10 @@ EXPOSE 16010 16020 16030
 COPY start-hbase.sh /start-hbase.sh
 RUN chmod +x /start-hbase.sh && \
     sed -i 's/\r$//' /start-hbase.sh && \
-    chmod +x /start-hbase.sh
+    dos2unix /start-hbase.sh 2>/dev/null || true && \
+    chmod +x /start-hbase.sh && \
+    file /start-hbase.sh
 
 ENTRYPOINT []
-CMD ["/bin/bash", "/start-hbase.sh"]
+CMD ["/bin/bash", "-c", "/start-hbase.sh"]
 
