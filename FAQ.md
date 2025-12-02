@@ -123,8 +123,42 @@ chmod +x scripts/*.sh
 ### Q: Où sont mes données ?
 **R:** Les données sont dans les volumes Docker. Pour les voir, utilisez les commandes `scan` (HBase) ou `SELECT` (Hive).
 
-### Q: Les services sont lents
-**R:** C'est normal au démarrage. Attendez 2-3 minutes que tout soit complètement démarré.
+### Q: Les services sont lents - 30 minutes c'est normal ?
+**R:** Non, 30 minutes c'est trop long. Vérifiez :
+
+1. **Regardez les logs** pour voir où ça bloque :
+   ```bash
+   docker-compose logs
+   docker-compose logs hadoop
+   docker-compose logs hbase
+   ```
+
+2. **Vérifiez l'état des conteneurs** :
+   ```bash
+   docker-compose ps
+   ```
+   Si certains sont "Restarting" en boucle, il y a un problème.
+
+3. **Problèmes courants** :
+   - **Connexion Internet lente** : Les téléchargements peuvent prendre du temps
+   - **Manque de ressources** : Docker a besoin de RAM (minimum 4GB recommandé)
+   - **Problème de réseau** : Timeout lors du téléchargement des images
+
+4. **Solution rapide** :
+   ```bash
+   # Arrêtez tout
+   docker-compose down
+   
+   # Vérifiez votre connexion
+   docker pull eclipse-temurin:8-jdk
+   
+   # Si ça fonctionne, relancez
+   docker-compose up -d
+   ```
+
+**Temps normal :** 
+- Premier lancement : 10-15 minutes maximum
+- Lancements suivants : 1-2 minutes
 
 ### Q: Comment savoir si je suis dans le bon conteneur ?
 **R:** Votre prompt change. Dans Hadoop : `root@hadoop:/#`, dans HBase : `hbase(main):001:0>`, dans Hive : `hive>`.
