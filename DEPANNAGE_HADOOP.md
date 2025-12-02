@@ -57,6 +57,15 @@ docker-compose logs hadoop
   docker-compose up -d
   ```
 
+**Si vous voyez "ERROR: JAVA_HOME is not set and could not be found" :**
+- Problème de configuration Java dans le conteneur
+- Solution : Mettez à jour le dépôt avec `git pull origin main`, puis :
+  ```bash
+  docker-compose down -v
+  docker-compose build --no-cache
+  docker-compose up -d
+  ```
+
 ### Solution 2 : Reconstruire l'Image Hadoop
 
 Si le problème persiste, reconstruisez l'image :

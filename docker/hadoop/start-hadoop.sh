@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Set JAVA_HOME if not already set
+export JAVA_HOME=${JAVA_HOME:-/opt/java/openjdk}
+export PATH=${JAVA_HOME}/bin:${PATH}
+
 # Start SSH
 service ssh start
 

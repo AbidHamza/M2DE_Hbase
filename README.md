@@ -64,7 +64,9 @@ cd rooms/room-0_introduction
 
 **Ce README** contient toutes les informations essentielles. Pour plus de détails :
 
+- **Checklist de départ** → [CHECKLIST_DEPART.md](CHECKLIST_DEPART.md) ⚠️ **À LIRE EN PREMIER !**
 - **Questions fréquentes** → [FAQ.md](FAQ.md)
+- **Erreur Hadoop** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
 - **Scripts d'aide** → [scripts/README.md](scripts/README.md)
 - **Débuter une room** → Allez dans `rooms/room-X_nom/` et lisez le README.md
 

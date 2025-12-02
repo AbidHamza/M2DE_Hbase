@@ -63,7 +63,7 @@ services:
       - HBASE_HEAPSIZE=512
       - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
       - HBASE_CONF_DIR=/opt/hbase/conf
-      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      - JAVA_HOME=/opt/java/openjdk
     volumes:
       - hbase-data:/opt/hbase/data
       - ./resources:/data/resources:ro
@@ -93,7 +93,7 @@ services:
       - HIVE_SITE_CONF_hive_metastore_uris=thrift://hive-metastore:9083
       - HIVE_SITE_CONF_hive_metastore_warehouse_dir=/user/hive/warehouse
       - HIVE_SITE_CONF_hive_exec_scratchdir=/tmp/hive
-      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      - JAVA_HOME=/opt/java/openjdk
     volumes:
       - hive-data:/opt/hive/warehouse
       - ./resources:/data/resources:ro
@@ -119,7 +119,7 @@ services:
     environment:
       - SERVICE_NAME=metastore
       - DB_DRIVER=derby
-      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      - JAVA_HOME=/opt/java/openjdk
     volumes:
       - hive-metastore-data:/opt/hive/metastore_db
     networks:

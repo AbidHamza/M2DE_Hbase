@@ -2,7 +2,7 @@ FROM eclipse-temurin:8-jdk
 
 ENV HBASE_VERSION=2.5.0
 ENV HBASE_HOME=/opt/hbase
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME=/opt/java/openjdk
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \

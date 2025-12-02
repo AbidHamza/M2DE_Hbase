@@ -127,6 +127,17 @@ chmod +x scripts/*.sh
 ### Q: Où sont mes données ?
 **R:** Les données sont dans les volumes Docker. Pour les voir, utilisez les commandes `scan` (HBase) ou `SELECT` (Hive).
 
+### Q: "ERROR: JAVA_HOME is not set and could not be found"
+**R:** Problème de configuration Java dans le conteneur. Solution :
+
+1. Mettez à jour le dépôt : `git pull origin main`
+2. Reconstruisez tout : 
+   ```bash
+   docker-compose down -v
+   docker-compose build --no-cache
+   docker-compose up -d
+   ```
+
 ### Q: Les services sont lents - 30 minutes c'est normal ?
 **R:** Non, 30 minutes c'est trop long. Vérifiez :
 
