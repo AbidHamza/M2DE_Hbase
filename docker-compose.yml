@@ -66,7 +66,7 @@ services:
       - HBASE_HEAPSIZE=512
       - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
       - HBASE_CONF_DIR=/opt/hbase/conf
-      - JAVA_HOME=/opt/java/openjdk
+      # JAVA_HOME is detected dynamically in start-hbase.sh and hbase-env.sh
     volumes:
       - hbase-data:/opt/hbase/data
       - ./resources:/data/resources:ro
