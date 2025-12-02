@@ -4,6 +4,9 @@
 
 ## ✅ Prérequis Obligatoires
 
+**Vous ne savez pas comment installer ?** 
+→ Guide complet étape par étape : [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md)
+
 ### 1. Docker Desktop (Windows/Mac)
 - [ ] Docker Desktop est **installé**
 - [ ] Docker Desktop est **lancé** (icône visible dans la barre des tâches)

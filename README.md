@@ -7,6 +7,11 @@
 ## Démarrage en 5 Minutes
 
 ### 1. Installer Docker et Git
+
+**Vous ne savez pas comment installer ?** 
+→ Consultez le guide complet : [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md)
+
+**Installation rapide :**
 - **Docker** : https://www.docker.com/get-started
 - **Git** : https://git-scm.com/downloads
 
@@ -64,6 +69,7 @@ cd rooms/room-0_introduction
 
 **Ce README** contient toutes les informations essentielles. Pour plus de détails :
 
+- **Installation complète (débutant)** → [INSTALLATION_COMPLETE.md](INSTALLATION_COMPLETE.md) 📚 **Si vous ne savez pas installer Docker/Git**
 - **Checklist de départ** → [CHECKLIST_DEPART.md](CHECKLIST_DEPART.md) ⚠️ **À LIRE EN PREMIER !**
 - **Questions fréquentes** → [FAQ.md](FAQ.md)
 - **Erreur Hadoop** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
