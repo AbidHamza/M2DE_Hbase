@@ -34,8 +34,7 @@ COPY start-hbase.sh /start-hbase.sh
 RUN chmod +x /start-hbase.sh && \
     sed -i 's/\r$//' /start-hbase.sh && \
     dos2unix /start-hbase.sh 2>/dev/null || true && \
-    chmod +x /start-hbase.sh && \
-    file /start-hbase.sh
+    chmod +x /start-hbase.sh
 
 ENTRYPOINT []
 CMD ["/bin/bash", "-c", "/start-hbase.sh"]
