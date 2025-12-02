@@ -1,5 +1,11 @@
 # FAQ - Questions Fréquentes
 
+**Consultez ce fichier si vous rencontrez un problème.**
+
+**Retour au README principal → [README.md](README.md)**
+
+---
+
 ## Docker
 
 ### Q: "docker-compose : command not found"
@@ -12,7 +18,25 @@
 3. Vérifiez que les ports ne sont pas déjà utilisés
 
 ### Q: "Port already in use"
-**R:** Un autre programme utilise le port. Arrêtez-le ou modifiez les ports dans `docker-compose.yml`.
+**R:** Un autre programme utilise le même port. Arrêtez-le ou changez les ports dans `docker-compose.yml`.
+
+### Q: Les conteneurs sont "Exited" (arrêtés)
+**R:** Regardez les logs :
+```bash
+docker-compose logs
+docker-compose logs hbase
+docker-compose logs hive
+```
+
+### Q: Comment réinitialiser complètement ?
+**R:** 
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+**ATTENTION :** Cela supprimera toutes les données !
+
+---
 
 ## HBase
 
@@ -25,6 +49,8 @@
 ### Q: Comment voir toutes les colonnes d'une table ?
 **R:** Utilisez `scan 'table_name'` pour voir toutes les données, ou `describe 'table_name'` pour voir la structure.
 
+---
+
 ## Hive
 
 ### Q: "ParseException" ou erreur de syntaxe
@@ -36,6 +62,8 @@
 ### Q: Le fichier a disparu après LOAD DATA
 **R:** C'est normal ! `LOAD DATA INPATH` DÉPLACE le fichier (pas copie). Le fichier est maintenant dans le warehouse Hive.
 
+---
+
 ## Git
 
 ### Q: "fatal: not a git repository"
@@ -46,6 +74,8 @@
 
 ### Q: Comment annuler un commit ?
 **R:** `git reset --soft HEAD~1` pour annuler le dernier commit mais garder les modifications.
+
+---
 
 ## Scripts Multi-plateforme
 
@@ -67,13 +97,14 @@ chmod +x scripts/*.sh
 - Pour Batch : `scripts\start.bat` (sans le point)
 - Vérifiez que vous êtes dans le bon dossier
 
+**Pour plus d'infos sur les scripts → [scripts/README.md](scripts/README.md)**
+
+---
+
 ## Général
 
 ### Q: Où sont mes données ?
 **R:** Les données sont dans les volumes Docker. Pour les voir, utilisez les commandes `scan` (HBase) ou `SELECT` (Hive).
-
-### Q: Comment réinitialiser complètement ?
-**R:** `docker-compose down -v` (ATTENTION : supprime toutes les données !)
 
 ### Q: Les services sont lents
 **R:** C'est normal au démarrage. Attendez 2-3 minutes que tout soit complètement démarré.
@@ -81,10 +112,11 @@ chmod +x scripts/*.sh
 ### Q: Comment savoir si je suis dans le bon conteneur ?
 **R:** Votre prompt change. Dans Hadoop : `root@hadoop:/#`, dans HBase : `hbase(main):001:0>`, dans Hive : `hive>`.
 
+---
+
 ## Besoin d'Aide ?
 
-1. Consultez le README.md principal
+1. Consultez le [README.md](README.md) principal
 2. Vérifiez les logs : `docker-compose logs`
 3. Relisez le README de la room concernée
 4. Consultez la documentation officielle HBase/Hive
-

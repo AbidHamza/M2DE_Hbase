@@ -51,7 +51,17 @@ cd rooms/room-0_introduction
 # Lisez le README.md de cette room
 ```
 
-**C'est tout !** Pour plus de détails, continuez la lecture ci-dessous.
+**C'est tout !** Continuez ci-dessous pour plus de détails.
+
+---
+
+## Navigation du Dépôt
+
+**Ce README** contient toutes les informations essentielles. Pour plus de détails :
+
+- **Questions fréquentes** → [FAQ.md](FAQ.md)
+- **Scripts d'aide** → [scripts/README.md](scripts/README.md)
+- **Débuter une room** → Allez dans `rooms/room-X_nom/` et lisez le README.md
 
 ---
 
@@ -122,7 +132,7 @@ docker exec -it hbase-hive-learning-lab-hive-1 hive
 docker exec -it hbase-hive-learning-lab-hadoop-1 bash
 ```
 
-### Scripts d'Aide (Windows/Linux/Mac)
+### Scripts d'Aide
 
 **Windows PowerShell :**
 ```powershell
@@ -151,6 +161,8 @@ chmod +x scripts/*.sh  # Première fois seulement
 ./scripts/hbase-shell.sh
 ./scripts/hive-cli.sh
 ```
+
+**Pour plus de détails sur les scripts → [scripts/README.md](scripts/README.md)**
 
 ### Commandes HBase de Base
 
@@ -286,14 +298,14 @@ Chaque room est un dossier avec un **README.md** qui contient :
 
 ### Liste des Rooms (Dans l'Ordre)
 
-1. **Room 0** : Introduction - Prise en main
-2. **Room 1** : HBase Basics - Opérations de base
-3. **Room 2** : HBase Advanced - Filtres et optimisation
-4. **Room 3** : Hive Introduction - Premières requêtes SQL
-5. **Room 4** : Hive Advanced - Jointures et partitions
-6. **Room 5** : Intégration HBase-Hive
-7. **Room 6** : Cas d'usage réels
-8. **Room 7** : Projet final
+1. **Room 0** : `rooms/room-0_introduction/` - Introduction - Prise en main
+2. **Room 1** : `rooms/room-1_hbase_basics/` - HBase Basics - Opérations de base
+3. **Room 2** : `rooms/room-2_hbase_advanced/` - HBase Advanced - Filtres et optimisation
+4. **Room 3** : `rooms/room-3_hive_introduction/` - Hive Introduction - Premières requêtes SQL
+5. **Room 4** : `rooms/room-4_hive_advanced/` - Hive Advanced - Jointures et partitions
+6. **Room 5** : `rooms/room-5_hbase_hive_integration/` - Intégration HBase-Hive
+7. **Room 6** : `rooms/room-6_real_world_scenarios/` - Cas d'usage réels
+8. **Room 7** : `rooms/room-7_final_project/` - Projet final
 
 **Règle d'or :** Ne passez pas à la room suivante tant que vous n'avez pas terminé la précédente.
 
@@ -304,7 +316,7 @@ Dans chaque room, vous créerez des fichiers comme :
 - `room-X_commandes.hbase` ou `.hql` - Vos commandes
 - `room-X_observations.md` - Vos réflexions
 
-**Template disponible :** Copiez `rooms/template_exercices.md` pour commencer.
+**Template disponible :** `rooms/template_exercices.md` - Copiez-le pour commencer.
 
 ---
 
@@ -394,8 +406,13 @@ docker-compose up -d
 
 ### Aide Supplémentaire
 
-- **FAQ** : Consultez [FAQ.md](FAQ.md) pour les questions fréquentes
-- **Scripts** : Consultez [scripts/README.md](scripts/README.md) pour les scripts d'aide
+**Pour plus de solutions → [FAQ.md](FAQ.md)**
+
+La FAQ contient :
+- Problèmes Docker courants
+- Erreurs HBase et Hive
+- Questions Git
+- Solutions détaillées
 
 ---
 
@@ -403,19 +420,22 @@ docker-compose up -d
 
 ```
 M2DE_Hbase/
-├── README.md              ← Vous êtes ici (tout est dedans)
-├── FAQ.md                 ← Questions fréquentes
+├── README.md              ← Vous êtes ici (tout l'essentiel)
+├── FAQ.md                 ← Questions fréquentes (consultez si problème)
 │
 ├── docker-compose.yml     ← Configuration Docker
 │
 ├── rooms/                 ← Vos travaux ici
 │   ├── room-0_introduction/
+│   │   └── README.md     ← Instructions de la room
 │   ├── room-1_hbase_basics/
+│   │   └── README.md
 │   └── ...
 │
 ├── resources/             ← Datasets pour les exercices
 ├── docker/                ← Configuration (ne pas modifier)
-└── scripts/               ← Scripts d'aide (Windows/Linux/Mac)
+└── scripts/               ← Scripts d'aide
+    └── README.md          ← Documentation des scripts
 ```
 
 ---
@@ -431,3 +451,12 @@ M2DE_Hbase/
 7. ✅ Commencez les exercices
 
 **Bon apprentissage !**
+
+---
+
+## Navigation Rapide
+
+- **Problème ?** → [FAQ.md](FAQ.md)
+- **Scripts d'aide ?** → [scripts/README.md](scripts/README.md)
+- **Commencer Room 0 ?** → `rooms/room-0_introduction/README.md`
+- **Commencer Room 1 ?** → `rooms/room-1_hbase_basics/README.md`

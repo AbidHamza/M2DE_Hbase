@@ -1,17 +1,22 @@
 # Scripts Utilitaires - Multi-plateforme
 
-Ce dossier contient des scripts pour Windows, Linux et Mac pour simplifier l'utilisation de l'environnement.
+**Ce fichier explique comment utiliser les scripts d'aide.**
 
-## Scripts de Gestion de l'Environnement
+**Retour au README principal → [README.md](../README.md)**
+
+---
+
+## Scripts Disponibles
 
 ### Démarrer l'environnement
 
-**Windows :**
+**Windows PowerShell :**
 ```powershell
-# PowerShell
 .\scripts\start.ps1
+```
 
-# Ou Batch
+**Windows Batch :**
+```batch
 scripts\start.bat
 ```
 
@@ -23,10 +28,13 @@ chmod +x scripts/start.sh  # Première fois seulement
 
 ### Arrêter l'environnement
 
-**Windows :**
+**Windows PowerShell :**
 ```powershell
 .\scripts\stop.ps1
-# Ou
+```
+
+**Windows Batch :**
+```batch
 scripts\stop.bat
 ```
 
@@ -37,10 +45,13 @@ scripts\stop.bat
 
 ### Vérifier l'état
 
-**Windows :**
+**Windows PowerShell :**
 ```powershell
 .\scripts\status.ps1
-# Ou
+```
+
+**Windows Batch :**
+```batch
 scripts\status.bat
 ```
 
@@ -53,31 +64,17 @@ scripts\status.bat
 
 **HBase Shell :**
 
-Windows :
-```powershell
-.\scripts\hbase-shell.ps1
-# Ou
-scripts\hbase-shell.bat
-```
-
-Linux/Mac :
-```bash
-./scripts/hbase-shell.sh
-```
+Windows PowerShell : `.\scripts\hbase-shell.ps1`
+Windows Batch : `scripts\hbase-shell.bat`
+Linux/Mac : `./scripts/hbase-shell.sh`
 
 **Hive CLI :**
 
-Windows :
-```powershell
-.\scripts\hive-cli.ps1
-# Ou
-scripts\hive-cli.bat
-```
+Windows PowerShell : `.\scripts\hive-cli.ps1`
+Windows Batch : `scripts\hive-cli.bat`
+Linux/Mac : `./scripts/hive-cli.sh`
 
-Linux/Mac :
-```bash
-./scripts/hive-cli.sh
-```
+---
 
 ## Scripts de Test et Initialisation
 
@@ -113,6 +110,8 @@ bash scripts/init-hdfs.sh
 docker exec hbase-hive-learning-lab-hadoop-1 bash /opt/scripts/init-hdfs.sh
 ```
 
+---
+
 ## Notes par Plateforme
 
 ### Windows
@@ -137,3 +136,19 @@ Vous avez le choix entre :
 ### Toutes les Plateformes
 
 Les scripts sont aussi montés dans les conteneurs Docker et accessibles via `/opt/scripts/` si vous êtes déjà dans un conteneur.
+
+---
+
+## Dépannage
+
+**Problème avec PowerShell sur Windows :**
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Problème "Permission denied" sur Linux/Mac :**
+```bash
+chmod +x scripts/*.sh
+```
+
+**Pour plus d'aide → [FAQ.md](../FAQ.md)**
