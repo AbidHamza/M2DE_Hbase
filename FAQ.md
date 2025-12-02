@@ -21,8 +21,25 @@
 2. Redémarrez : `docker-compose down` puis `docker-compose up -d`
 3. Vérifiez que les ports ne sont pas déjà utilisés
 
-### Q: "Port already in use"
-**R:** Un autre programme utilise le même port. Arrêtez-le ou changez les ports dans `docker-compose.yml`.
+### Q: "Port already in use" ou "access forbidden by its access permissions"
+**R:** Sur Windows, certains ports peuvent être réservés ou bloqués. Solutions :
+
+**Solution 1 : Vérifier quel programme utilise le port**
+```bash
+# Windows PowerShell
+netstat -ano | findstr :16010
+```
+
+**Solution 2 : Changer le port dans docker-compose.yml**
+Modifiez la ligne `"16010:16010"` par `"16011:16010"` (ou un autre port libre)
+
+**Solution 3 : Redémarrer Docker Desktop**
+- Fermez Docker Desktop complètement
+- Relancez-le en tant qu'administrateur
+- Réessayez
+
+**Solution 4 : Redémarrer l'ordinateur**
+Parfois Windows libère les ports après un redémarrage.
 
 ### Q: Les conteneurs sont "Exited" (arrêtés)
 **R:** Regardez les logs :

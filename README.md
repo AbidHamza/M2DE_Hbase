@@ -75,6 +75,7 @@ cd rooms/room-0_introduction
 - **Questions fréquentes** → [FAQ.md](FAQ.md)
 - **Erreur Hadoop** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
 - **Erreur HBase "unhealthy"** → [DIAGNOSTIC_HBASE.md](DIAGNOSTIC_HBASE.md)
+- **Port bloqué sur Windows** → [PROBLEME_PORT_WINDOWS.md](PROBLEME_PORT_WINDOWS.md)
 - **Scripts d'aide** → [scripts/README.md](scripts/README.md)
 - **Débuter une room** → Allez dans `rooms/room-X_nom/` et lisez le README.md
 
