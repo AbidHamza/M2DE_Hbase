@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Set JAVA_HOME dynamically
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export PATH=${JAVA_HOME}/bin:${PATH}
+
 # Wait for Hadoop and ZooKeeper to be ready
 echo "Waiting for Hadoop HDFS to be ready..."
 until hdfs dfsadmin -report 2>/dev/null; do

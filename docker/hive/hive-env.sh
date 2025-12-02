@@ -1,4 +1,4 @@
-export JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
+export JAVA_HOME=/opt/java/openjdk
 export HADOOP_HOME=/opt/hadoop
 export HIVE_HOME=/opt/hive
 export HIVE_CONF_DIR=${HIVE_HOME}/conf
