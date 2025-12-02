@@ -898,7 +898,7 @@ scan 'customers', {LIMIT => 3}
 - [ ]  Vous avez créé `room-1_exercices.md` avec toutes vos notes
 - [ ]  Vous avez créé `room-1_commandes.hbase` avec toutes vos commandes
 
-**Si toutes les cases sont cochées → Félicitations ! 🎉**
+**Si toutes les cases sont cochées → Félicitations !**
 
 ---
 

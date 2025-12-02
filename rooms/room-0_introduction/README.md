@@ -975,7 +975,7 @@ Je suis prêt pour la Room 1 !
 - [ ]  Vous avez supprimé la base de données
 - [ ]  Vous avez créé le fichier `room-0_exercices.md` avec toutes vos notes
 
-**Si toutes les cases sont cochées → Félicitations ! 🎉**
+**Si toutes les cases sont cochées → Félicitations !**
 
 ---
 
