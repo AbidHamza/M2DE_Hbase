@@ -406,7 +406,9 @@ docker-compose up -d
 
 ### Aide Supplémentaire
 
-**Pour plus de solutions → [FAQ.md](FAQ.md)**
+**Pour plus de solutions :**
+- **Problèmes généraux** → [FAQ.md](FAQ.md)
+- **Erreur Hadoop "unhealthy"** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
 
 La FAQ contient :
 - Problèmes Docker courants

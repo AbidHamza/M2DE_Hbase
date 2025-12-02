@@ -167,7 +167,8 @@ chmod +x scripts/*.sh
 
 ## Besoin d'Aide ?
 
-1. Consultez le [README.md](README.md) principal
-2. Vérifiez les logs : `docker-compose logs`
-3. Relisez le README de la room concernée
-4. Consultez la documentation officielle HBase/Hive
+1. **Erreur Hadoop "unhealthy" ?** → [DEPANNAGE_HADOOP.md](DEPANNAGE_HADOOP.md)
+2. Consultez le [README.md](README.md) principal
+3. Vérifiez les logs : `docker-compose logs`
+4. Relisez le README de la room concernée
+5. Consultez la documentation officielle HBase/Hive
