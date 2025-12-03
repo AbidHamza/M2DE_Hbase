@@ -301,7 +301,7 @@ set HIVE_CHECK_COUNT=0
 :check_hive
 if !HIVE_CHECK_COUNT! geq !HIVE_MAX_CHECKS! goto hive_check_done
 
-!COMPOSE_CMD! logs hive-metastore hive 2>&1 | findstr /I /C:"Cannot find hadoop" /C:"HADOOP_HOME" /C:"HADOOP_CONF_DIR" /C:"Hadoop binaries" /C:"hadoop.*command" /C:"ERROR" >nul 2>&1
+!COMPOSE_CMD! logs hive-metastore hive 2>&1 | findstr /I /C:"Cannot find hadoop" /C:"HADOOP_HOME" /C:"HADOOP_CONF_DIR" /C:"Hadoop binaries" /C:"hadoop.*command" /C:"ERROR" /C:"XBM0J" /C:"metastore_db" /C:"Database.*not found" /C:"Device or resource busy" >nul 2>&1
 if not errorlevel 1 (
     set HIVE_ERRORS=1
     echo   [ATTENTION] Erreurs Hive detectees dans les logs
