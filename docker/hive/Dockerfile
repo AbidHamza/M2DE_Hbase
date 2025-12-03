@@ -27,9 +27,28 @@ RUN wget -q https://jdbc.postgresql.org/download/postgresql-42.2.24.jar -O ${HIV
 # Copy configuration files
 COPY hive-site.xml ${HIVE_HOME}/conf/
 COPY hive-env.sh ${HIVE_HOME}/conf/
+RUN chmod +x ${HIVE_HOME}/conf/hive-env.sh && \
+    sed -i 's/\r$//' ${HIVE_HOME}/conf/hive-env.sh
 
-# Initialize Hive schema (Derby)
-RUN ${HIVE_HOME}/bin/schematool -initSchema -dbType derby || true
+# Create Hadoop configuration directory for Hive (Hive needs Hadoop config but not Hadoop binaries)
+# Hive will use these configs to connect to Hadoop container via network
+RUN mkdir -p /opt/hadoop/etc/hadoop
+
+# Copy minimal Hadoop config files needed by Hive
+# These point to the Hadoop container hostname 'hadoop'
+COPY core-site.xml /opt/hadoop/etc/hadoop/
+COPY hdfs-site.xml /opt/hadoop/etc/hadoop/
+
+# Copy startup scripts
+COPY start-hive-metastore.sh /start-hive-metastore.sh
+COPY start-hive.sh /start-hive.sh
+RUN chmod +x /start-hive-metastore.sh /start-hive.sh && \
+    sed -i 's/\r$//' /start-hive-metastore.sh /start-hive.sh
+
+# Initialize Hive schema (Derby) - set JAVA_HOME first
+RUN JAVA_HOME=/opt/java/openjdk && \
+    export JAVA_HOME && \
+    ${HIVE_HOME}/bin/schematool -initSchema -dbType derby || true
 
 # Expose ports
 EXPOSE 10000 10002

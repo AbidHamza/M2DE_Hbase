@@ -87,10 +87,13 @@ services:
       dockerfile: Dockerfile
     container_name: hbase-hive-learning-lab-hive
     hostname: hive
+    command: ["/bin/bash", "/start-hive.sh"]
     depends_on:
       hadoop:
         condition: service_healthy
       hbase:
+        condition: service_healthy
+      hive-metastore:
         condition: service_healthy
     ports:
       - "10000:10000"  # HiveServer2
@@ -119,7 +122,7 @@ services:
       dockerfile: Dockerfile
     container_name: hbase-hive-learning-lab-hive-metastore
     hostname: hive-metastore
-    command: ["/opt/hive/bin/hive", "--service", "metastore"]
+    command: ["/bin/bash", "/start-hive-metastore.sh"]
     depends_on:
       hadoop:
         condition: service_healthy
