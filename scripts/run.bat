@@ -160,7 +160,7 @@ echo   ✅ Nettoyage complet terminé
 echo.
 
 REM 9. Résumé des vérifications
-echo [9/10] Résumé des vérifications...
+echo [9/11] Résumé des vérifications...
 if !ERRORS! gtr 0 (
     echo   ❌ !ERRORS! erreur(s) bloquante(s) détectée(s)
     echo      → Corrigez les erreurs ci-dessus avant de continuer
@@ -179,8 +179,38 @@ if "!COMPOSE_CMD!"=="" (
     exit /b 1
 )
 
-REM 10. Lancer docker compose avec retry automatique
-echo [10/10] Lancement des conteneurs Docker...
+REM 10. Vérification finale Docker daemon avant lancement
+echo [10/11] Vérification finale Docker daemon...
+set DOCKER_READY=0
+for /l %%i in (1,1,10) do (
+    docker info >nul 2>&1
+    if not errorlevel 1 (
+        set DOCKER_READY=1
+        echo   ✅ Docker daemon est accessible
+        goto docker_ready_ok
+    )
+    if %%i lss 10 (
+        echo   ⚠️  Docker daemon non accessible, attente 2 secondes... (tentative %%i/10)
+        timeout /t 2 /nobreak >nul
+    )
+)
+
+:docker_ready_ok
+if !DOCKER_READY! equ 0 (
+    echo   ❌ ERREUR: Docker daemon n'est pas accessible
+    echo.
+    echo Solutions:
+    echo   1. Vérifiez que Docker Desktop est lancé
+    echo   2. Attendez que Docker Desktop soit complètement démarré (1-2 minutes)
+    echo   3. Redémarrez Docker Desktop si nécessaire
+    echo   4. Vérifiez avec: docker info
+    echo.
+    exit /b 1
+)
+echo.
+
+REM 11. Lancer docker compose avec retry automatique
+echo [11/11] Lancement des conteneurs Docker...
 echo   (Cela peut prendre 3-5 minutes pour démarrer tous les services)
 echo.
 
@@ -194,6 +224,27 @@ if !SUCCESS! equ 1 goto launch_success
 
 if !RETRY! gtr 0 (
     echo   🔄 Tentative !RETRY!/!MAX_RETRIES!...
+    echo      → Vérification Docker daemon avant retry...
+    set DOCKER_OK=0
+    for /l %%j in (1,1,5) do (
+        docker info >nul 2>&1
+        if not errorlevel 1 (
+            set DOCKER_OK=1
+            goto docker_check_ok
+        )
+        timeout /t 2 /nobreak >nul
+    )
+    :docker_check_ok
+    if !DOCKER_OK! equ 0 (
+        echo      ❌ Docker daemon non accessible, arrêt des tentatives
+        echo.
+        echo Solutions:
+        echo   1. Vérifiez que Docker Desktop est lancé
+        echo   2. Redémarrez Docker Desktop
+        echo   3. Vérifiez avec: docker info
+        echo.
+        exit /b 1
+    )
     echo      → Nettoyage avant retry...
     !COMPOSE_CMD! down -v >nul 2>&1
     timeout /t 5 /nobreak >nul

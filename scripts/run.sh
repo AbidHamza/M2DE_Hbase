@@ -234,7 +234,7 @@ echo "  ✅ Nettoyage complet terminé"
 echo ""
 
 # 9. Résumé des vérifications
-echo "[9/10] Résumé des vérifications..."
+echo "[9/11] Résumé des vérifications..."
 if [ $ERRORS -gt 0 ]; then
     echo "  ❌ $ERRORS erreur(s) bloquante(s) détectée(s)"
     echo "     → Corrigez les erreurs ci-dessus avant de continuer"

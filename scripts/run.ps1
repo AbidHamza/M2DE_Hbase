@@ -267,7 +267,7 @@ try {
 Write-Host ""
 
 # 9. Résumé des vérifications
-Write-Host "[9/10] Résumé des vérifications..." -ForegroundColor Yellow
+Write-Host "[9/11] Résumé des vérifications..." -ForegroundColor Yellow
 
 if ($Errors -gt 0) {
     Write-Host "  ❌ $Errors erreur(s) bloquante(s) détectée(s)" -ForegroundColor Red
@@ -287,8 +287,37 @@ if ([string]::IsNullOrWhiteSpace($composeCmd)) {
     exit 1
 }
 
-# 10. Lancer docker compose avec retry automatique
-Write-Host "[10/10] Lancement des conteneurs Docker..." -ForegroundColor Cyan
+# 10. Vérification finale Docker daemon avant lancement
+Write-Host "[10/11] Vérification finale Docker daemon..." -ForegroundColor Yellow
+$dockerReady = $false
+for ($i = 1; $i -le 10; $i++) {
+    docker info 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        $dockerReady = $true
+        Write-Host "  ✅ Docker daemon est accessible" -ForegroundColor Green
+        break
+    }
+    if ($i -lt 10) {
+        Write-Host "  ⚠️  Docker daemon non accessible, attente 2 secondes... (tentative $i/10)" -ForegroundColor Yellow
+        Start-Sleep -Seconds 2
+    }
+}
+
+if (-not $dockerReady) {
+    Write-Host "  ❌ ERREUR: Docker daemon n'est pas accessible" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Solutions:" -ForegroundColor Yellow
+    Write-Host "  1. Vérifiez que Docker Desktop est lancé" -ForegroundColor White
+    Write-Host "  2. Attendez que Docker Desktop soit complètement démarré (1-2 minutes)" -ForegroundColor White
+    Write-Host "  3. Redémarrez Docker Desktop si nécessaire" -ForegroundColor White
+    Write-Host "  4. Vérifiez avec: docker info" -ForegroundColor White
+    Write-Host ""
+    exit 1
+}
+Write-Host ""
+
+# 11. Lancer docker compose avec retry automatique
+Write-Host "[11/11] Lancement des conteneurs Docker..." -ForegroundColor Cyan
 Write-Host "  (Cela peut prendre 3-5 minutes pour démarrer tous les services)" -ForegroundColor Gray
 Write-Host ""
 
@@ -299,6 +328,26 @@ $success = $false
 while ($retry -lt $maxRetries -and -not $success) {
     if ($retry -gt 0) {
         Write-Host "  🔄 Tentative $($retry + 1)/$maxRetries..." -ForegroundColor Yellow
+        Write-Host "     → Vérification Docker daemon avant retry..." -ForegroundColor Yellow
+        # Vérifier Docker daemon avant chaque retry
+        $dockerOk = $false
+        for ($j = 1; $j -le 5; $j++) {
+            docker info 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                $dockerOk = $true
+                break
+            }
+            Start-Sleep -Seconds 2
+        }
+        if (-not $dockerOk) {
+            Write-Host "     ❌ Docker daemon non accessible, arrêt des tentatives" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "Solutions:" -ForegroundColor Yellow
+            Write-Host "  1. Vérifiez que Docker Desktop est lancé" -ForegroundColor White
+            Write-Host "  2. Redémarrez Docker Desktop" -ForegroundColor White
+            Write-Host "  3. Vérifiez avec: docker info" -ForegroundColor White
+            exit 1
+        }
         Write-Host "     → Nettoyage avant retry..." -ForegroundColor Yellow
         Invoke-Expression "$composeCmd down -v" 2>&1 | Out-Null
         Start-Sleep -Seconds 5
