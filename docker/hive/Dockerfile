@@ -2,6 +2,8 @@ FROM eclipse-temurin:8-jdk
 
 ENV HIVE_VERSION=3.1.3
 ENV HIVE_HOME=/opt/hive
+# JAVA_HOME is set by eclipse-temurin base image
+# It will be detected dynamically in hive-env.sh if needed
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH=${HIVE_HOME}/bin:${PATH}
 

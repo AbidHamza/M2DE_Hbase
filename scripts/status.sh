@@ -2,8 +2,17 @@
 # Script Bash pour vérifier l'état des services (Linux/Mac)
 # Usage: ./scripts/status.sh
 
+# Détecter docker-compose V1 ou V2
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null 2>&1; then
+    COMPOSE_CMD="docker compose"
+else
+    COMPOSE_CMD="docker-compose"
+fi
+
 echo "État des services Docker:"
-docker-compose ps
+$COMPOSE_CMD ps
 
 echo ""
 echo "Interfaces Web disponibles:"

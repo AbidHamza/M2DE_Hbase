@@ -3,11 +3,8 @@ FROM eclipse-temurin:8-jdk
 ENV HADOOP_VERSION=3.3.4
 ENV HADOOP_HOME=/opt/hadoop
 
-# Find and set JAVA_HOME dynamically
-RUN JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java)))) && \
-    echo "JAVA_HOME=$JAVA_HOME" >> /etc/environment && \
-    export JAVA_HOME
-
+# JAVA_HOME is set by eclipse-temurin base image
+# It will be detected dynamically in start-hadoop.sh if needed
 ENV JAVA_HOME=/opt/java/openjdk
 ENV HDFS_NAMENODE_USER=root
 ENV HDFS_DATANODE_USER=root

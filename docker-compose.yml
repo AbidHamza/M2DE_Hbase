@@ -19,10 +19,11 @@ services:
     networks:
       - hbase-hive-network
     healthcheck:
-      test: ["CMD", "hdfs", "dfsadmin", "-report"]
+      test: ["CMD-SHELL", "pgrep -f NameNode > /dev/null && pgrep -f DataNode > /dev/null && hdfs dfsadmin -report 2>&1 | grep -q 'Live datanodes' || exit 1"]
       interval: 30s
-      timeout: 10s
-      retries: 3
+      timeout: 20s
+      retries: 8
+      start_period: 180s
 
   zookeeper:
     image: zookeeper:3.7
@@ -42,7 +43,8 @@ services:
       test: ["CMD", "nc", "-z", "localhost", "2181"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
 
   hbase:
     build:
@@ -73,10 +75,10 @@ services:
     networks:
       - hbase-hive-network
     healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep -q '[h]base.*master' || ps aux | grep -q '[H]Master' || exit 0"]
+      test: ["CMD", "/bin/bash", "/healthcheck.sh"]
       interval: 30s
-      timeout: 10s
-      retries: 15
+      timeout: 15s
+      retries: 10
       start_period: 120s
 
   hive:
@@ -107,8 +109,9 @@ services:
     healthcheck:
       test: ["CMD", "hive", "--version"]
       interval: 30s
-      timeout: 10s
+      timeout: 15s
       retries: 5
+      start_period: 90s
 
   hive-metastore:
     build:
@@ -133,6 +136,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 60s
 
 volumes:
   hadoop-data:
