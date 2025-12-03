@@ -354,17 +354,9 @@ $checkCount = 0
 while ($checkCount -lt $maxChecks) {
     $hadoopLogs = Invoke-Expression "$composeCmd logs hadoop 2>&1" | Out-String
     
-    # Détecter les erreurs JAVA_HOME (tous les patterns possibles)
-    if ($hadoopLogs -match "ERROR.*JAVA_HOME.*not.*set" -or 
-        $hadoopLogs -match "ERROR.*JAVA_HOME.*could not be found" -or
-        $hadoopLogs -match "ERROR.*JAVA_HOME.*not set" -or
-        $hadoopLogs -match "ERROR.*JAVA_HOME.*could not be found" -or
-        $hadoopLogs -match "JAVA_HOME.*not.*set" -or
-        $hadoopLogs -match "JAVA_HOME.*could not be found" -or
-        $hadoopLogs -match "readlink.*missing operand" -or
-        $hadoopLogs -match "dirname.*missing operand" -or
-        $hadoopLogs -match "Cannot find Java installation" -or
-        $hadoopLogs -match "Java not found") {
+    # Détecter les erreurs JAVA_HOME (regex unifiée pour tous les patterns)
+    $javaHomePattern = "(?i)(ERROR.*JAVA_HOME.*(not.*set|could not be found|is not set)|JAVA_HOME.*(not.*set|could not be found|is not set)|readlink.*missing operand|dirname.*missing operand|Cannot find Java installation|Java not found|JAVA_HOME.*not.*set.*and.*could not be found)"
+    if ($hadoopLogs -match $javaHomePattern) {
         
         $javaHomeErrors = $true
         Write-Host "  [ATTENTION] Erreurs JAVA_HOME détectées dans les logs" -ForegroundColor Yellow
