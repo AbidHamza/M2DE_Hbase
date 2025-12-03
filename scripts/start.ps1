@@ -571,16 +571,6 @@ Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "ENVIRONNEMENT DÉMARRÉ" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Accès aux services:" -ForegroundColor Yellow
-Write-Host "  - HBase Shell: .\scripts\hbase-shell.ps1" -ForegroundColor White
-Write-Host "  - Hive CLI: .\scripts\hive-cli.ps1" -ForegroundColor White
-Write-Host "  - État: .\scripts\status.ps1" -ForegroundColor White
-Write-Host ""
-Write-Host "Interfaces Web:" -ForegroundColor Yellow
-Write-Host "  - HDFS: http://localhost:9870" -ForegroundColor White
-Write-Host "  - YARN: http://localhost:8088" -ForegroundColor White
-Write-Host "  - HBase: http://localhost:16011" -ForegroundColor White
-Write-Host ""
 Write-Host "Note: Les services peuvent prendre 2-3 minutes pour être opérationnels." -ForegroundColor Gray
 Write-Host "      Si un conteneur est 'unhealthy', attendez encore 1-2 minutes." -ForegroundColor Gray
 Write-Host ""

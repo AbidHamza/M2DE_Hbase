@@ -361,8 +361,7 @@ M2DE_Hbase/
 │   ├── start.*              # Lancer l'environnement (RECOMMANDÉ)
 │   ├── stop.*               # Arrêter l'environnement
 │   ├── status.*             # Vérifier l'état
-│   ├── hbase-shell.*        # Accéder à HBase Shell
-│   └── hive-cli.*           # Accéder à Hive CLI
+│   └── (scripts supprimés - utilisez docker exec directement)
 │
 ├── resources/                # Datasets pour les exercices
 │   ├── customers/

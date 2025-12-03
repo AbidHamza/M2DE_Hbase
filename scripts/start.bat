@@ -366,14 +366,6 @@ echo Verification de l'etat...
 
 echo.
 echo ==========================================
-echo ENVIRONNEMENT DÉMARRÉ
-echo ==========================================
-echo.
-echo Accès aux services:
-echo   - HBase Shell: scripts\hbase-shell.bat
-echo   - Hive CLI: scripts\hive-cli.bat
-echo.
-echo ==========================================
 echo ÉTAT DES SERVICES
 echo ==========================================
 %composeCmd% ps
