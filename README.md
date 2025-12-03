@@ -136,6 +136,46 @@ Chaque room contient :
 
 ## Commandes Essentielles
 
+### Accéder aux Conteneurs
+
+**Accéder au shell Hadoop :**
+```bash
+# Windows PowerShell
+.\scripts\hadoop-shell.ps1
+
+# Windows Batch
+scripts\hadoop-shell.bat
+
+# Linux/Mac
+./scripts/hadoop-shell.sh
+```
+
+**Accéder au shell HBase :**
+```bash
+# Windows PowerShell
+.\scripts\hbase-shell.ps1
+
+# Windows Batch
+scripts\hbase-shell.bat
+
+# Linux/Mac
+./scripts/hbase-shell.sh
+```
+
+**Accéder au CLI Hive :**
+```bash
+# Windows PowerShell
+.\scripts\hive-cli.ps1
+
+# Windows Batch
+scripts\hive-cli.bat
+
+# Linux/Mac
+./scripts/hive-cli.sh
+```
+
+**Note :** Ces scripts détectent automatiquement le bon nom de conteneur, même si Docker Compose utilise des noms différents.
+
 ### Arrêter l'Environnement
 
 ```bash
@@ -168,6 +208,37 @@ scripts\status.bat
 docker compose logs
 docker compose logs hadoop
 docker compose logs hbase
+```
+
+### Trouver le Nom Exact d'un Conteneur
+
+Si vous avez besoin d'exécuter `docker exec` manuellement, trouvez d'abord le nom exact :
+
+```bash
+# Voir tous les conteneurs avec leurs noms
+docker compose ps
+
+# Ou avec docker directement
+docker ps --format "{{.Names}}\t{{.Status}}"
+```
+
+**Exemple de sortie :**
+```
+NAME                                STATUS
+hbase-hive-learning-lab-hadoop     Up 5 minutes (healthy)
+hbase-hive-learning-lab-hbase      Up 5 minutes (healthy)
+```
+
+**Utilisez ensuite le nom exact :**
+```bash
+docker exec -it hbase-hive-learning-lab-hadoop bash
+```
+
+**OU utilisez les scripts fournis** (recommandé - détection automatique) :
+```bash
+.\scripts\hadoop-shell.ps1    # Windows PowerShell
+.\scripts\hbase-shell.ps1     # Windows PowerShell
+.\scripts\hive-cli.ps1        # Windows PowerShell
 ```
 
 ---
