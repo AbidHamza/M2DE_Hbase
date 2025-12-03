@@ -14,6 +14,14 @@ echo "=========================================="
 echo "LANCEMENT ENVIRONNEMENT HBASE & HIVE"
 echo "=========================================="
 echo ""
+echo "Ce script va automatiquement :"
+echo "  - Verifier Docker et Docker Compose"
+echo "  - Nettoyer les conteneurs existants"
+echo "  - Lancer tous les services (Hadoop, HBase, Hive)"
+echo "  - Corriger automatiquement les erreurs detectees"
+echo ""
+echo "Temps estime : 3-5 minutes pour le premier lancement"
+echo ""
 
 ERRORS=0
 WARNINGS=0

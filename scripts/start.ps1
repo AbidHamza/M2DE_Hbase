@@ -12,6 +12,14 @@ Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "LANCEMENT ENVIRONNEMENT HBASE & HIVE" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host ""
+Write-Host "Ce script va automatiquement :" -ForegroundColor Gray
+Write-Host "  - Verifier Docker et Docker Compose" -ForegroundColor Gray
+Write-Host "  - Nettoyer les conteneurs existants" -ForegroundColor Gray
+Write-Host "  - Lancer tous les services (Hadoop, HBase, Hive)" -ForegroundColor Gray
+Write-Host "  - Corriger automatiquement les erreurs detectees" -ForegroundColor Gray
+Write-Host ""
+Write-Host "Temps estime : 3-5 minutes pour le premier lancement" -ForegroundColor Yellow
+Write-Host ""
 
 # Variables
 $Errors = 0
@@ -82,8 +90,14 @@ try {
         throw "Docker non disponible"
     }
 } catch {
-    Write-Host "  [ERREUR] Docker n'est pas installé" -ForegroundColor Red
-    Write-Host "  -> Téléchargez Docker Desktop: https://www.docker.com/get-started" -ForegroundColor Yellow
+    Write-Host "  [ERREUR] Docker n'est pas installe" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "SOLUTION :" -ForegroundColor Yellow
+    Write-Host "  1. Telechargez Docker Desktop : https://www.docker.com/get-started" -ForegroundColor White
+    Write-Host "  2. Installez Docker Desktop" -ForegroundColor White
+    Write-Host "  3. Lancez Docker Desktop et attendez qu'il soit pret" -ForegroundColor White
+    Write-Host "  4. Relancez ce script : .\scripts\start.ps1" -ForegroundColor White
+    Write-Host ""
     exit 1
 }
 Write-Host ""
@@ -110,8 +124,13 @@ try {
             throw "Docker Compose non disponible"
         }
     } catch {
-        Write-Host "  [ERREUR] Docker Compose n'est pas installé" -ForegroundColor Red
-        Write-Host "  -> Mettez à jour Docker Desktop" -ForegroundColor Yellow
+        Write-Host "  [ERREUR] Docker Compose n'est pas installe" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "SOLUTION :" -ForegroundColor Yellow
+        Write-Host "  1. Mettez a jour Docker Desktop vers la derniere version" -ForegroundColor White
+        Write-Host "  2. Redemarrez Docker Desktop" -ForegroundColor White
+        Write-Host "  3. Relancez ce script : .\scripts\start.ps1" -ForegroundColor White
+        Write-Host ""
         exit 1
     }
 }
@@ -134,8 +153,14 @@ try {
     if (Start-DockerDesktop) {
         Write-Host "  [OK] Docker Desktop lancé" -ForegroundColor Green
     } else {
-        Write-Host "  [ERREUR] Impossible de lancer Docker Desktop" -ForegroundColor Red
-        Write-Host "  -> Lancez Docker Desktop manuellement puis relancez ce script" -ForegroundColor Yellow
+        Write-Host "  [ERREUR] Impossible de lancer Docker Desktop automatiquement" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "SOLUTION :" -ForegroundColor Yellow
+        Write-Host "  1. Lancez Docker Desktop manuellement depuis le menu Demarrer" -ForegroundColor White
+        Write-Host "  2. Attendez que l'icone Docker apparaisse dans la barre des taches" -ForegroundColor White
+        Write-Host "  3. Verifiez que Docker fonctionne : docker info" -ForegroundColor White
+        Write-Host "  4. Relancez ce script : .\scripts\start.ps1" -ForegroundColor White
+        Write-Host ""
         exit 1
     }
 }
@@ -294,11 +319,20 @@ while ($retry -lt $maxRetries -and -not $success) {
 
 if (-not $success) {
     Write-Host ""
-    Write-Host "[ERREUR] Échec après $maxRetries tentatives" -ForegroundColor Red
+    Write-Host "[ERREUR] Echec apres $maxRetries tentatives" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Pour diagnostiquer:" -ForegroundColor Yellow
-    Write-Host "  $composeCmd logs" -ForegroundColor White
-    Write-Host "  $composeCmd ps" -ForegroundColor White
+    Write-Host "DIAGNOSTIC :" -ForegroundColor Yellow
+    Write-Host "  Pour voir les logs : $composeCmd logs" -ForegroundColor White
+    Write-Host "  Pour voir l'etat : $composeCmd ps" -ForegroundColor White
+    Write-Host ""
+    Write-Host "SOLUTIONS POSSIBLES :" -ForegroundColor Yellow
+    Write-Host "  1. Verifiez que Docker Desktop est bien lance" -ForegroundColor White
+    Write-Host "  2. Verifiez votre connexion Internet (telechargement des images)" -ForegroundColor White
+    Write-Host "  3. Verifiez l'espace disque disponible (minimum 5GB)" -ForegroundColor White
+    Write-Host "  4. Essayez de nettoyer Docker : docker system prune -a" -ForegroundColor White
+    Write-Host "  5. Relancez le script : .\scripts\start.ps1" -ForegroundColor White
+    Write-Host ""
+    Write-Host "Si le probleme persiste, consultez le README.md section 'Depannage'" -ForegroundColor Gray
     Write-Host ""
     exit 1
 }
