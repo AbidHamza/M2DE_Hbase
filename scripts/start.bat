@@ -210,11 +210,79 @@ exit /b 1
 echo.
 echo [OK] Conteneurs démarrés
 echo.
-echo Attente du démarrage complet (60 secondes)...
-timeout /t 60 /nobreak >nul
+
+REM ÉTAPE 9 : Vérification JAVA_HOME dans les logs
+echo [9/9] Vérification JAVA_HOME...
+timeout /t 30 /nobreak >nul
+
+set JAVA_HOME_ERRORS=0
+set MAX_CHECKS=6
+set CHECK_COUNT=0
+
+:check_java_home
+if !CHECK_COUNT! geq !MAX_CHECKS! goto java_home_check_done
+
+!COMPOSE_CMD! logs hadoop 2>&1 | findstr /I /C:"ERROR" /C:"JAVA_HOME" /C:"not set" /C:"could not be found" /C:"readlink" /C:"dirname" /C:"Cannot find Java" /C:"Java not found" >nul 2>&1
+if not errorlevel 1 (
+    set JAVA_HOME_ERRORS=1
+    echo   [ATTENTION] Erreurs JAVA_HOME detectees dans les logs
+    echo   [REPARATION] Reconstruction de l'image Hadoop...
+    
+    REM Arrêter les conteneurs
+    !COMPOSE_CMD! down -v >nul 2>&1
+    timeout /t 5 /nobreak >nul
+    
+    REM Reconstruire l'image hadoop sans cache
+    echo   [INFO] Reconstruction en cours (cela peut prendre 2-3 minutes)...
+    !COMPOSE_CMD! build --no-cache hadoop
+    
+    if not errorlevel 1 (
+        echo   [OK] Image Hadoop reconstruite
+        echo   [INFO] Relancement des conteneurs...
+        
+        REM Relancer les conteneurs avec build pour etre sur
+        !COMPOSE_CMD! up -d --build >nul 2>&1
+        echo   [INFO] Attente du demarrage initial (45 secondes)...
+        timeout /t 45 /nobreak >nul
+        
+        REM Réinitialiser le compteur
+        set CHECK_COUNT=0
+        set JAVA_HOME_ERRORS=0
+        goto check_java_home
+    ) else (
+        echo   [ERREUR] Echec de la reconstruction
+        goto java_home_check_done
+    )
+) else (
+    REM Vérifier si Hadoop est healthy (simplifié)
+    !COMPOSE_CMD! ps hadoop 2>&1 | findstr /C:"healthy" >nul 2>&1
+    if not errorlevel 1 (
+        echo   [OK] Hadoop est operationnel (JAVA_HOME correct)
+        goto java_home_check_done
+    )
+)
+
+set /a CHECK_COUNT+=1
+if !CHECK_COUNT! lss !MAX_CHECKS! (
+    echo   [INFO] Attente du demarrage... (!CHECK_COUNT!/!MAX_CHECKS!)
+    timeout /t 15 /nobreak >nul
+    goto check_java_home
+)
+
+:java_home_check_done
+if !JAVA_HOME_ERRORS! equ 1 (
+    echo   [ATTENTION] Problemes JAVA_HOME persistants
+    echo   -^> Consultez les logs: !COMPOSE_CMD! logs hadoop
+) else (
+    echo   [OK] JAVA_HOME configure correctement
+)
+echo.
+
+echo Attente du demarrage complet (30 secondes supplementaires)...
+timeout /t 30 /nobreak >nul
 
 echo.
-echo Vérification de l'état...
+echo Verification de l'etat...
 !COMPOSE_CMD! ps
 
 echo.

@@ -306,8 +306,87 @@ if (-not $success) {
 Write-Host ""
 Write-Host "[OK] Conteneurs démarrés" -ForegroundColor Green
 Write-Host ""
-Write-Host "Attente du démarrage complet (60 secondes)..." -ForegroundColor Yellow
-Start-Sleep -Seconds 60
+
+# ==========================================
+# ÉTAPE 9 : Vérification JAVA_HOME dans les logs
+# ==========================================
+Write-Host "[9/9] Vérification JAVA_HOME..." -ForegroundColor Yellow
+Start-Sleep -Seconds 30
+
+$javaHomeErrors = $false
+$maxChecks = 6
+$checkCount = 0
+
+while ($checkCount -lt $maxChecks) {
+    $hadoopLogs = Invoke-Expression "$composeCmd logs hadoop 2>&1" | Out-String
+    
+    # Détecter les erreurs JAVA_HOME (tous les patterns possibles)
+    if ($hadoopLogs -match "ERROR.*JAVA_HOME.*not.*set" -or 
+        $hadoopLogs -match "ERROR.*JAVA_HOME.*could not be found" -or
+        $hadoopLogs -match "ERROR.*JAVA_HOME.*not set" -or
+        $hadoopLogs -match "ERROR.*JAVA_HOME.*could not be found" -or
+        $hadoopLogs -match "JAVA_HOME.*not.*set" -or
+        $hadoopLogs -match "JAVA_HOME.*could not be found" -or
+        $hadoopLogs -match "readlink.*missing operand" -or
+        $hadoopLogs -match "dirname.*missing operand" -or
+        $hadoopLogs -match "Cannot find Java installation" -or
+        $hadoopLogs -match "Java not found") {
+        
+        $javaHomeErrors = $true
+        Write-Host "  [ATTENTION] Erreurs JAVA_HOME détectées dans les logs" -ForegroundColor Yellow
+        Write-Host "  [REPARATION] Reconstruction de l'image Hadoop..." -ForegroundColor Cyan
+        
+        # Arrêter les conteneurs
+        Invoke-Expression "$composeCmd down -v" 2>&1 | Out-Null
+        Start-Sleep -Seconds 5
+        
+        # Reconstruire l'image hadoop sans cache (afficher la sortie pour debug)
+        Write-Host "  [INFO] Reconstruction en cours (cela peut prendre 2-3 minutes)..." -ForegroundColor Gray
+        Invoke-Expression "$composeCmd build --no-cache hadoop" 2>&1 | Tee-Object -Variable buildOutput | Out-Null
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] Image Hadoop reconstruite" -ForegroundColor Green
+            Write-Host "  [INFO] Relancement des conteneurs..." -ForegroundColor Cyan
+            
+            # Relancer les conteneurs avec build pour être sûr
+            Invoke-Expression "$composeCmd up -d --build" 2>&1 | Out-Null
+            Write-Host "  [INFO] Attente du démarrage initial (45 secondes)..." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            
+            # Réinitialiser le compteur pour vérifier à nouveau
+            $checkCount = 0
+            $javaHomeErrors = $false
+            continue
+        } else {
+            Write-Host "  [ERREUR] Échec de la reconstruction" -ForegroundColor Red
+            break
+        }
+    } else {
+        # Vérifier si Hadoop est healthy
+        $hadoopStatus = Invoke-Expression "$composeCmd ps hadoop --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($hadoopStatus -and $hadoopStatus.Health -eq "healthy") {
+            Write-Host "  [OK] Hadoop est opérationnel (JAVA_HOME correct)" -ForegroundColor Green
+            break
+        }
+    }
+    
+    $checkCount++
+    if ($checkCount -lt $maxChecks) {
+        Write-Host "  [INFO] Attente du démarrage... ($checkCount/$maxChecks)" -ForegroundColor Gray
+        Start-Sleep -Seconds 15
+    }
+}
+
+if ($javaHomeErrors) {
+    Write-Host "  [ATTENTION] Problèmes JAVA_HOME persistants" -ForegroundColor Yellow
+    Write-Host "  -> Consultez les logs: $composeCmd logs hadoop" -ForegroundColor White
+} else {
+    Write-Host "  [OK] JAVA_HOME configuré correctement" -ForegroundColor Green
+}
+Write-Host ""
+
+Write-Host "Attente du démarrage complet (30 secondes supplémentaires)..." -ForegroundColor Yellow
+Start-Sleep -Seconds 30
 
 Write-Host ""
 Write-Host "Vérification de l'état..." -ForegroundColor Cyan

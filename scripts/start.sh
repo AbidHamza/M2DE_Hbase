@@ -324,12 +324,79 @@ fi
 echo ""
 echo "[OK] Conteneurs démarrés"
 echo ""
-echo "Attente du démarrage complet (60 secondes)..."
-sleep 60
+
+# ==========================================
+# ÉTAPE 9 : Vérification JAVA_HOME dans les logs
+# ==========================================
+echo "[9/9] Vérification JAVA_HOME..."
+sleep 30
+
+JAVA_HOME_ERRORS=0
+MAX_CHECKS=6
+CHECK_COUNT=0
+
+while [ $CHECK_COUNT -lt $MAX_CHECKS ]; do
+    HADOOP_LOGS=$(eval "$COMPOSE_CMD logs hadoop 2>&1" || echo "")
+    
+    # Détecter les erreurs JAVA_HOME (tous les patterns possibles)
+    if echo "$HADOOP_LOGS" | grep -qiE "(ERROR.*JAVA_HOME.*not.*set|ERROR.*JAVA_HOME.*could not be found|JAVA_HOME.*not.*set|JAVA_HOME.*could not be found|readlink.*missing operand|dirname.*missing operand|Cannot find Java installation|Java not found)" 2>/dev/null; then
+        JAVA_HOME_ERRORS=1
+        echo "  [ATTENTION] Erreurs JAVA_HOME détectées dans les logs"
+        echo "  [REPARATION] Reconstruction de l'image Hadoop..."
+        
+        # Arrêter les conteneurs
+        eval "$COMPOSE_CMD down -v" >/dev/null 2>&1 || true
+        sleep 5
+        
+        # Reconstruire l'image hadoop sans cache
+        echo "  [INFO] Reconstruction en cours (cela peut prendre 2-3 minutes)..."
+        if eval "$COMPOSE_CMD build --no-cache hadoop" 2>&1; then
+            echo "  [OK] Image Hadoop reconstruite"
+            echo "  [INFO] Relancement des conteneurs..."
+            
+            # Relancer les conteneurs avec build pour être sûr
+            eval "$COMPOSE_CMD up -d --build" >/dev/null 2>&1
+            echo "  [INFO] Attente du démarrage initial (45 secondes)..."
+            sleep 45
+            
+            # Réinitialiser le compteur pour vérifier à nouveau
+            CHECK_COUNT=0
+            JAVA_HOME_ERRORS=0
+            continue
+        else
+            echo "  [ERREUR] Échec de la reconstruction"
+            break
+        fi
+    else
+        # Vérifier si Hadoop est healthy
+        HADOOP_STATUS=$(eval "$COMPOSE_CMD ps hadoop --format json" 2>/dev/null | grep -o '"Health":"healthy"' || echo "")
+        if [ -n "$HADOOP_STATUS" ]; then
+            echo "  [OK] Hadoop est opérationnel (JAVA_HOME correct)"
+            break
+        fi
+    fi
+    
+    CHECK_COUNT=$((CHECK_COUNT + 1))
+    if [ $CHECK_COUNT -lt $MAX_CHECKS ]; then
+        echo "  [INFO] Attente du démarrage... ($CHECK_COUNT/$MAX_CHECKS)"
+        sleep 15
+    fi
+done
+
+if [ $JAVA_HOME_ERRORS -eq 1 ]; then
+    echo "  [ATTENTION] Problèmes JAVA_HOME persistants"
+    echo "  -> Consultez les logs: $COMPOSE_CMD logs hadoop"
+else
+    echo "  [OK] JAVA_HOME configuré correctement"
+fi
+echo ""
+
+echo "Attente du démarrage complet (30 secondes supplémentaires)..."
+sleep 30
 
 echo ""
 echo "Vérification de l'état..."
-$COMPOSE_CMD ps
+eval "$COMPOSE_CMD ps"
 
 echo ""
 echo "=========================================="

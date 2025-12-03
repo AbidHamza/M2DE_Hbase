@@ -50,7 +50,7 @@ if ([string]::IsNullOrEmpty($containerName)) {
     Write-Host "Solutions:" -ForegroundColor Yellow
     Write-Host "  1. Vérifiez l'état: $composeCmd ps" -ForegroundColor White
     Write-Host "  2. Démarrez l'environnement: $composeCmd up -d" -ForegroundColor White
-    Write-Host "  3. OU utilisez le script setup: .\scripts\setup.ps1" -ForegroundColor White
+    Write-Host "  3. OU utilisez le script start: .\scripts\start.ps1" -ForegroundColor White
     Write-Host ""
     Write-Host "Attendez 2-3 minutes après le démarrage pour que HBase soit prêt." -ForegroundColor Yellow
     exit 1

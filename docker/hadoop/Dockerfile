@@ -3,9 +3,8 @@ FROM eclipse-temurin:8-jdk
 ENV HADOOP_VERSION=3.3.4
 ENV HADOOP_HOME=/opt/hadoop
 
-# JAVA_HOME is set by eclipse-temurin base image
-# It will be detected dynamically in start-hadoop.sh if needed
-ENV JAVA_HOME=/opt/java/openjdk
+# JAVA_HOME will be detected dynamically in hadoop-env.sh
+# The eclipse-temurin base image typically has Java at /usr/lib/jvm/temurin-8-jdk-amd64
 ENV HDFS_NAMENODE_USER=root
 ENV HDFS_DATANODE_USER=root
 ENV HDFS_SECONDARYNAMENODE_USER=root
@@ -40,7 +39,24 @@ RUN chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
     sed -i 's/\r$//' ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
 # Format HDFS (with JAVA_HOME set)
-RUN export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java)))) && \
+# eclipse-temurin image has Java at /opt/java/openjdk
+RUN JAVA_HOME="" && \
+    if [ -d "/opt/java/openjdk" ] && [ -f "/opt/java/openjdk/bin/java" ]; then \
+        JAVA_HOME="/opt/java/openjdk"; \
+    elif [ -n "$JAVA_HOME" ] && [ -d "$JAVA_HOME" ] && [ -f "$JAVA_HOME/bin/java" ]; then \
+        JAVA_HOME="$JAVA_HOME"; \
+    else \
+        JAVA_BIN=$(which java 2>/dev/null || echo ""); \
+        if [ -n "$JAVA_BIN" ] && [ -f "$JAVA_BIN" ]; then \
+            JAVA_DIR=$(dirname "$JAVA_BIN"); \
+            JAVA_HOME=$(dirname "$JAVA_DIR"); \
+        else \
+            echo "ERROR: Cannot find Java installation" >&2; \
+            exit 1; \
+        fi; \
+    fi && \
+    export JAVA_HOME && \
+    echo "Formatting HDFS with JAVA_HOME=$JAVA_HOME" && \
     ${HADOOP_HOME}/bin/hdfs namenode -format -force
 
 # Add Hadoop to PATH

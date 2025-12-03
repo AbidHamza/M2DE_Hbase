@@ -5,25 +5,18 @@ if [ -f "${HADOOP_HOME}/etc/hadoop/hadoop-env.sh" ]; then
     source ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 fi
 
-# Also set JAVA_HOME dynamically as fallback
-export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which java))))}
+# Verify JAVA_HOME is set and valid
+if [ -z "$JAVA_HOME" ] || [ ! -d "$JAVA_HOME" ] || [ ! -f "$JAVA_HOME/bin/java" ]; then
+    echo "ERROR: JAVA_HOME is not set or invalid: $JAVA_HOME" >&2
+    echo "ERROR: Hadoop services cannot start without Java." >&2
+    exit 1
+fi
+
+# Ensure Java is in PATH
 export PATH=${JAVA_HOME}/bin:${PATH}
 
-# Verify JAVA_HOME
+# Display JAVA_HOME for confirmation
 echo "JAVA_HOME is set to: $JAVA_HOME"
-if [ ! -f "$JAVA_HOME/bin/java" ]; then
-    echo "WARNING: JAVA_HOME is incorrect: $JAVA_HOME"
-    echo "WARNING: Java not found at $JAVA_HOME/bin/java"
-    echo "Attempting to find Java automatically..."
-    # Try to find Java again
-    export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-    if [ ! -f "$JAVA_HOME/bin/java" ]; then
-        echo "CRITICAL ERROR: Cannot find Java installation"
-        echo "Container will continue but services may fail"
-    else
-        echo "Java found at: $JAVA_HOME"
-    fi
-fi
 
 # Export JAVA_HOME to environment so SSH sessions inherit it
 echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc

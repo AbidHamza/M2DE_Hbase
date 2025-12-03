@@ -30,7 +30,7 @@ if [ -z "$CONTAINER_NAME" ]; then
     echo "Solutions:"
     echo "  1. Vérifiez l'état: $COMPOSE_CMD ps"
     echo "  2. Démarrez l'environnement: $COMPOSE_CMD up -d"
-    echo "  3. OU utilisez le script setup: ./scripts/setup.sh"
+    echo "  3. OU utilisez le script start: ./scripts/start.sh"
     echo ""
     echo "Attendez 2-3 minutes après le démarrage pour que HBase soit prêt."
     exit 1

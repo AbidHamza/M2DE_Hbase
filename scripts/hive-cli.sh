@@ -30,7 +30,7 @@ if [ -z "$CONTAINER_NAME" ]; then
     echo "Solutions:"
     echo "  1. Vérifiez l'état: $COMPOSE_CMD ps"
     echo "  2. Démarrez l'environnement: $COMPOSE_CMD up -d"
-    echo "  3. OU utilisez le script setup: ./scripts/setup.sh"
+    echo "  3. OU utilisez le script start: ./scripts/start.sh"
     echo ""
     exit 1
 fi
