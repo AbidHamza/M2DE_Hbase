@@ -69,6 +69,31 @@ fi
 # Create log directory if it doesn't exist
 mkdir -p ${HIVE_HOME}/logs
 
+# Initialiser le schéma Derby si nécessaire (vérifier si service.properties existe)
+echo "Vérification de l'initialisation du schéma Derby..."
+if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
+    echo "Initialisation du schéma Derby..."
+    ${HIVE_HOME}/bin/schematool -initSchema -dbType derby 2>&1 | tee ${HIVE_HOME}/logs/schema-init.log
+    SCHEMA_INIT_EXIT_CODE=${PIPESTATUS[0]}
+    if [ $SCHEMA_INIT_EXIT_CODE -ne 0 ]; then
+        echo "WARNING: Échec de l'initialisation du schéma (code: $SCHEMA_INIT_EXIT_CODE)" >&2
+        echo "Tentative de nettoyage complet et réinitialisation..." >&2
+        # Nettoyer complètement
+        rm -rf "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.??* 2>/dev/null || true
+        sleep 2
+        # Réessayer
+        ${HIVE_HOME}/bin/schematool -initSchema -dbType derby 2>&1 | tee -a ${HIVE_HOME}/logs/schema-init.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "ERROR: Impossible d'initialiser le schéma Derby après nettoyage" >&2
+            echo "Consultez les logs: ${HIVE_HOME}/logs/schema-init.log" >&2
+            exit 1
+        fi
+    fi
+    echo "Schéma Derby initialisé avec succès"
+else
+    echo "Schéma Derby déjà initialisé (service.properties trouvé)"
+fi
+
 # Start Hive Metastore in background and capture output
 echo "Launching Hive Metastore service..."
 LOG_FILE=${HIVE_HOME}/logs/metastore.log
