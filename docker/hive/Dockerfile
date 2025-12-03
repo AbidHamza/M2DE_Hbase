@@ -60,14 +60,11 @@ COPY healthcheck.sh /healthcheck.sh
 RUN chmod +x /start-hive-metastore.sh /start-hive.sh /healthcheck.sh && \
     sed -i 's/\r$//' /start-hive-metastore.sh /start-hive.sh /healthcheck.sh
 
-# Initialize Hive schema (Derby) - set JAVA_HOME first
-# Create metastore_db directory first
-RUN mkdir -p ${HIVE_HOME}/metastore_db ${HIVE_HOME}/logs && \
-    JAVA_HOME=/opt/java/openjdk && \
-    export JAVA_HOME && \
-    export HIVE_HOME=${HIVE_HOME} && \
-    ${HIVE_HOME}/bin/schematool -initSchema -dbType derby || \
-    (echo "WARNING: Schema initialization failed, will retry at runtime" && true)
+# Create logs directory (metastore_db sera créé dans le volume au runtime)
+RUN mkdir -p ${HIVE_HOME}/logs
+
+# Note: L'initialisation du schéma Derby se fera au runtime dans start-hive-metastore.sh
+# car le répertoire metastore_db est monté depuis un volume Docker
 
 # Expose ports (9083 for Metastore, 10000/10002 for HiveServer2)
 EXPOSE 9083 10000 10002

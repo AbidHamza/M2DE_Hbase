@@ -9,6 +9,21 @@ if [ -f "${HIVE_HOME}/conf/hive-env.sh" ]; then
     source ${HIVE_HOME}/conf/hive-env.sh
 fi
 
+# Gérer le répertoire metastore_db (peut exister mais être corrompu)
+METASTORE_DB_DIR="/opt/hive/metastore_db"
+if [ -d "$METASTORE_DB_DIR" ]; then
+    # Vérifier si c'est une base Derby valide (doit contenir service.properties)
+    if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
+        echo "WARNING: Répertoire metastore_db existe mais n'est pas une base Derby valide"
+        echo "Nettoyage du répertoire corrompu..."
+        rm -rf "$METASTORE_DB_DIR"/*
+        rm -rf "$METASTORE_DB_DIR"/.??* 2>/dev/null || true
+    fi
+fi
+
+# Créer le répertoire s'il n'existe pas
+mkdir -p "$METASTORE_DB_DIR"
+
 # Verify JAVA_HOME is set
 if [ -z "$JAVA_HOME" ] || [ ! -f "$JAVA_HOME/bin/java" ]; then
     echo "ERROR: JAVA_HOME is not set or invalid: $JAVA_HOME" >&2
