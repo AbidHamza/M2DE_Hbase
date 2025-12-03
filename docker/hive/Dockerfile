@@ -5,13 +5,14 @@ ENV HIVE_HOME=/opt/hive
 # JAVA_HOME is set by eclipse-temurin base image
 # It will be detected dynamically in hive-env.sh if needed
 ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH=${HIVE_HOME}/bin:${PATH}
+# PATH will be set after Hadoop installation to include all components
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
     postgresql-client \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and install Hive
@@ -48,14 +49,16 @@ RUN mkdir -p ${HADOOP_HOME}/etc/hadoop
 COPY core-site.xml ${HADOOP_HOME}/etc/hadoop/
 COPY hdfs-site.xml ${HADOOP_HOME}/etc/hadoop/
 
-# Add Hadoop to PATH so Hive can find hadoop/hdfs commands
-ENV PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
+# Add Hadoop and Hive to PATH (order matters: Hadoop first, then Hive, then Java)
+# This ensures hadoop/hdfs commands are found before hive commands
+ENV PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${HIVE_HOME}/bin:${JAVA_HOME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Copy startup scripts
+# Copy startup scripts and healthcheck
 COPY start-hive-metastore.sh /start-hive-metastore.sh
 COPY start-hive.sh /start-hive.sh
-RUN chmod +x /start-hive-metastore.sh /start-hive.sh && \
-    sed -i 's/\r$//' /start-hive-metastore.sh /start-hive.sh
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /start-hive-metastore.sh /start-hive.sh /healthcheck.sh && \
+    sed -i 's/\r$//' /start-hive-metastore.sh /start-hive.sh /healthcheck.sh
 
 # Initialize Hive schema (Derby) - set JAVA_HOME first
 RUN JAVA_HOME=/opt/java/openjdk && \

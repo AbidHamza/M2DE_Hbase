@@ -139,11 +139,11 @@ services:
     networks:
       - hbase-hive-network
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "9083"]
+      test: ["CMD", "/bin/bash", "/healthcheck.sh"]
       interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      timeout: 15s
+      retries: 8
+      start_period: 120s
 
 volumes:
   hadoop-data:

@@ -68,16 +68,24 @@ fi
 
 # Ensure JAVA_HOME is exported
 export JAVA_HOME
-export PATH=${JAVA_HOME}/bin:${PATH}
 
-# Hive and Hadoop configuration
+# Hive and Hadoop configuration (set before PATH to avoid duplication)
 export HADOOP_HOME=/opt/hadoop
 export HIVE_HOME=/opt/hive
 export HIVE_CONF_DIR=${HIVE_HOME}/conf
 export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop
 
-# Add Hadoop to PATH (Hive needs hadoop/hdfs commands)
-export PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
+# Set PATH: Hadoop first (for hadoop/hdfs commands), then Hive, then Java
+# Only add if not already in PATH to avoid duplication
+if [[ ":$PATH:" != *":${HADOOP_HOME}/bin:"* ]]; then
+    export PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
+fi
+if [[ ":$PATH:" != *":${HIVE_HOME}/bin:"* ]]; then
+    export PATH=${HIVE_HOME}/bin:${PATH}
+fi
+if [[ ":$PATH:" != *":${JAVA_HOME}/bin:"* ]]; then
+    export PATH=${JAVA_HOME}/bin:${PATH}
+fi
 
 # Verify HADOOP_HOME exists and has binaries
 if [ ! -d "$HADOOP_HOME" ] || [ ! -f "$HADOOP_HOME/bin/hadoop" ]; then

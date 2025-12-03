@@ -41,8 +41,53 @@ echo "JAVA_HOME: $JAVA_HOME"
 echo "HADOOP_HOME: $HADOOP_HOME"
 echo "HADOOP_CONF_DIR: $HADOOP_CONF_DIR"
 echo "HIVE_HOME: $HIVE_HOME"
+echo "HIVE_CONF_DIR: $HIVE_CONF_DIR"
+echo "PATH: $PATH"
 echo "Hadoop version: $(hadoop version 2>&1 | head -1 || echo 'unknown')"
 
-# Start Hive Metastore
-exec ${HIVE_HOME}/bin/hive --service metastore
+# Verify hive command exists
+if [ ! -f "${HIVE_HOME}/bin/hive" ]; then
+    echo "ERROR: Hive binary not found at ${HIVE_HOME}/bin/hive" >&2
+    exit 1
+fi
+
+# Start Hive Metastore in background and wait for it to be ready
+echo "Launching Hive Metastore service..."
+${HIVE_HOME}/bin/hive --service metastore &
+METASTORE_PID=$!
+
+# Wait for Metastore to start listening on port 9083
+echo "Waiting for Hive Metastore to be ready..."
+MAX_WAIT=120
+WAIT_COUNT=0
+while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
+    if nc -z localhost 9083 2>/dev/null || \
+       (command -v timeout >/dev/null 2>&1 && timeout 1 bash -c "echo > /dev/tcp/localhost/9083" 2>/dev/null); then
+        echo "Hive Metastore is ready and listening on port 9083"
+        break
+    fi
+    
+    # Check if process is still running
+    if ! kill -0 $METASTORE_PID 2>/dev/null; then
+        echo "ERROR: Hive Metastore process died unexpectedly" >&2
+        wait $METASTORE_PID
+        exit $?
+    fi
+    
+    sleep 2
+    WAIT_COUNT=$((WAIT_COUNT + 2))
+done
+
+if [ $WAIT_COUNT -ge $MAX_WAIT ]; then
+    echo "WARNING: Hive Metastore did not become ready within $MAX_WAIT seconds" >&2
+    echo "But continuing anyway - healthcheck will verify..." >&2
+fi
+
+# Keep the process running
+wait $METASTORE_PID
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "ERROR: Hive Metastore exited with code $EXIT_CODE" >&2
+    exit $EXIT_CODE
+fi
 
