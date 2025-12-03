@@ -1,294 +1,605 @@
-# HBase & Hive Learning Lab
+# Guide Complet - HBase & Hive Learning Lab
 
-Parcours d'apprentissage complet et guidé pour maîtriser HBase et Hive dans l'écosystème Hadoop.
-
----
-
-## Table des Matières
-
-1. [Démarrage Rapide](#démarrage-rapide)
-2. [Prérequis](#prérequis)
-3. [Installation et Configuration](#installation-et-configuration)
-4. [Lancement de l'Environnement](#lancement-de-lenvironnement)
-5. [Vérification et Tests](#vérification-et-tests)
-6. [Structure du Projet](#structure-du-projet)
-7. [Scripts Disponibles](#scripts-disponibles)
-8. [Travail dans les Rooms](#travail-dans-les-rooms)
-9. [Résolution de Problèmes](#résolution-de-problèmes)
-10. [Commandes de Référence](#commandes-de-référence)
+Parcours d'apprentissage étape par étape pour maîtriser HBase et Hive dans l'écosystème Hadoop.
 
 ---
 
-## Démarrage Rapide
+## 📋 Table des Matières
 
-Pour démarrer rapidement, **une seule commande suffit** :
+1. [Introduction](#introduction)
+2. [Étape 1 : Installation des Prérequis](#étape-1--installation-des-prérequis)
+3. [Étape 2 : Récupération du Projet](#étape-2--récupération-du-projet)
+4. [Étape 3 : Lancement de l'Environnement](#étape-3--lancement-de-lenvironnement)
+5. [Étape 4 : Vérification que Tout Fonctionne](#étape-4--vérification-que-tout-fonctionne)
+6. [Étape 5 : Commencer les Rooms](#étape-5--commencer-les-rooms)
+7. [Commandes Essentielles](#commandes-essentielles)
+8. [Résolution de Problèmes](#résolution-de-problèmes)
 
-**Linux/Mac :**
+---
+
+## Introduction
+
+Ce projet vous permet d'apprendre HBase et Hive dans un environnement Docker pré-configuré. **Vous n'avez pas besoin d'installer Hadoop, HBase ou Hive manuellement** - tout est automatisé.
+
+**Ce que vous allez apprendre :**
+- HBase : Base de données NoSQL pour le Big Data
+- Hive : Requêtes SQL sur Hadoop
+- Intégration HBase-Hive
+- Cas d'usage réels
+
+**Temps estimé pour le setup initial :** 10-15 minutes
+
+---
+
+## Étape 1 : Installation des Prérequis
+
+### 1.1 Installer Docker
+
+**Sur Windows ou Mac :**
+1. Allez sur https://www.docker.com/get-started
+2. Téléchargez Docker Desktop
+3. Installez Docker Desktop
+4. Lancez Docker Desktop depuis le menu Démarrer
+5. Attendez que l'icône Docker apparaisse dans la barre des tâches (1-2 minutes)
+
+**Vérification :**
+Ouvrez un terminal et tapez :
 ```bash
-chmod +x scripts/*.sh && ./scripts/setup.sh
+docker --version
 ```
+Vous devriez voir quelque chose comme : `Docker version 24.0.0` ou similaire.
 
-**Windows PowerShell :**
-```powershell
-.\scripts\setup.ps1
-```
-
-**Windows Batch :**
-```batch
-scripts\setup.bat
-```
-
-Le script `setup` va :
-1. ✅ Vérifier et installer automatiquement les dépendances manquantes
-2. ✅ Lancer Docker Desktop si nécessaire (Windows/Mac)
-3. ✅ Lancer automatiquement l'environnement
-4. ✅ Afficher l'état des services
-
-**Ensuite :**
-- Attendez 2-3 minutes que tous les services démarrent
-- Vérifiez l'état : `docker compose ps` ou `docker-compose ps`
-- Commencez la Room 0 : `cd rooms/room-0_introduction`
-
----
-
-## Prérequis
-
-### Logiciels Requis
-
-- **Docker** : Version 20.10 ou supérieure
-  - Installation : https://www.docker.com/get-started
-  - Vérification : `docker --version`
-- **Docker Compose** : Version 1.29 ou supérieure (ou Docker Compose V2)
-  - Généralement inclus avec Docker Desktop
-  - Vérification : `docker-compose --version` ou `docker compose version`
-- **Git** : Version 2.0 ou supérieure
-  - Installation : https://git-scm.com/downloads
-  - Vérification : `git --version`
-
-### Ressources Système Recommandées
-
-- **RAM** : Minimum 4GB, recommandé 8GB
-- **Espace disque** : Minimum 5GB, recommandé 10GB
-- **CPU** : 2 cœurs minimum
-
-### Plateformes Supportées
-
-- Windows 10/11 (avec Docker Desktop)
-- macOS 10.15+ (avec Docker Desktop)
-- Linux (Ubuntu 20.04+, Debian 10+, CentOS 7+)
-
----
-
-## Installation et Configuration
-
-### Étape 1 : Installer Docker
-
-**Windows/Mac :**
-1. Téléchargez Docker Desktop depuis https://www.docker.com/get-started
-2. Installez et lancez Docker Desktop
-3. Attendez que l'icône Docker apparaisse dans la barre des tâches
-4. Vérifiez : `docker info` (ne doit pas afficher d'erreur)
-
-**Linux :**
+**Sur Linux (Ubuntu/Debian) :**
 ```bash
-# Ubuntu/Debian
 sudo apt-get update
 sudo apt-get install docker.io docker-compose
 sudo systemctl start docker
 sudo systemctl enable docker
-
-# CentOS/RHEL
-sudo yum install docker docker-compose
-sudo systemctl start docker
-sudo systemctl enable docker
 ```
 
-### Étape 2 : Cloner le Dépôt
-
-**Première fois :**
+**Vérification :**
 ```bash
+docker --version
+docker info
+```
+
+### 1.2 Vérifier Docker Compose
+
+Docker Compose est généralement inclus avec Docker Desktop. Vérifiez :
+
+```bash
+docker-compose --version
+# OU
+docker compose version
+```
+
+Si les deux commandes fonctionnent, c'est parfait. Le projet supporte les deux versions.
+
+### 1.3 Installer Git (Recommandé)
+
+**Windows/Mac :**
+- Téléchargez depuis https://git-scm.com/downloads
+- Installez avec les options par défaut
+
+**Linux :**
+```bash
+sudo apt-get install git
+```
+
+**Vérification :**
+```bash
+git --version
+```
+
+---
+
+## Étape 2 : Récupération du Projet
+
+### 2.1 Première Fois : Cloner le Dépôt
+
+Ouvrez un terminal et allez dans le dossier où vous voulez travailler (par exemple `Desktop` ou `Documents`).
+
+```bash
+# Cloner le projet
 git clone https://github.com/AbidHamza/M2DE_Hbase.git
+
+# Aller dans le dossier du projet
 cd M2DE_Hbase
 ```
 
-**Mise à jour (si déjà cloné) :**
+### 2.2 Mise à Jour (Si Déjà Cloné)
+
+Si vous avez déjà cloné le projet avant :
+
 ```bash
+# Aller dans le dossier du projet
 cd M2DE_Hbase
+
+# Récupérer les dernières modifications
 git pull origin main
 ```
 
-**En cas de conflit Git :**
+**Si vous avez des erreurs Git :**
+```bash
+# Sauvegarder vos modifications locales
+git stash
+
+# Récupérer les dernières modifications
+git pull origin main
+
+# Récupérer vos modifications sauvegardées (si besoin)
+git stash pop
+```
+
+---
+
+## Étape 3 : Lancement de l'Environnement
+
+### 3.1 Méthode Simple : Script `setup` (RECOMMANDÉ)
+
+**Cette méthode fait TOUT automatiquement :**
+- Vérifie que Docker fonctionne
+- Lance Docker Desktop si nécessaire
+- Nettoie les anciens conteneurs
+- Reconstruit les images
+- Lance l'environnement
+
+**Sur Windows (PowerShell) :**
+```powershell
+.\scripts\setup.ps1
+```
+
+**Sur Windows (Invite de commande) :**
+```batch
+scripts\setup.bat
+```
+
+**Sur Linux ou Mac :**
+```bash
+chmod +x scripts/*.sh
+./scripts/setup.sh
+```
+
+**Ce qui se passe :**
+1. Le script vérifie Docker (et le lance si nécessaire)
+2. Nettoie les conteneurs existants
+3. Reconstruit les images Docker (5-10 minutes la première fois)
+4. Lance tous les services automatiquement
+5. Affiche l'état final
+
+**Attendez 2-3 minutes** après la fin du script pour que tous les services démarrent complètement.
+
+### 3.2 Méthode Alternative : Script `run`
+
+Si vous avez déjà lancé l'environnement avant et que vous voulez juste relancer :
+
+**Sur Windows (PowerShell) :**
+```powershell
+.\scripts\run.ps1
+```
+
+**Sur Windows (Invite de commande) :**
+```batch
+scripts\run.bat
+```
+
+**Sur Linux ou Mac :**
+```bash
+./scripts/run.sh
+```
+
+**Ce script :**
+- Vérifie que Docker fonctionne
+- Vérifie que les fichiers sont présents
+- Nettoie les conteneurs existants
+- Lance l'environnement
+
+### 3.3 Vérifier que l'Environnement est Lancé
+
+Après avoir lancé le script, vérifiez l'état :
+
+```bash
+docker compose ps
+# OU
+docker-compose ps
+```
+
+**Résultat attendu :**
+Vous devriez voir tous les conteneurs avec le statut "Up" et "healthy" (ou au moins "Up") :
+
+```
+NAME                              STATUS
+hbase-hive-learning-lab-hadoop    Up X minutes (healthy)
+hbase-hive-learning-lab-zookeeper  Up X minutes (healthy)
+hbase-hive-learning-lab-hbase     Up X minutes (healthy)
+hbase-hive-learning-lab-hive      Up X minutes
+hbase-hive-learning-lab-hive-metastore Up X minutes
+```
+
+**Si un conteneur est "unhealthy" :**
+- Attendez encore 1-2 minutes (les services peuvent prendre du temps)
+- Si après 5 minutes c'est toujours "unhealthy", consultez la section Résolution de Problèmes
+
+---
+
+## Étape 4 : Vérification que Tout Fonctionne
+
+### 4.1 Tester HBase
+
+**Ouvrir le shell HBase :**
+
+**Sur Windows (PowerShell) :**
+```powershell
+.\scripts\hbase-shell.ps1
+```
+
+**Sur Windows (Invite de commande) :**
+```batch
+scripts\hbase-shell.bat
+```
+
+**Sur Linux ou Mac :**
+```bash
+./scripts/hbase-shell.sh
+```
+
+**Dans le shell HBase, tapez :**
+```
+version
+```
+
+**Résultat attendu :**
+Vous devriez voir la version de HBase affichée, par exemple :
+```
+HBase 2.5.0
+```
+
+**Si ça fonctionne :** Tapez `exit` pour quitter.
+
+**Si vous avez une erreur "Server is not running yet" :**
+- Attendez encore 1-2 minutes
+- HBase Master peut prendre du temps à démarrer complètement
+
+### 4.2 Tester Hive
+
+**Ouvrir le CLI Hive :**
+
+**Sur Windows (PowerShell) :**
+```powershell
+.\scripts\hive-cli.ps1
+```
+
+**Sur Windows (Invite de commande) :**
+```batch
+scripts\hive-cli.bat
+```
+
+**Sur Linux ou Mac :**
+```bash
+./scripts/hive-cli.sh
+```
+
+**Dans le CLI Hive, tapez :**
+```sql
+SHOW DATABASES;
+```
+
+**Résultat attendu :**
+Vous devriez voir une liste de bases de données (même si elle est vide).
+
+**Si ça fonctionne :** Tapez `exit;` pour quitter (notez le point-virgule).
+
+### 4.3 Accéder aux Interfaces Web
+
+Ouvrez votre navigateur et allez sur :
+
+- **HDFS NameNode** : http://localhost:9870
+  - Vous devriez voir l'interface web de Hadoop HDFS
+  
+- **YARN ResourceManager** : http://localhost:8088
+  - Vous devriez voir l'interface web de YARN
+  
+- **HBase Master** : http://localhost:16011
+  - Vous devriez voir l'interface web de HBase
+
+**Si les pages se chargent :** Tout fonctionne correctement !
+
+---
+
+## Étape 5 : Commencer les Rooms
+
+### 5.1 Qu'est-ce qu'une Room ?
+
+Une **room** est un parcours d'apprentissage guidé. Chaque room contient :
+- Des explications théoriques
+- Des exercices pratiques étape par étape
+- Des datasets fournis dans `/resources`
+
+### 5.2 Ordre des Rooms
+
+Suivez les rooms dans l'ordre numérique :
+
+1. **Room 0** : Introduction - Prise en main de l'environnement
+2. **Room 1** : HBase Basics - Opérations de base (créer, lire, modifier, supprimer)
+3. **Room 2** : HBase Advanced - Filtres et optimisation
+4. **Room 3** : Hive Introduction - Premières requêtes SQL
+5. **Room 4** : Hive Advanced - Jointures et partitions
+6. **Room 5** : Intégration HBase-Hive
+7. **Room 6** : Cas d'usage réels
+8. **Room 7** : Projet final
+
+**Règle importante :** Ne passez pas à la room suivante tant que vous n'avez pas terminé la précédente.
+
+### 5.3 Comment Travailler dans une Room
+
+**Exemple avec Room 1 :**
+
+1. **Aller dans la room :**
+   ```bash
+   cd rooms/room-1_hbase_basics
+   ```
+
+2. **Lire le README.md de la room :**
+   ```bash
+   # Sur Windows
+   notepad README.md
+   # OU sur Mac/Linux
+   cat README.md
+   ```
+
+3. **Suivre les instructions étape par étape**
+
+4. **Créer les fichiers demandés** dans le dossier de la room
+
+5. **Tester vos commandes** avec les scripts fournis :
+   ```bash
+   # Pour tester HBase
+   ../../scripts/hbase-shell.sh    # Linux/Mac
+   ..\..\scripts\hbase-shell.ps1   # Windows
+   ```
+
+6. **Documenter votre travail** dans les fichiers demandés
+
+7. **Enregistrer votre travail** avec Git (après chaque room) :
+   ```bash
+   # Retourner à la racine
+   cd ../..
+   
+   # Ajouter vos fichiers
+   git add rooms/room-1_hbase_basics/*
+   
+   # Créer un commit
+   git commit -m "Room 1 terminée"
+   
+   # Envoyer sur GitHub
+   git push origin main
+   ```
+
+### 5.4 Règles Importantes
+
+**Ce que vous POUVEZ faire :**
+- Créer et modifier des fichiers dans `/rooms/room-X_*/`
+- Documenter votre progression
+- Tester vos commandes
+
+**Ce que vous NE POUVEZ PAS faire :**
+- Modifier les fichiers Docker (`/docker/`)
+- Modifier les scripts (`/scripts/`)
+- Modifier les ressources (`/resources/`)
+- Modifier le README principal
+
+---
+
+## Commandes Essentielles
+
+### Arrêter l'Environnement
+
+**Sur Windows (PowerShell) :**
+```powershell
+.\scripts\stop.ps1
+```
+
+**Sur Windows (Invite de commande) :**
+```batch
+scripts\stop.bat
+```
+
+**Sur Linux ou Mac :**
+```bash
+./scripts/stop.sh
+```
+
+**Ou manuellement :**
+```bash
+docker compose down
+```
+
+### Vérifier l'État
+
+**Sur Windows (PowerShell) :**
+```powershell
+.\scripts\status.ps1
+```
+
+**Sur Windows (Invite de commande) :**
+```batch
+scripts\status.bat
+```
+
+**Sur Linux ou Mac :**
+```bash
+./scripts/status.sh
+```
+
+**Ou manuellement :**
+```bash
+docker compose ps
+```
+
+### Voir les Logs
+
+Si quelque chose ne fonctionne pas, regardez les logs :
+
+```bash
+# Tous les services
+docker compose logs
+
+# Un service spécifique
+docker compose logs hadoop
+docker compose logs hbase
+docker compose logs hive
+```
+
+### Redémarrer un Service
+
+```bash
+docker compose restart hadoop
+docker compose restart hbase
+```
+
+---
+
+## Résolution de Problèmes
+
+### Problème 1 : Docker Desktop n'est pas lancé
+
+**Symptôme :** `docker: command not found` ou `Cannot connect to Docker`
+
+**Solution :**
+1. Lancez Docker Desktop depuis le menu Démarrer
+2. Attendez que l'icône Docker apparaisse dans la barre des tâches (1-2 minutes)
+3. Vérifiez : `docker info` (ne doit pas afficher d'erreur)
+
+### Problème 2 : Les conteneurs ne démarrent pas
+
+**Solution :**
+```bash
+# Arrêter tous les conteneurs
+docker compose down
+
+# Relancer
+docker compose up -d
+
+# OU utiliser le script setup
+.\scripts\setup.ps1    # Windows
+./scripts/setup.sh     # Linux/Mac
+```
+
+### Problème 3 : Conteneur "unhealthy"
+
+**Si Hadoop est "unhealthy" :**
+```bash
+# Regarder les logs
+docker compose logs hadoop
+
+# Réinitialiser complètement (ATTENTION : supprime les données)
+docker compose down -v
+docker compose build --no-cache hadoop
+docker compose up -d
+```
+
+**Si HBase est "unhealthy" :**
+```bash
+# Regarder les logs
+docker compose logs hbase
+
+# Vérifier que Hadoop et ZooKeeper sont "healthy"
+docker compose ps
+
+# Si Hadoop et ZooKeeper sont OK, attendez encore 2-3 minutes
+# HBase peut prendre jusqu'à 3 minutes pour démarrer complètement
+```
+
+**Si HBase affiche "Server is not running yet" :**
+- C'est normal au début, attendez 1-2 minutes supplémentaires
+- Le Master HBase peut prendre du temps à initialiser
+
+### Problème 4 : Port déjà utilisé
+
+**Symptôme :** `Port already in use` ou `access forbidden by its access permissions`
+
+**Solution automatique :**
+Le script `setup` ou `run` nettoie automatiquement les ports occupés. Si le problème persiste :
+
+**Sur Windows :**
+```powershell
+# Vérifier quel programme utilise le port
+netstat -ano | findstr :16011
+
+# Arrêter le processus (remplacez <PID> par le numéro trouvé)
+taskkill /PID <PID> /F
+```
+
+**Sur Linux/Mac :**
+```bash
+# Trouver le processus
+lsof -i :16011
+
+# Arrêter le processus
+kill -9 <PID>
+```
+
+### Problème 5 : "JAVA_HOME is not set"
+
+**Solution :**
+```bash
+# Mettre à jour le dépôt
+git pull origin main
+
+# Reconstruire les conteneurs
+docker compose build --no-cache
+docker compose up -d
+```
+
+### Problème 6 : Git pull échoue
+
+**Symptôme :** `Your local changes would be overwritten by merge`
+
+**Solution :**
 ```bash
 # Option 1 : Sauvegarder vos modifications
 git stash
 git pull origin main
+git stash pop
 
 # Option 2 : Réinitialiser complètement (ATTENTION : supprime vos modifications locales)
 git reset --hard origin/main
 git pull origin main
 ```
 
----
+### Problème 7 : Les conteneurs sont "Exited" (arrêtés)
 
-## Lancement de l'Environnement
-
-### Méthode la Plus Simple : Script `setup` (UNE SEULE COMMANDE)
-
-Le script `setup` vérifie et installe automatiquement les dépendances manquantes, puis lance l'environnement. **C'est la méthode recommandée pour démarrer rapidement.**
-
-**Linux/Mac :**
+**Solution :**
 ```bash
-chmod +x scripts/*.sh
-./scripts/setup.sh
+# Regarder les logs pour voir pourquoi
+docker compose logs
+
+# Redémarrer
+docker compose restart
+
+# OU relancer complètement
+.\scripts\setup.ps1    # Windows
+./scripts/setup.sh     # Linux/Mac
 ```
 
-**Windows PowerShell :**
-```powershell
-.\scripts\setup.ps1
-```
+### Réinitialiser Complètement (Dernier Recours)
 
-**Windows Batch :**
-```batch
-scripts\setup.bat
-```
-
-**Ce que fait le script `setup` :**
-1. ✅ Vérifie Docker (et tente de l'installer sur Linux si possible)
-2. ✅ Vérifie Docker Desktop (et le lance automatiquement sur Windows/Mac)
-3. ✅ Vérifie Docker Compose (et l'installe si nécessaire sur Linux)
-4. ✅ Vérifie Git (optionnel, installation automatique sur Linux)
-5. ✅ Lance automatiquement l'environnement
-
-### Méthode Alternative : Script `run`
-
-Le script `run` effectue toutes les vérifications nécessaires avant de lancer l'environnement (sans installation automatique).
-
-**Linux/Mac :**
-```bash
-chmod +x scripts/*.sh
-./scripts/run.sh
-```
-
-**Windows PowerShell :**
-```powershell
-.\scripts\run.ps1
-```
-
-**Windows Batch :**
-```batch
-scripts\run.bat
-```
-
-### Méthode Alternative : Scripts `start`
-
-Les scripts `start` effectuent également une vérification automatique :
-
-**Linux/Mac :**
-```bash
-./scripts/start.sh
-```
-
-**Windows PowerShell :**
-```powershell
-.\scripts\start.ps1
-```
-
-**Windows Batch :**
-```batch
-scripts\start.bat
-```
-
-### Méthode Manuelle : Docker Compose Direct
-
-Si vous préférez lancer manuellement :
+Si rien ne fonctionne, réinitialisez tout :
 
 ```bash
-# Détecter automatiquement docker-compose V1 ou V2
-docker-compose up -d
-# OU
-docker compose up -d
+# Arrêter et supprimer TOUT
+docker compose down -v
+
+# Nettoyer Docker
+docker system prune -a -f
+
+# Mettre à jour le code
+git pull origin main
+
+# Relancer avec setup
+.\scripts\setup.ps1    # Windows
+./scripts/setup.sh     # Linux/Mac
 ```
-
-**Note :** Le projet supporte automatiquement Docker Compose V1 (`docker-compose`) et V2 (`docker compose`).
-
-### Ce qui se passe lors du lancement
-
-1. Vérification automatique des prérequis (Docker, ports, fichiers, etc.)
-2. Démarrage des conteneurs dans l'ordre :
-   - Hadoop (HDFS, YARN)
-   - ZooKeeper
-   - HBase (dépend de Hadoop et ZooKeeper)
-   - Hive Metastore (dépend de Hadoop)
-   - Hive (dépend de Hadoop, HBase et Hive Metastore)
-3. Attente du démarrage complet (2-3 minutes)
-
----
-
-## Vérification et Tests
-
-### Vérifier l'État des Services
-
-```bash
-# Avec docker-compose V1
-docker-compose ps
-
-# Avec docker compose V2
-docker compose ps
-```
-
-**Résultat attendu :** Tous les conteneurs doivent être "Up" et "healthy" (ou au moins "Up" si le healthcheck n'est pas encore passé).
-
-**Si un conteneur est "unhealthy" :**
-- Attendez encore 1-2 minutes (les healthchecks peuvent prendre du temps)
-- Si après 5 minutes c'est toujours "unhealthy", consultez la section Résolution de Problèmes
-
-### Tester HBase
-
-```bash
-# Linux/Mac
-./scripts/hbase-shell.sh
-
-# Windows PowerShell
-.\scripts\hbase-shell.ps1
-
-# Windows Batch
-scripts\hbase-shell.bat
-```
-
-Dans le shell HBase, tapez :
-```
-version
-exit
-```
-
-Si la commande `version` affiche la version de HBase, HBase fonctionne correctement.
-
-### Tester Hive
-
-```bash
-# Linux/Mac
-./scripts/hive-cli.sh
-
-# Windows PowerShell
-.\scripts\hive-cli.ps1
-
-# Windows Batch
-scripts\hive-cli.bat
-```
-
-Dans le shell Hive, tapez :
-```sql
-SHOW DATABASES;
-exit;
-```
-
-Si la commande affiche les bases de données (même si la liste est vide), Hive fonctionne correctement.
-
-### Interfaces Web
-
-- **HDFS NameNode** : http://localhost:9870
-- **YARN ResourceManager** : http://localhost:8088
-- **HBase Master** : http://localhost:16011
 
 ---
 
@@ -296,8 +607,8 @@ Si la commande affiche les bases de données (même si la liste est vide), Hive 
 
 ```
 M2DE_Hbase/
-├── README.md                 # Ce fichier
-├── docker-compose.yml        # Configuration Docker (NE PAS MODIFIER)
+├── README.md                 # Ce fichier (guide complet)
+├── docker-compose.yml        # Configuration Docker
 │
 ├── docker/                   # Configurations Docker (NE PAS MODIFIER)
 │   ├── hadoop/              # Configuration Hadoop
@@ -305,15 +616,14 @@ M2DE_Hbase/
 │   └── hive/                # Configuration Hive
 │
 ├── scripts/                  # Scripts utilitaires
-│   ├── run.sh/.ps1/.bat     # Script principal (recommandé)
-│   ├── start.sh/.ps1/.bat   # Script de démarrage
-│   ├── stop.sh/.ps1/.bat    # Script d'arrêt
-│   ├── status.sh/.ps1/.bat  # Vérifier l'état
-│   ├── check-prereqs.*      # Vérification des prérequis
-│   ├── hbase-shell.*        # Accéder à HBase Shell
-│   └── hive-cli.*           # Accéder à Hive CLI
+│   ├── setup.*              # Script principal (RECOMMANDÉ)
+│   ├── run.*                # Script de lancement
+│   ├── stop.*               # Arrêter l'environnement
+│   ├── status.*              # Vérifier l'état
+│   ├── hbase-shell.*         # Accéder à HBase Shell
+│   └── hive-cli.*            # Accéder à Hive CLI
 │
-├── resources/                # Datasets pour les exercices (NE PAS MODIFIER)
+├── resources/                # Datasets pour les exercices
 │   ├── customers/           # Données clients (CSV)
 │   ├── iot-logs/            # Logs IoT (CSV)
 │   ├── sales/               # Données de ventes (CSV)
@@ -332,278 +642,13 @@ M2DE_Hbase/
 
 ---
 
-## Scripts Disponibles
-
-### Scripts Principaux
-
-**setup.sh/.ps1/.bat** : Script de configuration et lancement (RECOMMANDÉ)
-- **UNE SEULE COMMANDE** pour tout faire
-- Vérifie et installe automatiquement les dépendances manquantes
-- Lance Docker Desktop automatiquement si nécessaire (Windows/Mac)
-- Lance automatiquement l'environnement
-- **C'est la méthode la plus simple pour démarrer**
-
-**run.sh/.ps1/.bat** : Script principal
-- Exécute automatiquement `check-prereqs`
-- Lance `docker compose up -d`
-- Affiche un résumé de l'état
-- (Sans installation automatique des dépendances)
-
-**start.sh/.ps1/.bat** : Script de démarrage
-- Exécute automatiquement `check-before-start`
-- Lance `docker compose up -d`
-
-**stop.sh/.ps1/.bat** : Arrêter l'environnement
-```bash
-./scripts/stop.sh
-# Arrête tous les conteneurs
-```
-
-**status.sh/.ps1/.bat** : Vérifier l'état
-```bash
-./scripts/status.sh
-# Affiche l'état de tous les conteneurs
-```
-
-### Scripts de Vérification
-
-**check-prereqs.sh/.ps1/.bat** : Vérification complète des prérequis
-- Détecte automatiquement docker-compose V1 ou V2
-- Vérifie Docker, ports, fichiers, Git, etc.
-- Affiche des messages d'erreur clairs avec solutions
-
-**check-before-start.sh/.ps1/.bat** : Vérification avant démarrage (ancien script, toujours fonctionnel)
-
-### Scripts d'Accès aux Shells
-
-**hbase-shell.sh/.ps1/.bat** : Accéder à HBase Shell
-```bash
-./scripts/hbase-shell.sh
-```
-
-**hive-cli.sh/.ps1/.bat** : Accéder à Hive CLI
-```bash
-./scripts/hive-cli.sh
-```
-
----
-
-## Travail dans les Rooms
-
-### Qu'est-ce qu'une Room ?
-
-Une **room** est un parcours d'apprentissage guidé qui vous apprend progressivement HBase et Hive. Chaque room contient :
-- Un **README.md** avec les instructions complètes
-- Des **rappels théoriques** et **explications détaillées**
-- Des **exercices pratiques** à réaliser étape par étape
-- Des **datasets** fournis dans `/resources` (accessibles depuis les conteneurs)
-
-### Ordre des Rooms
-
-Suivez les rooms dans l'ordre numérique :
-
-1. **Room 0** : Introduction - Prise en main
-2. **Room 1** : HBase Basics - Opérations de base
-3. **Room 2** : HBase Advanced - Filtres et optimisation
-4. **Room 3** : Hive Introduction - Premières requêtes SQL
-5. **Room 4** : Hive Advanced - Jointures et partitions
-6. **Room 5** : Intégration HBase-Hive
-7. **Room 6** : Cas d'usage réels
-8. **Room 7** : Projet final
-
-**Règle importante :** Ne passez pas à la room suivante tant que vous n'avez pas terminé la précédente.
-
-### Comment Travailler dans une Room
-
-1. **Aller dans la room** : `cd rooms/room-0_introduction`
-2. **Lire le README.md** de la room entièrement
-3. **Suivre les instructions** étape par étape
-4. **Créer les fichiers demandés** dans le dossier de la room
-5. **Tester vos commandes** avec les scripts fournis
-6. **Documenter votre travail** dans les fichiers demandés
-7. **Enregistrer votre travail** avec Git (après chaque room)
-
-### Règles Importantes
-
-**Ce que vous POUVEZ faire :**
-- Créer et modifier des fichiers dans `/rooms/room-X_*/`
-- Documenter votre progression
-- Tester vos commandes
-
-**Ce que vous NE POUVEZ PAS faire :**
-- Modifier les fichiers Docker (`/docker/`)
-- Modifier les scripts (`/scripts/`)
-- Modifier les ressources (`/resources/`)
-- Modifier le README principal ou autres fichiers de documentation
-
-### Enregistrer son Travail
-
-Après chaque room terminée :
-
-```bash
-# Retourner à la racine du projet
-cd ../..
-
-# Ajouter les fichiers modifiés
-git add rooms/room-X_nom/*
-
-# Créer un commit
-git commit -m "Room X terminée"
-
-# Envoyer sur GitHub
-git push origin main
-```
-
----
-
-## Résolution de Problèmes
-
-### Problème 1 : Docker Desktop n'est pas lancé (Windows/Mac)
-
-**Symptôme :** `docker: command not found` ou `Cannot connect to Docker`
-
-**Solution :**
-1. Lancez Docker Desktop depuis le menu Démarrer
-2. Attendez que l'icône Docker apparaisse dans la barre des tâches (1-2 minutes)
-3. Vérifiez : `docker info` (ne doit pas afficher d'erreur)
-
-### Problème 2 : Les conteneurs ne démarrent pas
-
-**Solution :**
-```bash
-# Arrêter tous les conteneurs
-docker compose down
-# OU
-docker-compose down
-
-# Vérifier l'état
-docker compose ps
-
-# Relancer
-docker compose up -d
-```
-
-### Problème 3 : Conteneur "unhealthy"
-
-**Si Hadoop est "unhealthy" :**
-```bash
-# Regarder les logs
-docker compose logs hadoop
-
-# Réinitialiser complètement (ATTENTION : supprime les données)
-docker compose down -v
-docker compose build --no-cache
-docker compose up -d
-```
-
-**Si HBase est "unhealthy" :**
-```bash
-# Regarder les logs
-docker compose logs hbase
-
-# Vérifier que Hadoop et ZooKeeper sont "healthy"
-docker compose ps
-
-# Si Hadoop et ZooKeeper sont OK, attendez encore 2-3 minutes
-# Le healthcheck HBase peut prendre jusqu'à 3 minutes
-```
-
-### Problème 4 : Port déjà utilisé
-
-**Symptôme :** `Port already in use` ou `access forbidden by its access permissions`
-
-**Sur Windows :**
-```powershell
-# Vérifier quel programme utilise le port
-netstat -ano | findstr :16011
-
-# Arrêter le processus (remplacez <PID> par le numéro trouvé)
-taskkill /PID <PID> /F
-```
-
-**Ou changer le port dans docker-compose.yml :**
-- Trouvez la section `hbase` → `ports`
-- Changez `"16011:16010"` par `"16012:16010"` (ou un autre port libre)
-
-### Problème 5 : "JAVA_HOME is not set"
-
-**Solution :**
-```bash
-# Mettre à jour le dépôt
-git pull origin main
-
-# Reconstruire les conteneurs
-docker compose build --no-cache
-docker compose up -d
-```
-
-### Problème 6 : Les conteneurs sont "Exited" (arrêtés)
-
-**Solution :**
-```bash
-# Regarder les logs pour voir pourquoi
-docker compose logs
-
-# Redémarrer
-docker compose restart
-```
-
-### Problème 7 : Git pull échoue avec "Your local changes would be overwritten"
-
-**Solution :**
-```bash
-# Option 1 : Sauvegarder vos modifications
-git stash
-git pull origin main
-
-# Option 2 : Réinitialiser complètement (ATTENTION : supprime vos modifications locales)
-git reset --hard origin/main
-git pull origin main
-```
-
-### Diagnostic Détaillé
-
-**Vérifier les logs d'un service spécifique :**
-```bash
-docker compose logs hadoop
-docker compose logs hbase
-docker compose logs hive
-docker compose logs zookeeper
-```
-
-**Vérifier l'état de tous les conteneurs :**
-```bash
-docker compose ps
-```
-
-**Tester HBase manuellement :**
-```bash
-# Si le healthcheck échoue mais que HBase fonctionne
-./scripts/hbase-shell.sh    # Linux/Mac
-.\scripts\hbase-shell.ps1    # Windows
-
-# Tapez : version
-# Si ça fonctionne, HBase est opérationnel même si marqué "unhealthy"
-```
-
-**Réinitialiser complètement (ATTENTION : supprime les données) :**
-```bash
-docker compose down -v
-docker compose build --no-cache
-docker compose up -d
-```
-
----
-
-## Commandes de Référence
+## Commandes de Référence Rapide
 
 ### Docker Compose
 
 ```bash
 # Démarrer
 docker compose up -d
-# OU
-docker-compose up -d
 
 # Arrêter
 docker compose down
@@ -618,56 +663,63 @@ docker compose logs hbase
 
 # Redémarrer
 docker compose restart
-
-# Arrêter et supprimer les volumes (ATTENTION : supprime les données)
-docker compose down -v
 ```
 
 ### HBase Shell
 
-**Accéder au shell :**
+**Ouvrir le shell :**
 ```bash
-./scripts/hbase-shell.sh    # Linux/Mac
-.\scripts\hbase-shell.ps1    # Windows
+.\scripts\hbase-shell.ps1    # Windows PowerShell
+scripts\hbase-shell.bat      # Windows Batch
+./scripts/hbase-shell.sh     # Linux/Mac
 ```
 
-**Commandes HBase de base :**
+**Commandes de base :**
 ```
-create 'table', 'cf'                              # Créer une table
-put 'table', 'row', 'cf:col', 'value'            # Insérer une donnée
-get 'table', 'row'                                # Récupérer une ligne
-scan 'table'                                      # Voir toutes les données
-count 'table'                                     # Compter les lignes
-delete 'table', 'row'                             # Supprimer une ligne
-deleteall 'table', 'row'                          # Supprimer toute la ligne
-drop 'table'                                      # Supprimer la table
-list                                              # Lister toutes les tables
-describe 'table'                                  # Décrire une table
-exit                                              # Quitter
+create 'table', 'cf'                    # Créer une table
+put 'table', 'row', 'cf:col', 'value'  # Insérer une donnée
+get 'table', 'row'                      # Récupérer une ligne
+scan 'table'                            # Voir toutes les données
+count 'table'                           # Compter les lignes
+delete 'table', 'row'                   # Supprimer une ligne
+drop 'table'                            # Supprimer la table
+list                                    # Lister toutes les tables
+describe 'table'                        # Décrire une table
+exit                                    # Quitter
 ```
 
 ### Hive CLI
 
-**Accéder au CLI :**
+**Ouvrir le CLI :**
 ```bash
-./scripts/hive-cli.sh    # Linux/Mac
-.\scripts\hive-cli.ps1   # Windows
+.\scripts\hive-cli.ps1    # Windows PowerShell
+scripts\hive-cli.bat      # Windows Batch
+./scripts/hive-cli.sh     # Linux/Mac
 ```
 
-**Commandes Hive de base :**
+**Commandes de base :**
 ```sql
-SHOW DATABASES;                    # Lister les bases
-CREATE DATABASE nom_db;            # Créer une base
-USE nom_db;                        # Utiliser une base
-SHOW TABLES;                       # Lister les tables
-CREATE TABLE nom_table (...);      # Créer une table
-SELECT * FROM table;               # Voir les données
-DROP TABLE table;                  # Supprimer une table
-DROP DATABASE nom_db;              # Supprimer une base
-exit;                              # Quitter (avec ;)
+SHOW DATABASES;              # Lister les bases
+CREATE DATABASE nom_db;      # Créer une base
+USE nom_db;                  # Utiliser une base
+SHOW TABLES;                 # Lister les tables
+CREATE TABLE nom_table (...); # Créer une table
+SELECT * FROM table;         # Voir les données
+DROP TABLE table;            # Supprimer une table
+exit;                        # Quitter (avec ;)
 ```
 
 **Note importante :** Hive nécessite un point-virgule `;` à la fin de chaque commande. HBase non.
+
+---
+
+## Interfaces Web
+
+Une fois l'environnement lancé, vous pouvez accéder à :
+
+- **HDFS NameNode** : http://localhost:9870
+- **YARN ResourceManager** : http://localhost:8088
+- **HBase Master** : http://localhost:16011
 
 ---
 
@@ -685,15 +737,13 @@ exit;                              # Quitter (avec ;)
 
 ---
 
-## Support et Aide
+## Support
 
-Si vous rencontrez un problème non résolu dans cette documentation :
+Si vous rencontrez un problème :
 
 1. Vérifiez que vous avez bien suivi toutes les étapes
 2. Consultez les logs : `docker compose logs`
 3. Vérifiez que votre dépôt est à jour : `git pull origin main`
-4. Réinitialisez complètement si nécessaire : `docker compose down -v && docker compose up -d`
-
----
+4. Utilisez le script `setup` pour réinitialiser : `.\scripts\setup.ps1`
 
 **Bon apprentissage !**
