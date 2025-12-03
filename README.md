@@ -255,18 +255,23 @@ docker exec -it $(docker compose ps -q hive) hive
 **Cause :** Le nom exact du conteneur peut varier selon votre version de Docker Compose.
 
 **Solution :**
-1. **Utilisez les scripts fournis** (recommandé) :
+1. **Vérifiez que les conteneurs sont démarrés :**
    ```bash
-   .\scripts\hadoop-shell.ps1    # Au lieu de docker exec manuel
-   .\scripts\hbase-shell.ps1
-   .\scripts\hive-cli.ps1
+   docker compose ps
    ```
-   Ces scripts détectent automatiquement le bon nom de conteneur.
 
-2. **Ou trouvez le nom exact manuellement :**
+2. **Utilisez directement l'ID du service :**
+   ```bash
+   docker exec -it $(docker compose ps -q hbase) hbase shell
+   docker exec -it $(docker compose ps -q hive) hive
+   docker exec -it $(docker compose ps -q hadoop) bash
+   ```
+
+3. **Ou trouvez le nom exact manuellement :**
    ```bash
    docker compose ps
    # Utilisez le nom exact affiché dans la colonne NAME
+   docker exec -it hbase-hive-learning-lab-hbase hbase shell
    ```
 
 ### Port déjà utilisé
