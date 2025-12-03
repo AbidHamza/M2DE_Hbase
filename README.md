@@ -269,6 +269,27 @@ docker exec -it hbase-hive-learning-lab-hadoop bash
    .\scripts\start.ps1    # Relancer
    ```
 
+### Erreur "No such container"
+
+**Symptôme :** `Error response from daemon: No such container: hbase-hive-learning-lab-hadoop-1`
+
+**Cause :** Le nom exact du conteneur peut varier selon votre version de Docker Compose.
+
+**Solution :**
+1. **Utilisez les scripts fournis** (recommandé) :
+   ```bash
+   .\scripts\hadoop-shell.ps1    # Au lieu de docker exec manuel
+   .\scripts\hbase-shell.ps1
+   .\scripts\hive-cli.ps1
+   ```
+   Ces scripts détectent automatiquement le bon nom de conteneur.
+
+2. **Ou trouvez le nom exact manuellement :**
+   ```bash
+   docker compose ps
+   # Utilisez le nom exact affiché dans la colonne NAME
+   ```
+
 ### Port déjà utilisé
 
 **Solution :**
