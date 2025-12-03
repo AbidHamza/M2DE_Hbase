@@ -253,8 +253,36 @@ if [ -z "$COMPOSE_CMD" ]; then
     exit 1
 fi
 
-# 10. Lancer docker compose avec retry automatique
-echo "[10/10] Lancement des conteneurs Docker..."
+# 10. Vérification finale Docker daemon avant lancement
+echo "[10/11] Vérification finale Docker daemon..."
+DOCKER_READY=0
+for i in {1..10}; do
+    if docker info &> /dev/null 2>&1; then
+        DOCKER_READY=1
+        echo "  ✅ Docker daemon est accessible"
+        break
+    fi
+    if [ $i -lt 10 ]; then
+        echo "  ⚠️  Docker daemon non accessible, attente 2 secondes... (tentative $i/10)"
+        sleep 2
+    fi
+done
+
+if [ $DOCKER_READY -eq 0 ]; then
+    echo "  ❌ ERREUR: Docker daemon n'est pas accessible"
+    echo ""
+    echo "Solutions:"
+    echo "  1. Vérifiez que Docker Desktop est lancé"
+    echo "  2. Attendez que Docker Desktop soit complètement démarré (1-2 minutes)"
+    echo "  3. Redémarrez Docker Desktop si nécessaire"
+    echo "  4. Vérifiez avec: docker info"
+    echo ""
+    exit 1
+fi
+echo ""
+
+# 11. Lancer docker compose avec retry automatique
+echo "[11/11] Lancement des conteneurs Docker..."
 echo "  (Cela peut prendre 3-5 minutes pour démarrer tous les services)"
 echo ""
 
@@ -265,11 +293,29 @@ SUCCESS=0
 while [ $RETRY -lt $MAX_RETRIES ] && [ $SUCCESS -eq 0 ]; do
     if [ $RETRY -gt 0 ]; then
         echo "  🔄 Tentative $((RETRY + 1))/$MAX_RETRIES..."
+        echo "     → Vérification Docker daemon avant retry..."
+        # Vérifier Docker daemon avant chaque retry
+        DOCKER_OK=0
+        for j in {1..5}; do
+            if docker info &> /dev/null 2>&1; then
+                DOCKER_OK=1
+                break
+            fi
+            sleep 2
+        done
+        if [ $DOCKER_OK -eq 0 ]; then
+            echo "     ❌ Docker daemon non accessible, arrêt des tentatives"
+            echo ""
+            echo "Solutions:"
+            echo "  1. Vérifiez que Docker Desktop est lancé"
+            echo "  2. Redémarrez Docker Desktop"
+            echo "  3. Vérifiez avec: docker info"
+            exit 1
+        fi
         echo "     → Nettoyage avant retry..."
         eval "$COMPOSE_CMD down -v" >/dev/null 2>&1 || true
         sleep 5
     fi
-    
     
     if eval "$COMPOSE_CMD up -d --build"; then
         SUCCESS=1
