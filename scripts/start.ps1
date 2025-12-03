@@ -385,6 +385,85 @@ if ($javaHomeErrors) {
 }
 Write-Host ""
 
+# ==========================================
+# ÉTAPE 10 : Vérification Hive dans les logs
+# ==========================================
+Write-Host "[10/10] Vérification Hive..." -ForegroundColor Yellow
+Start-Sleep -Seconds 20
+
+$hiveErrors = $false
+$hiveMaxChecks = 6
+$hiveCheckCount = 0
+
+while ($hiveCheckCount -lt $hiveMaxChecks) {
+    $hiveMetastoreLogs = Invoke-Expression "$composeCmd logs hive-metastore 2>&1" | Out-String
+    $hiveLogs = Invoke-Expression "$composeCmd logs hive 2>&1" | Out-String
+    
+    # Détecter les erreurs Hive
+    if ($hiveMetastoreLogs -match "Cannot find hadoop installation" -or 
+        $hiveMetastoreLogs -match "HADOOP_HOME.*not.*set" -or
+        $hiveMetastoreLogs -match "HADOOP_CONF_DIR.*not.*exist" -or
+        $hiveMetastoreLogs -match "ERROR.*JAVA_HOME" -or
+        $hiveLogs -match "Cannot find hadoop installation" -or
+        $hiveLogs -match "HADOOP_HOME.*not.*set" -or
+        $hiveLogs -match "HADOOP_CONF_DIR.*not.*exist") {
+        
+        $hiveErrors = $true
+        Write-Host "  [ATTENTION] Erreurs Hive détectées dans les logs" -ForegroundColor Yellow
+        Write-Host "  [REPARATION] Reconstruction de l'image Hive..." -ForegroundColor Cyan
+        
+        # Arrêter les conteneurs
+        Invoke-Expression "$composeCmd down -v" 2>&1 | Out-Null
+        Start-Sleep -Seconds 5
+        
+        # Reconstruire l'image hive sans cache
+        Write-Host "  [INFO] Reconstruction en cours (cela peut prendre 2-3 minutes)..." -ForegroundColor Gray
+        Invoke-Expression "$composeCmd build --no-cache hive" 2>&1 | Out-Null
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] Image Hive reconstruite" -ForegroundColor Green
+            Write-Host "  [INFO] Relancement des conteneurs..." -ForegroundColor Cyan
+            
+            # Relancer les conteneurs avec build
+            Invoke-Expression "$composeCmd up -d --build" 2>&1 | Out-Null
+            Write-Host "  [INFO] Attente du démarrage initial (45 secondes)..." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            
+            # Réinitialiser le compteur
+            $hiveCheckCount = 0
+            $hiveErrors = $false
+            continue
+        } else {
+            Write-Host "  [ERREUR] Échec de la reconstruction" -ForegroundColor Red
+            break
+        }
+    } else {
+        # Vérifier si Hive est healthy
+        $hiveMetastoreStatus = Invoke-Expression "$composeCmd ps hive-metastore --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $hiveStatus = Invoke-Expression "$composeCmd ps hive --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+        
+        if (($hiveMetastoreStatus -and $hiveMetastoreStatus.Health -eq "healthy") -and 
+            ($hiveStatus -and $hiveStatus.Health -eq "healthy")) {
+            Write-Host "  [OK] Hive est opérationnel" -ForegroundColor Green
+            break
+        }
+    }
+    
+    $hiveCheckCount++
+    if ($hiveCheckCount -lt $hiveMaxChecks) {
+        Write-Host "  [INFO] Attente du démarrage Hive... ($hiveCheckCount/$hiveMaxChecks)" -ForegroundColor Gray
+        Start-Sleep -Seconds 15
+    }
+}
+
+if ($hiveErrors) {
+    Write-Host "  [ATTENTION] Problèmes Hive persistants" -ForegroundColor Yellow
+    Write-Host "  -> Consultez les logs: $composeCmd logs hive-metastore hive" -ForegroundColor White
+} else {
+    Write-Host "  [OK] Hive configuré correctement" -ForegroundColor Green
+}
+Write-Host ""
+
 Write-Host "Attente du démarrage complet (30 secondes supplémentaires)..." -ForegroundColor Yellow
 Start-Sleep -Seconds 30
 

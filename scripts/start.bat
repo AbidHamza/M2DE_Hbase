@@ -278,6 +278,73 @@ if !JAVA_HOME_ERRORS! equ 1 (
 )
 echo.
 
+REM ÉTAPE 10 : Vérification Hive dans les logs
+echo [10/10] Verification Hive...
+timeout /t 20 /nobreak >nul
+
+set HIVE_ERRORS=0
+set HIVE_MAX_CHECKS=6
+set HIVE_CHECK_COUNT=0
+
+:check_hive
+if !HIVE_CHECK_COUNT! geq !HIVE_MAX_CHECKS! goto hive_check_done
+
+!COMPOSE_CMD! logs hive-metastore hive 2>&1 | findstr /I /C:"Cannot find hadoop" /C:"HADOOP_HOME" /C:"HADOOP_CONF_DIR" /C:"ERROR" >nul 2>&1
+if not errorlevel 1 (
+    set HIVE_ERRORS=1
+    echo   [ATTENTION] Erreurs Hive detectees dans les logs
+    echo   [REPARATION] Reconstruction de l'image Hive...
+    
+    REM Arrêter les conteneurs
+    !COMPOSE_CMD! down -v >nul 2>&1
+    timeout /t 5 /nobreak >nul
+    
+    REM Reconstruire l'image hive sans cache
+    echo   [INFO] Reconstruction en cours (cela peut prendre 2-3 minutes)...
+    !COMPOSE_CMD! build --no-cache hive
+    
+    if not errorlevel 1 (
+        echo   [OK] Image Hive reconstruite
+        echo   [INFO] Relancement des conteneurs...
+        
+        REM Relancer les conteneurs avec build
+        !COMPOSE_CMD! up -d --build >nul 2>&1
+        echo   [INFO] Attente du demarrage initial (45 secondes)...
+        timeout /t 45 /nobreak >nul
+        
+        REM Réinitialiser le compteur
+        set HIVE_CHECK_COUNT=0
+        set HIVE_ERRORS=0
+        goto check_hive
+    ) else (
+        echo   [ERREUR] Echec de la reconstruction
+        goto hive_check_done
+    )
+) else (
+    REM Vérifier si Hive est healthy (simplifié)
+    !COMPOSE_CMD! ps hive-metastore hive 2>&1 | findstr /C:"healthy" >nul 2>&1
+    if not errorlevel 1 (
+        echo   [OK] Hive est operationnel
+        goto hive_check_done
+    )
+)
+
+set /a HIVE_CHECK_COUNT+=1
+if !HIVE_CHECK_COUNT! lss !HIVE_MAX_CHECKS! (
+    echo   [INFO] Attente du demarrage Hive... (!HIVE_CHECK_COUNT!/!HIVE_MAX_CHECKS!)
+    timeout /t 15 /nobreak >nul
+    goto check_hive
+)
+
+:hive_check_done
+if !HIVE_ERRORS! equ 1 (
+    echo   [ATTENTION] Problemes Hive persistants
+    echo   -^> Consultez les logs: !COMPOSE_CMD! logs hive-metastore hive
+) else (
+    echo   [OK] Hive configure correctement
+)
+echo.
+
 echo Attente du demarrage complet (30 secondes supplementaires)...
 timeout /t 30 /nobreak >nul
 

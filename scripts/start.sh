@@ -391,6 +391,75 @@ else
 fi
 echo ""
 
+# ==========================================
+# ÉTAPE 10 : Vérification Hive dans les logs
+# ==========================================
+echo "[10/10] Vérification Hive..."
+sleep 20
+
+HIVE_ERRORS=0
+HIVE_MAX_CHECKS=6
+HIVE_CHECK_COUNT=0
+
+while [ $HIVE_CHECK_COUNT -lt $HIVE_MAX_CHECKS ]; do
+    HIVE_METASTORE_LOGS=$(eval "$COMPOSE_CMD logs hive-metastore 2>&1" || echo "")
+    HIVE_LOGS=$(eval "$COMPOSE_CMD logs hive 2>&1" || echo "")
+    
+    # Détecter les erreurs Hive
+    if echo "$HIVE_METASTORE_LOGS $HIVE_LOGS" | grep -qiE "(Cannot find hadoop installation|HADOOP_HOME.*not.*set|HADOOP_CONF_DIR.*not.*exist|ERROR.*JAVA_HOME)" 2>/dev/null; then
+        HIVE_ERRORS=1
+        echo "  [ATTENTION] Erreurs Hive détectées dans les logs"
+        echo "  [REPARATION] Reconstruction de l'image Hive..."
+        
+        # Arrêter les conteneurs
+        eval "$COMPOSE_CMD down -v" >/dev/null 2>&1 || true
+        sleep 5
+        
+        # Reconstruire l'image hive sans cache
+        echo "  [INFO] Reconstruction en cours (cela peut prendre 2-3 minutes)..."
+        if eval "$COMPOSE_CMD build --no-cache hive" 2>&1; then
+            echo "  [OK] Image Hive reconstruite"
+            echo "  [INFO] Relancement des conteneurs..."
+            
+            # Relancer les conteneurs avec build
+            eval "$COMPOSE_CMD up -d --build" >/dev/null 2>&1
+            echo "  [INFO] Attente du démarrage initial (45 secondes)..."
+            sleep 45
+            
+            # Réinitialiser le compteur
+            HIVE_CHECK_COUNT=0
+            HIVE_ERRORS=0
+            continue
+        else
+            echo "  [ERREUR] Échec de la reconstruction"
+            break
+        fi
+    else
+        # Vérifier si Hive est healthy
+        HIVE_METASTORE_STATUS=$(eval "$COMPOSE_CMD ps hive-metastore --format json" 2>/dev/null | grep -o '"Health":"healthy"' || echo "")
+        HIVE_STATUS=$(eval "$COMPOSE_CMD ps hive --format json" 2>/dev/null | grep -o '"Health":"healthy"' || echo "")
+        
+        if [ -n "$HIVE_METASTORE_STATUS" ] && [ -n "$HIVE_STATUS" ]; then
+            echo "  [OK] Hive est opérationnel"
+            break
+        fi
+    fi
+    
+    HIVE_CHECK_COUNT=$((HIVE_CHECK_COUNT + 1))
+    if [ $HIVE_CHECK_COUNT -lt $HIVE_MAX_CHECKS ]; then
+        echo "  [INFO] Attente du démarrage Hive... ($HIVE_CHECK_COUNT/$HIVE_MAX_CHECKS)"
+        sleep 15
+    fi
+done
+
+if [ $HIVE_ERRORS -eq 1 ]; then
+    echo "  [ATTENTION] Problèmes Hive persistants"
+    echo "  -> Consultez les logs: $COMPOSE_CMD logs hive-metastore hive"
+else
+    echo "  [OK] Hive configuré correctement"
+fi
+echo ""
+
 echo "Attente du démarrage complet (30 secondes supplémentaires)..."
 sleep 30
 
