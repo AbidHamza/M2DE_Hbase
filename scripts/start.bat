@@ -372,7 +372,28 @@ echo.
 echo Accès aux services:
 echo   - HBase Shell: scripts\hbase-shell.bat
 echo   - Hive CLI: scripts\hive-cli.bat
-echo   - État: scripts\status.bat
+echo.
+echo ==========================================
+echo ÉTAT DES SERVICES
+echo ==========================================
+%composeCmd% ps
+
+echo.
+echo Interfaces Web disponibles:
+echo   - HDFS NameNode: http://localhost:9870
+echo   - YARN ResourceManager: http://localhost:8088
+echo   - HBase Master: http://localhost:16011
+echo.
+echo Pour accéder aux shells, utilisez directement Docker:
+for /f "tokens=*" %%i in ('%composeCmd% ps -q hbase 2^>nul') do set HBASE_CONTAINER=%%i
+for /f "tokens=*" %%i in ('%composeCmd% ps -q hive 2^>nul') do set HIVE_CONTAINER=%%i
+for /f "tokens=*" %%i in ('%composeCmd% ps -q hadoop 2^>nul') do set HADOOP_CONTAINER=%%i
+echo   - HBase Shell: docker exec -it %HBASE_CONTAINER% hbase shell
+echo   - Hive CLI: docker exec -it %HIVE_CONTAINER% hive
+echo   - Hadoop Shell: docker exec -it %HADOOP_CONTAINER% bash
+echo.
+echo Pour arrêter l'environnement: scripts\stop.bat
+echo.
 echo.
 echo Interfaces Web:
 echo   - HDFS: http://localhost:9870

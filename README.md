@@ -140,41 +140,25 @@ Chaque room contient :
 
 **Accéder au shell Hadoop :**
 ```bash
-# Windows PowerShell
-.\scripts\hadoop-shell.ps1
-
-# Windows Batch
-scripts\hadoop-shell.bat
-
-# Linux/Mac
-./scripts/hadoop-shell.sh
+docker exec -it $(docker compose ps -q hadoop) bash
 ```
 
 **Accéder au shell HBase :**
 ```bash
-# Windows PowerShell
-.\scripts\hbase-shell.ps1
-
-# Windows Batch
-scripts\hbase-shell.bat
-
-# Linux/Mac
-./scripts/hbase-shell.sh
+docker exec -it $(docker compose ps -q hbase) hbase shell
 ```
 
 **Accéder au CLI Hive :**
 ```bash
-# Windows PowerShell
-.\scripts\hive-cli.ps1
-
-# Windows Batch
-scripts\hive-cli.bat
-
-# Linux/Mac
-./scripts/hive-cli.sh
+docker exec -it $(docker compose ps -q hive) hive
 ```
 
-**Note :** Ces scripts détectent automatiquement le bon nom de conteneur, même si Docker Compose utilise des noms différents.
+**Note :** Si `$(docker compose ps -q ...)` ne fonctionne pas sur votre système, trouvez d'abord l'ID du conteneur :
+```bash
+docker compose ps
+# Utilisez l'ID ou le nom affiché dans la colonne NAME
+docker exec -it hbase-hive-learning-lab-hadoop bash
+```
 
 ### Arrêter l'Environnement
 
@@ -192,15 +176,10 @@ scripts\stop.bat
 ### Vérifier l'État
 
 ```bash
-# Windows PowerShell
-.\scripts\status.ps1
-
-# Windows Batch
-scripts\status.bat
-
-# Linux/Mac
-./scripts/status.sh
+docker compose ps
 ```
+
+Le script `start` affiche automatiquement l'état à la fin du démarrage.
 
 ### Voir les Logs
 
@@ -234,11 +213,11 @@ hbase-hive-learning-lab-hbase      Up 5 minutes (healthy)
 docker exec -it hbase-hive-learning-lab-hadoop bash
 ```
 
-**OU utilisez les scripts fournis** (recommandé - détection automatique) :
+**OU utilisez directement l'ID du service :**
 ```bash
-.\scripts\hadoop-shell.ps1    # Windows PowerShell
-.\scripts\hbase-shell.ps1     # Windows PowerShell
-.\scripts\hive-cli.ps1        # Windows PowerShell
+docker exec -it $(docker compose ps -q hadoop) bash
+docker exec -it $(docker compose ps -q hbase) hbase shell
+docker exec -it $(docker compose ps -q hive) hive
 ```
 
 ---

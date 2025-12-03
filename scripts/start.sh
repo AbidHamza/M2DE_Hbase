@@ -472,7 +472,25 @@ echo "Attente du démarrage complet (30 secondes supplémentaires)..."
 sleep 30
 
 echo ""
-echo "Vérification de l'état..."
+echo ""
+echo "=========================================="
+echo "ÉTAT DES SERVICES"
+echo "=========================================="
+$COMPOSE_CMD ps
+
+echo ""
+echo "Interfaces Web disponibles:"
+echo "  - HDFS NameNode: http://localhost:9870"
+echo "  - YARN ResourceManager: http://localhost:8088"
+echo "  - HBase Master: http://localhost:16011"
+echo ""
+echo "Pour accéder aux shells, utilisez directement Docker:"
+echo "  - HBase Shell: docker exec -it \$($COMPOSE_CMD ps -q hbase) hbase shell"
+echo "  - Hive CLI: docker exec -it \$($COMPOSE_CMD ps -q hive) hive"
+echo "  - Hadoop Shell: docker exec -it \$($COMPOSE_CMD ps -q hadoop) bash"
+echo ""
+echo "Pour arrêter l'environnement: ./scripts/stop.sh"
+echo ""
 eval "$COMPOSE_CMD ps"
 
 echo ""

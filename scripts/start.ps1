@@ -542,7 +542,28 @@ Write-Host "Attente du démarrage complet (30 secondes supplémentaires)..." -Fo
 Start-Sleep -Seconds 30
 
 Write-Host ""
-Write-Host "Vérification de l'état..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "==========================================" -ForegroundColor Green
+Write-Host "ÉTAT DES SERVICES" -ForegroundColor Green
+Write-Host "==========================================" -ForegroundColor Green
+& $COMPOSE_CMD ps
+
+Write-Host ""
+Write-Host "Interfaces Web disponibles:" -ForegroundColor Cyan
+Write-Host "  - HDFS NameNode: http://localhost:9870" -ForegroundColor White
+Write-Host "  - YARN ResourceManager: http://localhost:8088" -ForegroundColor White
+Write-Host "  - HBase Master: http://localhost:16011" -ForegroundColor White
+Write-Host ""
+Write-Host "Pour accéder aux shells, utilisez directement Docker:" -ForegroundColor Cyan
+$hbaseContainer = & $COMPOSE_CMD ps -q hbase 2>$null
+$hiveContainer = & $COMPOSE_CMD ps -q hive 2>$null
+$hadoopContainer = & $COMPOSE_CMD ps -q hadoop 2>$null
+Write-Host "  - HBase Shell: docker exec -it $hbaseContainer hbase shell" -ForegroundColor White
+Write-Host "  - Hive CLI: docker exec -it $hiveContainer hive" -ForegroundColor White
+Write-Host "  - Hadoop Shell: docker exec -it $hadoopContainer bash" -ForegroundColor White
+Write-Host ""
+Write-Host "Pour arrêter l'environnement: .\scripts\stop.ps1" -ForegroundColor Yellow
+Write-Host ""
 Invoke-Expression "$composeCmd ps"
 
 Write-Host ""
