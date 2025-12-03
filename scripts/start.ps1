@@ -81,7 +81,7 @@ function Restore-MissingFiles {
 # ==========================================
 # ÉTAPE 1 : Vérification Docker
 # ==========================================
-Write-Host "[1/8] Vérification Docker..." -ForegroundColor Yellow
+Write-Host "[1/10] Vérification Docker..." -ForegroundColor Yellow
 try {
     $dockerVersion = docker --version 2>&1
     if ($LASTEXITCODE -eq 0) {
@@ -105,7 +105,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 2 : Détection Docker Compose
 # ==========================================
-Write-Host "[2/8] Détection Docker Compose..." -ForegroundColor Yellow
+Write-Host "[2/10] Détection Docker Compose..." -ForegroundColor Yellow
 try {
     $composeVersion = docker-compose --version 2>&1
     if ($LASTEXITCODE -eq 0) {
@@ -139,7 +139,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 3 : Vérification Docker Desktop
 # ==========================================
-Write-Host "[3/8] Vérification Docker Desktop..." -ForegroundColor Yellow
+Write-Host "[3/10] Vérification Docker Desktop..." -ForegroundColor Yellow
 try {
     docker info 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
@@ -169,7 +169,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 4 : Vérification fichiers
 # ==========================================
-Write-Host "[4/8] Vérification fichiers..." -ForegroundColor Yellow
+Write-Host "[4/10] Vérification fichiers..." -ForegroundColor Yellow
 if (-not (Test-Path "docker-compose.yml")) {
     Write-Host "  [INFO] docker-compose.yml introuvable" -ForegroundColor Yellow
     Write-Host "  [INFO] Tentative de récupération..." -ForegroundColor Cyan
@@ -192,7 +192,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 5 : Nettoyage conteneurs existants
 # ==========================================
-Write-Host "[5/8] Nettoyage conteneurs existants..." -ForegroundColor Yellow
+Write-Host "[5/10] Nettoyage conteneurs existants..." -ForegroundColor Yellow
 try {
     $runningContainers = docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>&1 | Where-Object { $_ -ne "" }
     if ($runningContainers.Count -gt 0) {
@@ -217,7 +217,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 6 : Libération ports occupés
 # ==========================================
-Write-Host "[6/8] Vérification ports..." -ForegroundColor Yellow
+Write-Host "[6/10] Vérification ports..." -ForegroundColor Yellow
 $ports = @(9000, 9870, 16011, 2181)
 $portConflicts = 0
 foreach ($port in $ports) {
@@ -238,7 +238,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 7 : Vérification espace disque
 # ==========================================
-Write-Host "[7/8] Vérification espace disque..." -ForegroundColor Yellow
+Write-Host "[7/10] Vérification espace disque..." -ForegroundColor Yellow
 try {
     $disk = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Root -eq (Get-Location).Drive.Root }
     $freeGB = [math]::Round($disk.Free / 1GB, 2)
@@ -259,7 +259,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 8 : Vérification finale Docker
 # ==========================================
-Write-Host "[8/8] Vérification finale Docker..." -ForegroundColor Yellow
+Write-Host "[8/10] Vérification finale Docker..." -ForegroundColor Yellow
 $dockerReady = $false
 for ($i = 1; $i -le 10; $i++) {
     docker info 2>&1 | Out-Null
@@ -344,7 +344,7 @@ Write-Host ""
 # ==========================================
 # ÉTAPE 9 : Vérification JAVA_HOME dans les logs
 # ==========================================
-Write-Host "[9/9] Vérification JAVA_HOME..." -ForegroundColor Yellow
+Write-Host "[9/10] Vérification JAVA_HOME..." -ForegroundColor Yellow
 Start-Sleep -Seconds 30
 
 $javaHomeErrors = $false
@@ -433,18 +433,10 @@ while ($hiveCheckCount -lt $hiveMaxChecks) {
     $hiveMetastoreLogs = Invoke-Expression "$composeCmd logs hive-metastore 2>&1" | Out-String
     $hiveLogs = Invoke-Expression "$composeCmd logs hive 2>&1" | Out-String
     
-    # Détecter les erreurs Hive
-    if ($hiveMetastoreLogs -match "Cannot find hadoop installation" -or 
-        $hiveMetastoreLogs -match "HADOOP_HOME.*not.*set" -or
-        $hiveMetastoreLogs -match "HADOOP_CONF_DIR.*not.*exist" -or
-        $hiveMetastoreLogs -match "Hadoop binaries not found" -or
-        $hiveMetastoreLogs -match "hadoop.*command not found" -or
-        $hiveMetastoreLogs -match "ERROR.*JAVA_HOME" -or
-        $hiveLogs -match "Cannot find hadoop installation" -or
-        $hiveLogs -match "HADOOP_HOME.*not.*set" -or
-        $hiveLogs -match "HADOOP_CONF_DIR.*not.*exist" -or
-        $hiveLogs -match "Hadoop binaries not found" -or
-        $hiveLogs -match "hadoop.*command not found") {
+    # Détecter les erreurs Hive (regex unifiée pour tous les patterns)
+    $hiveErrorPattern = "(?i)(Cannot find hadoop installation|HADOOP_HOME.*(not.*set|does not exist)|HADOOP_CONF_DIR.*(not.*exist|does not exist)|Hadoop binaries not found|hadoop.*command not found|ERROR.*JAVA_HOME|ERROR.*HADOOP_HOME|ERROR.*HADOOP_CONF_DIR)"
+    $allHiveLogs = "$hiveMetastoreLogs $hiveLogs"
+    if ($allHiveLogs -match $hiveErrorPattern) {
         
         $hiveErrors = $true
         Write-Host "  [ATTENTION] Erreurs Hive détectées dans les logs" -ForegroundColor Yellow
@@ -476,12 +468,31 @@ while ($hiveCheckCount -lt $hiveMaxChecks) {
             break
         }
     } else {
-        # Vérifier si Hive est healthy
-        $hiveMetastoreStatus = Invoke-Expression "$composeCmd ps hive-metastore --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
-        $hiveStatus = Invoke-Expression "$composeCmd ps hive --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+        # Vérifier si Hive est healthy (méthode robuste)
+        $hiveMetastoreHealthy = $false
+        $hiveHealthy = $false
         
-        if (($hiveMetastoreStatus -and $hiveMetastoreStatus.Health -eq "healthy") -and 
-            ($hiveStatus -and $hiveStatus.Health -eq "healthy")) {
+        $hiveMetastoreStatusRaw = Invoke-Expression "$composeCmd ps hive-metastore --format json" 2>&1
+        if ($hiveMetastoreStatusRaw -match '"Health":"healthy"') {
+            $hiveMetastoreHealthy = $true
+        } else {
+            $hiveMetastorePs = Invoke-Expression "$composeCmd ps hive-metastore" 2>&1 | Out-String
+            if ($hiveMetastorePs -match "healthy") {
+                $hiveMetastoreHealthy = $true
+            }
+        }
+        
+        $hiveStatusRaw = Invoke-Expression "$composeCmd ps hive --format json" 2>&1
+        if ($hiveStatusRaw -match '"Health":"healthy"') {
+            $hiveHealthy = $true
+        } else {
+            $hivePs = Invoke-Expression "$composeCmd ps hive" 2>&1 | Out-String
+            if ($hivePs -match "healthy") {
+                $hiveHealthy = $true
+            }
+        }
+        
+        if ($hiveMetastoreHealthy -and $hiveHealthy) {
             Write-Host "  [OK] Hive est opérationnel" -ForegroundColor Green
             break
         }

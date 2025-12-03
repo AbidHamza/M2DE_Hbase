@@ -63,7 +63,7 @@ restore_missing_files() {
 # ==========================================
 # ÉTAPE 1 : Vérification Docker
 # ==========================================
-echo "[1/8] Vérification Docker..."
+echo "[1/10] Vérification Docker..."
 if ! command -v docker &> /dev/null; then
     echo "  [ERREUR] Docker n'est pas installé"
     echo "  -> Installation automatique..."
@@ -113,7 +113,7 @@ echo ""
 # ==========================================
 # ÉTAPE 2 : Détection Docker Compose
 # ==========================================
-echo "[2/8] Détection Docker Compose..."
+echo "[2/10] Détection Docker Compose..."
 if command -v docker-compose &> /dev/null; then
     COMPOSE_CMD="docker-compose"
     COMPOSE_VERSION=$(docker-compose --version 2>&1)
@@ -152,7 +152,7 @@ echo ""
 # ==========================================
 # ÉTAPE 3 : Vérification Docker daemon
 # ==========================================
-echo "[3/8] Vérification Docker daemon..."
+echo "[3/10] Vérification Docker daemon..."
 if ! docker info &> /dev/null; then
     echo "  [INFO] Docker daemon n'est pas en cours d'exécution"
     echo "  [INFO] Tentative de démarrage..."
@@ -179,7 +179,7 @@ echo ""
 # ==========================================
 # ÉTAPE 4 : Vérification fichiers
 # ==========================================
-echo "[4/8] Vérification fichiers..."
+echo "[4/10] Vérification fichiers..."
 if [ ! -f "docker-compose.yml" ]; then
     echo "  [INFO] docker-compose.yml introuvable"
     echo "  [INFO] Tentative de récupération..."
@@ -202,7 +202,7 @@ echo ""
 # ==========================================
 # ÉTAPE 5 : Nettoyage conteneurs existants
 # ==========================================
-echo "[5/8] Nettoyage conteneurs existants..."
+echo "[5/10] Nettoyage conteneurs existants..."
 RUNNING_COUNT=$(docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>/dev/null | wc -l || echo "0")
 if [ "$RUNNING_COUNT" -gt 0 ]; then
     echo "  [INFO] Arrêt des conteneurs existants..."
@@ -222,7 +222,7 @@ echo ""
 # ==========================================
 # ÉTAPE 6 : Libération ports occupés
 # ==========================================
-echo "[6/8] Vérification ports..."
+echo "[6/10] Vérification ports..."
 PORT_CONFLICTS=0
 for port in 9000 9870 16011 2181; do
     if lsof -Pi :$port -sTCP:LISTEN -t &> /dev/null 2>&1 || \
@@ -242,7 +242,7 @@ echo ""
 # ==========================================
 # ÉTAPE 7 : Vérification espace disque
 # ==========================================
-echo "[7/8] Vérification espace disque..."
+echo "[7/10] Vérification espace disque..."
 if command -v df &> /dev/null; then
     DISK_SPACE_RAW=$(df -BG . 2>/dev/null | tail -1 | awk '{print $4}' | sed 's/G//' || echo "0")
     if [[ "$DISK_SPACE_RAW" =~ ^[0-9]+$ ]]; then
@@ -268,7 +268,7 @@ echo ""
 # ==========================================
 # ÉTAPE 8 : Vérification finale Docker
 # ==========================================
-echo "[8/8] Vérification finale Docker..."
+echo "[8/10] Vérification finale Docker..."
 DOCKER_READY=0
 for i in {1..10}; do
     if docker info &> /dev/null 2>&1; then
@@ -336,7 +336,7 @@ echo ""
 # ==========================================
 # ÉTAPE 9 : Vérification JAVA_HOME dans les logs
 # ==========================================
-echo "[9/9] Vérification JAVA_HOME..."
+echo "[9/10] Vérification JAVA_HOME..."
 sleep 30
 
 JAVA_HOME_ERRORS=0

@@ -17,7 +17,7 @@ set ERRORS=0
 set COMPOSE_CMD=
 
 REM ÉTAPE 1 : Vérification Docker
-echo [1/8] Vérification Docker...
+echo [1/10] Vérification Docker...
 docker --version >nul 2>&1
 if errorlevel 1 (
     echo   [ERREUR] Docker n'est pas installé
@@ -29,7 +29,7 @@ if errorlevel 1 (
 echo.
 
 REM ÉTAPE 2 : Détection Docker Compose
-echo [2/8] Détection Docker Compose...
+echo [2/10] Détection Docker Compose...
 docker-compose --version >nul 2>&1
 if not errorlevel 1 (
     set COMPOSE_CMD=docker-compose
@@ -48,7 +48,7 @@ if not errorlevel 1 (
 echo.
 
 REM ÉTAPE 3 : Vérification Docker Desktop
-echo [3/8] Vérification Docker Desktop...
+echo [3/10] Vérification Docker Desktop...
 docker info >nul 2>&1
 if errorlevel 1 (
     echo   [INFO] Docker Desktop n'est pas lancé
@@ -85,7 +85,7 @@ if errorlevel 1 (
 echo.
 
 REM ÉTAPE 4 : Vérification fichiers
-echo [4/8] Vérification fichiers...
+echo [4/10] Vérification fichiers...
 if not exist "docker-compose.yml" (
     echo   [INFO] docker-compose.yml introuvable
     echo   [INFO] Tentative de récupération...
@@ -107,7 +107,7 @@ if not exist "docker-compose.yml" (
 echo.
 
 REM ÉTAPE 5 : Nettoyage conteneurs existants
-echo [5/8] Nettoyage conteneurs existants...
+echo [5/10] Nettoyage conteneurs existants...
 for /f "tokens=*" %%i in ('docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2^>nul') do (
     set /a RUNNING_COUNT+=1
 )
@@ -129,17 +129,17 @@ echo   [OK] Nettoyage terminé
 echo.
 
 REM ÉTAPE 6 : Vérification ports (simplifiée)
-echo [6/8] Vérification ports...
+echo [6/10] Vérification ports...
 echo   [OK] Vérification simplifiée
 echo.
 
 REM ÉTAPE 7 : Vérification espace disque (simplifiée)
-echo [7/8] Vérification espace disque...
+echo [7/10] Vérification espace disque...
 echo   [OK] Vérification simplifiée
 echo.
 
 REM ÉTAPE 8 : Vérification finale Docker
-echo [8/8] Vérification finale Docker...
+echo [8/10] Vérification finale Docker...
 set DOCKER_READY=0
 for /l %%i in (1,1,10) do (
     docker info >nul 2>&1
@@ -212,7 +212,7 @@ echo [OK] Conteneurs démarrés
 echo.
 
 REM ÉTAPE 9 : Vérification JAVA_HOME dans les logs
-echo [9/9] Vérification JAVA_HOME...
+echo [9/10] Vérification JAVA_HOME...
 timeout /t 30 /nobreak >nul
 
 set JAVA_HOME_ERRORS=0
@@ -279,7 +279,7 @@ if !JAVA_HOME_ERRORS! equ 1 (
 echo.
 
 REM ÉTAPE 10 : Vérification Hive dans les logs
-echo [10/10] Verification Hive...
+echo [10/10] Vérification Hive...
 timeout /t 20 /nobreak >nul
 
 set HIVE_ERRORS=0
