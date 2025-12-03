@@ -31,8 +31,9 @@ sleep 2
 # Start HDFS
 echo "Starting HDFS..."
 ${HADOOP_HOME}/sbin/start-dfs.sh || {
-    echo "ERROR: Failed to start HDFS"
-    exit 1
+    echo "WARNING: HDFS start command returned error, but continuing..."
+    echo "HDFS services may still be starting in the background"
+    sleep 5
 }
 
 # Wait for HDFS to be ready (up to 2 minutes)
@@ -57,8 +58,9 @@ fi
 # Start YARN
 echo "Starting YARN..."
 ${HADOOP_HOME}/sbin/start-yarn.sh || {
-    echo "ERROR: Failed to start YARN"
-    exit 1
+    echo "WARNING: YARN start command returned error, but continuing..."
+    echo "YARN services may still be starting in the background"
+    sleep 5
 }
 
 # Wait a bit for YARN to be ready

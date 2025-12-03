@@ -12,15 +12,30 @@ else
 fi
 
 echo "Vérification du conteneur Hive..."
-CONTAINER_NAME=$($COMPOSE_CMD ps -q hive)
+
+# Méthode robuste : essayer plusieurs façons de trouver le conteneur
+CONTAINER_NAME=""
+
+# Méthode 1 : docker compose ps -q
+CONTAINER_NAME=$($COMPOSE_CMD ps -q hive 2>/dev/null | head -n 1)
+
+# Méthode 2 : docker ps directement
+if [ -z "$CONTAINER_NAME" ]; then
+    CONTAINER_NAME=$(docker ps --filter "name=hbase-hive-learning-lab-hive" --format "{{.ID}}" 2>/dev/null | head -n 1)
+fi
 
 if [ -z "$CONTAINER_NAME" ]; then
     echo "ERREUR: Le conteneur Hive n'est pas démarré."
-    echo "Vérifiez l'état avec: $COMPOSE_CMD ps"
-    echo "Démarrez avec: $COMPOSE_CMD up -d"
+    echo ""
+    echo "Solutions:"
+    echo "  1. Vérifiez l'état: $COMPOSE_CMD ps"
+    echo "  2. Démarrez l'environnement: $COMPOSE_CMD up -d"
+    echo "  3. OU utilisez le script setup: ./scripts/setup.sh"
+    echo ""
     exit 1
 fi
 
 echo "Ouverture du CLI Hive..."
+echo ""
 docker exec -it $CONTAINER_NAME hive
 

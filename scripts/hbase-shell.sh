@@ -12,15 +12,32 @@ else
 fi
 
 echo "Vérification du conteneur HBase..."
-CONTAINER_NAME=$($COMPOSE_CMD ps -q hbase)
+
+# Méthode robuste : essayer plusieurs façons de trouver le conteneur
+CONTAINER_NAME=""
+
+# Méthode 1 : docker compose ps -q
+CONTAINER_NAME=$($COMPOSE_CMD ps -q hbase 2>/dev/null | head -n 1)
+
+# Méthode 2 : docker ps directement
+if [ -z "$CONTAINER_NAME" ]; then
+    CONTAINER_NAME=$(docker ps --filter "name=hbase-hive-learning-lab-hbase" --format "{{.ID}}" 2>/dev/null | head -n 1)
+fi
 
 if [ -z "$CONTAINER_NAME" ]; then
     echo "ERREUR: Le conteneur HBase n'est pas démarré."
-    echo "Vérifiez l'état avec: $COMPOSE_CMD ps"
-    echo "Démarrez avec: $COMPOSE_CMD up -d"
+    echo ""
+    echo "Solutions:"
+    echo "  1. Vérifiez l'état: $COMPOSE_CMD ps"
+    echo "  2. Démarrez l'environnement: $COMPOSE_CMD up -d"
+    echo "  3. OU utilisez le script setup: ./scripts/setup.sh"
+    echo ""
+    echo "Attendez 2-3 minutes après le démarrage pour que HBase soit prêt."
     exit 1
 fi
 
 echo "Ouverture du shell HBase..."
+echo "(Si vous voyez 'Server is not running yet', attendez 1-2 minutes)"
+echo ""
 docker exec -it $CONTAINER_NAME hbase shell
 

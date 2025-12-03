@@ -16,15 +16,32 @@ if not errorlevel 1 (
 )
 
 echo Vérification du conteneur HBase...
-!COMPOSE_CMD! ps -q hbase >nul 2>&1
-if errorlevel 1 (
+
+REM Méthode robuste : essayer plusieurs façons de trouver le conteneur
+set CONTAINER_ID=
+
+REM Méthode 1 : docker compose ps -q
+for /f "tokens=*" %%i in ('!COMPOSE_CMD! ps -q hbase 2^>nul') do set CONTAINER_ID=%%i
+
+REM Méthode 2 : docker ps directement
+if "!CONTAINER_ID!"=="" (
+    for /f "tokens=*" %%i in ('docker ps --filter "name=hbase-hive-learning-lab-hbase" --format "{{.ID}}" 2^>nul') do set CONTAINER_ID=%%i
+)
+
+if "!CONTAINER_ID!"=="" (
     echo ERREUR: Le conteneur HBase n'est pas démarré.
-    echo Vérifiez l'état avec: !COMPOSE_CMD! ps
-    echo Démarrez avec: !COMPOSE_CMD! up -d
+    echo.
+    echo Solutions:
+    echo   1. Vérifiez l'état: !COMPOSE_CMD! ps
+    echo   2. Démarrez l'environnement: !COMPOSE_CMD! up -d
+    echo   3. OU utilisez le script setup: scripts\setup.bat
+    echo.
+    echo Attendez 2-3 minutes après le démarrage pour que HBase soit prêt.
     exit /b 1
 )
 
 echo Ouverture du shell HBase...
-for /f "tokens=*" %%i in ('!COMPOSE_CMD! ps -q hbase') do set CONTAINER_ID=%%i
-docker exec -it %CONTAINER_ID% hbase shell
+echo (Si vous voyez 'Server is not running yet', attendez 1-2 minutes)
+echo.
+docker exec -it !CONTAINER_ID! hbase shell
 

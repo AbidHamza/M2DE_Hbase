@@ -16,15 +16,30 @@ if not errorlevel 1 (
 )
 
 echo Vérification du conteneur Hive...
-!COMPOSE_CMD! ps -q hive >nul 2>&1
-if errorlevel 1 (
+
+REM Méthode robuste : essayer plusieurs façons de trouver le conteneur
+set CONTAINER_ID=
+
+REM Méthode 1 : docker compose ps -q
+for /f "tokens=*" %%i in ('!COMPOSE_CMD! ps -q hive 2^>nul') do set CONTAINER_ID=%%i
+
+REM Méthode 2 : docker ps directement
+if "!CONTAINER_ID!"=="" (
+    for /f "tokens=*" %%i in ('docker ps --filter "name=hbase-hive-learning-lab-hive" --format "{{.ID}}" 2^>nul') do set CONTAINER_ID=%%i
+)
+
+if "!CONTAINER_ID!"=="" (
     echo ERREUR: Le conteneur Hive n'est pas démarré.
-    echo Vérifiez l'état avec: !COMPOSE_CMD! ps
-    echo Démarrez avec: !COMPOSE_CMD! up -d
+    echo.
+    echo Solutions:
+    echo   1. Vérifiez l'état: !COMPOSE_CMD! ps
+    echo   2. Démarrez l'environnement: !COMPOSE_CMD! up -d
+    echo   3. OU utilisez le script setup: scripts\setup.bat
+    echo.
     exit /b 1
 )
 
 echo Ouverture du CLI Hive...
-for /f "tokens=*" %%i in ('!COMPOSE_CMD! ps -q hive') do set CONTAINER_ID=%%i
-docker exec -it %CONTAINER_ID% hive
+echo.
+docker exec -it !CONTAINER_ID! hive
 

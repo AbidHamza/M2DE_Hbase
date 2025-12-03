@@ -108,14 +108,8 @@ Write-Host ""
 Write-Host "Vérification de l'état actuel..." -ForegroundColor Yellow
 $runningContainers = @()
 try {
-    $psOutput = Invoke-Expression "$composeCmd ps --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
-    if ($psOutput) {
-        $runningContainers = $psOutput | Where-Object { $_.State -eq "running" -or $_.State -eq "restarting" } | Select-Object -ExpandProperty Name
-    }
-    
-    if ($runningContainers.Count -eq 0) {
-        $runningContainers = docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>&1 | Where-Object { $_ -ne "" }
-    }
+    # Méthode robuste : utiliser docker ps directement
+    $runningContainers = docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>&1 | Where-Object { $_ -ne "" -and $_ -notmatch "error|Error|ERROR" }
     
     if ($runningContainers.Count -gt 0) {
         Write-Host "  ⚠️  Des conteneurs sont déjà en cours d'exécution:" -ForegroundColor Yellow
@@ -127,7 +121,7 @@ try {
         Write-Host "  ✅ Aucun conteneur en cours d'exécution" -ForegroundColor Green
     }
 } catch {
-    Write-Host "  ⚠️  Impossible de vérifier l'état" -ForegroundColor Yellow
+    Write-Host "  ⚠️  Impossible de vérifier l'état (continuation)" -ForegroundColor Yellow
 }
 Write-Host ""
 

@@ -7,9 +7,17 @@ export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 
 # Verify JAVA_HOME exists
 if [ ! -d "$JAVA_HOME" ] || [ ! -f "$JAVA_HOME/bin/java" ]; then
-    echo "ERROR: JAVA_HOME is incorrect: $JAVA_HOME" >&2
-    echo "ERROR: Java not found at $JAVA_HOME/bin/java" >&2
-    exit 1
+    echo "WARNING: JAVA_HOME is incorrect: $JAVA_HOME" >&2
+    echo "WARNING: Java not found at $JAVA_HOME/bin/java" >&2
+    echo "Attempting to detect Java automatically..." >&2
+    # Try to find Java again
+    export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+    if [ ! -f "$JAVA_HOME/bin/java" ]; then
+        echo "ERROR: Cannot find Java installation" >&2
+        echo "Hadoop services may fail to start" >&2
+    else
+        echo "Java found at: $JAVA_HOME" >&2
+    fi
 fi
 
 # Add Java to PATH
