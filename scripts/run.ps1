@@ -22,14 +22,14 @@ $composeCmd = ""
 # Fonction d'auto-réparation : Libérer les ports occupés
 function Free-Port {
     param([int]$Port)
-    Write-Host "  🔧 Tentative de libération du port $Port..." -ForegroundColor Yellow
+    Write-Host "  [REPARATION] Tentative de liberation du port $Port..." -ForegroundColor Yellow
     try {
         $connections = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
         if ($null -ne $connections) {
             foreach ($conn in $connections) {
                 if ($null -ne $conn.OwningProcess) {
                     Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue
-                    Write-Host "    → Processus $($conn.OwningProcess) arrêté" -ForegroundColor Green
+                    Write-Host "    -> Processus $($conn.OwningProcess) arrete" -ForegroundColor Green
                 }
             }
         }
