@@ -69,8 +69,8 @@ RUN mkdir -p ${HIVE_HOME}/metastore_db ${HIVE_HOME}/logs && \
     ${HIVE_HOME}/bin/schematool -initSchema -dbType derby || \
     (echo "WARNING: Schema initialization failed, will retry at runtime" && true)
 
-# Expose ports
-EXPOSE 10000 10002
+# Expose ports (9083 for Metastore, 10000/10002 for HiveServer2)
+EXPOSE 9083 10000 10002
 
 # Default command
 CMD ["/bin/bash"]
