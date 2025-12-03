@@ -1,6 +1,9 @@
 #!/bin/bash
 # Script to start Hive Metastore with proper environment setup
 
+# Set HIVE_HOME first (before sourcing hive-env.sh)
+export HIVE_HOME=${HIVE_HOME:-/opt/hive}
+
 # Source hive-env.sh to set JAVA_HOME and HADOOP_HOME
 if [ -f "${HIVE_HOME}/conf/hive-env.sh" ]; then
     source ${HIVE_HOME}/conf/hive-env.sh
