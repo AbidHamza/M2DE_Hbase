@@ -61,9 +61,13 @@ RUN chmod +x /start-hive-metastore.sh /start-hive.sh /healthcheck.sh && \
     sed -i 's/\r$//' /start-hive-metastore.sh /start-hive.sh /healthcheck.sh
 
 # Initialize Hive schema (Derby) - set JAVA_HOME first
-RUN JAVA_HOME=/opt/java/openjdk && \
+# Create metastore_db directory first
+RUN mkdir -p ${HIVE_HOME}/metastore_db ${HIVE_HOME}/logs && \
+    JAVA_HOME=/opt/java/openjdk && \
     export JAVA_HOME && \
-    ${HIVE_HOME}/bin/schematool -initSchema -dbType derby || true
+    export HIVE_HOME=${HIVE_HOME} && \
+    ${HIVE_HOME}/bin/schematool -initSchema -dbType derby || \
+    (echo "WARNING: Schema initialization failed, will retry at runtime" && true)
 
 # Expose ports
 EXPOSE 10000 10002

@@ -51,43 +51,103 @@ if [ ! -f "${HIVE_HOME}/bin/hive" ]; then
     exit 1
 fi
 
-# Start Hive Metastore in background and wait for it to be ready
+# Create log directory if it doesn't exist
+mkdir -p ${HIVE_HOME}/logs
+
+# Start Hive Metastore in background and capture output
 echo "Launching Hive Metastore service..."
-${HIVE_HOME}/bin/hive --service metastore &
+LOG_FILE=${HIVE_HOME}/logs/metastore.log
+${HIVE_HOME}/bin/hive --service metastore > "$LOG_FILE" 2>&1 &
 METASTORE_PID=$!
 
-# Wait for Metastore to start listening on port 9083
+# Function to check if Metastore is truly ready (not just port open, but responding)
+check_metastore_ready() {
+    # Method 1: Check port is listening
+    if ! nc -z localhost 9083 2>/dev/null && \
+       ! (command -v timeout >/dev/null 2>&1 && timeout 1 bash -c "echo > /dev/tcp/localhost/9083" 2>/dev/null); then
+        return 1
+    fi
+    
+    # Method 2: Check process is running
+    if ! kill -0 $METASTORE_PID 2>/dev/null; then
+        return 1
+    fi
+    
+    # Method 3: Check logs for successful startup (look for "Starting Hive Metastore Server" or similar)
+    if [ -f "$LOG_FILE" ]; then
+        if grep -qiE "(Starting.*Metastore|Metastore.*started|listening on|bind.*9083)" "$LOG_FILE" 2>/dev/null; then
+            # Check for errors in logs
+            if grep -qiE "(ERROR|FATAL|Exception.*failed|Cannot.*start)" "$LOG_FILE" 2>/dev/null; then
+                return 1
+            fi
+            return 0
+        fi
+    fi
+    
+    return 1
+}
+
+# Wait for Metastore to be truly ready
 echo "Waiting for Hive Metastore to be ready..."
-MAX_WAIT=120
+MAX_WAIT=180
 WAIT_COUNT=0
+READY=0
+
 while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
-    if nc -z localhost 9083 2>/dev/null || \
-       (command -v timeout >/dev/null 2>&1 && timeout 1 bash -c "echo > /dev/tcp/localhost/9083" 2>/dev/null); then
+    # Check if process died
+    if ! kill -0 $METASTORE_PID 2>/dev/null; then
+        echo "ERROR: Hive Metastore process died unexpectedly" >&2
+        if [ -f "$LOG_FILE" ]; then
+            echo "Last 50 lines of log:" >&2
+            tail -50 "$LOG_FILE" >&2
+        fi
+        wait $METASTORE_PID 2>/dev/null
+        exit 1
+    fi
+    
+    # Check if ready
+    if check_metastore_ready; then
         echo "Hive Metastore is ready and listening on port 9083"
+        READY=1
         break
     fi
     
-    # Check if process is still running
-    if ! kill -0 $METASTORE_PID 2>/dev/null; then
-        echo "ERROR: Hive Metastore process died unexpectedly" >&2
-        wait $METASTORE_PID
-        exit $?
-    fi
+    sleep 3
+    WAIT_COUNT=$((WAIT_COUNT + 3))
     
-    sleep 2
-    WAIT_COUNT=$((WAIT_COUNT + 2))
+    # Show progress every 15 seconds
+    if [ $((WAIT_COUNT % 15)) -eq 0 ]; then
+        echo "Still waiting for Hive Metastore... ($WAIT_COUNT/$MAX_WAIT seconds)"
+    fi
 done
 
-if [ $WAIT_COUNT -ge $MAX_WAIT ]; then
-    echo "WARNING: Hive Metastore did not become ready within $MAX_WAIT seconds" >&2
-    echo "But continuing anyway - healthcheck will verify..." >&2
+if [ $READY -eq 0 ]; then
+    echo "ERROR: Hive Metastore did not become ready within $MAX_WAIT seconds" >&2
+    if [ -f "$LOG_FILE" ]; then
+        echo "Last 100 lines of log:" >&2
+        tail -100 "$LOG_FILE" >&2
+    fi
+    kill $METASTORE_PID 2>/dev/null
+    exit 1
 fi
 
-# Keep the process running
+echo "Hive Metastore started successfully. PID: $METASTORE_PID"
+echo "Logs available at: $LOG_FILE"
+
+# Keep the process running and monitor it
+while kill -0 $METASTORE_PID 2>/dev/null; do
+    sleep 5
+done
+
+# Process exited, check exit code
 wait $METASTORE_PID
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
     echo "ERROR: Hive Metastore exited with code $EXIT_CODE" >&2
+    if [ -f "$LOG_FILE" ]; then
+        echo "Last 100 lines of log:" >&2
+        tail -100 "$LOG_FILE" >&2
+    fi
     exit $EXIT_CODE
 fi
 

@@ -136,6 +136,7 @@ services:
       - JAVA_HOME=/opt/java/openjdk
     volumes:
       - hive-metastore-data:/opt/hive/metastore_db
+      - hive-metastore-logs:/opt/hive/logs
     networks:
       - hbase-hive-network
     healthcheck:
@@ -153,6 +154,7 @@ volumes:
   hbase-data:
   hive-data:
   hive-metastore-data:
+  hive-metastore-logs:
 
 networks:
   hbase-hive-network:

@@ -1,26 +1,40 @@
 #!/bin/bash
 # Healthcheck script for Hive Metastore
-# Checks if the Metastore service is listening on port 9083
+# Checks if the Metastore service is listening on port 9083 AND responding
 
-# Method 1: Check if port 9083 is listening
+# Method 1: Check if process is running (must be first)
+if ! pgrep -f "hive.*metastore" > /dev/null 2>&1 && ! pgrep -f "Metastore" > /dev/null 2>&1; then
+    exit 1
+fi
+
+# Method 2: Check if port 9083 is listening AND accepting connections
 if command -v nc >/dev/null 2>&1; then
     if nc -z localhost 9083 2>/dev/null; then
-        exit 0
+        # Port is open, check if it's actually responding (not just bound)
+        # Try to connect and see if connection is accepted
+        if echo "" | nc -w 1 localhost 9083 2>/dev/null; then
+            exit 0
+        fi
     fi
 fi
 
-# Method 2: Check if process is running
-if pgrep -f "hive.*metastore" > /dev/null 2>&1 || pgrep -f "Metastore" > /dev/null 2>&1; then
-    exit 0
-fi
-
-# Method 3: Try to connect with timeout
+# Method 3: Try TCP connection with timeout
 if command -v timeout >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
     if timeout 2 bash -c "echo > /dev/tcp/localhost/9083" 2>/dev/null; then
         exit 0
     fi
 fi
 
-# If none of the checks pass, service is not healthy
+# Method 4: Check logs for errors (if process running but port not responding, might be error)
+LOG_FILE=${HIVE_HOME:-/opt/hive}/logs/metastore.log
+if [ -f "$LOG_FILE" ]; then
+    # If there are fatal errors in logs, consider unhealthy
+    if grep -qiE "(FATAL|ERROR.*Cannot.*start|Exception.*failed|bind.*failed)" "$LOG_FILE" 2>/dev/null; then
+        exit 1
+    fi
+fi
+
+# If process is running but port checks failed, still consider unhealthy
+# (process might be stuck or erroring)
 exit 1
 
