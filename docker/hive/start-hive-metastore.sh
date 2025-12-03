@@ -11,18 +11,28 @@ fi
 
 # Gérer le répertoire metastore_db (peut exister mais être corrompu)
 METASTORE_DB_DIR="/opt/hive/metastore_db"
+METASTORE_DB_PARENT="/opt/hive"
+
+echo "Vérification du répertoire metastore_db..."
+
+# Vérifier si le répertoire existe et s'il contient une base Derby valide
 if [ -d "$METASTORE_DB_DIR" ]; then
     # Vérifier si c'est une base Derby valide (doit contenir service.properties)
     if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
         echo "WARNING: Répertoire metastore_db existe mais n'est pas une base Derby valide"
-        echo "Nettoyage du répertoire corrompu..."
-        rm -rf "$METASTORE_DB_DIR"/*
-        rm -rf "$METASTORE_DB_DIR"/.??* 2>/dev/null || true
+        echo "Nettoyage complet du répertoire corrompu..."
+        # Supprimer complètement le répertoire (pas seulement son contenu)
+        rm -rf "$METASTORE_DB_DIR"
+        echo "Répertoire supprimé, sera recréé lors de l'initialisation"
+    else
+        echo "Base Derby valide détectée (service.properties trouvé)"
     fi
+else
+    echo "Répertoire metastore_db n'existe pas, sera créé lors de l'initialisation"
 fi
 
-# Créer le répertoire s'il n'existe pas
-mkdir -p "$METASTORE_DB_DIR"
+# Créer le répertoire parent s'il n'existe pas (pour éviter les erreurs)
+mkdir -p "$METASTORE_DB_PARENT"
 
 # Verify JAVA_HOME is set
 if [ -z "$JAVA_HOME" ] || [ ! -f "$JAVA_HOME/bin/java" ]; then
@@ -71,27 +81,51 @@ mkdir -p ${HIVE_HOME}/logs
 
 # Initialiser le schéma Derby si nécessaire (vérifier si service.properties existe)
 echo "Vérification de l'initialisation du schéma Derby..."
-if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
-    echo "Initialisation du schéma Derby..."
+SCHEMA_INIT_ATTEMPTS=0
+MAX_SCHEMA_INIT_ATTEMPTS=3
+
+while [ $SCHEMA_INIT_ATTEMPTS -lt $MAX_SCHEMA_INIT_ATTEMPTS ]; do
+    # Vérifier si la base est déjà initialisée
+    if [ -f "$METASTORE_DB_DIR/service.properties" ]; then
+        echo "Schéma Derby déjà initialisé (service.properties trouvé)"
+        break
+    fi
+    
+    SCHEMA_INIT_ATTEMPTS=$((SCHEMA_INIT_ATTEMPTS + 1))
+    echo "Tentative d'initialisation du schéma Derby (tentative $SCHEMA_INIT_ATTEMPTS/$MAX_SCHEMA_INIT_ATTEMPTS)..."
+    
+    # Initialiser le schéma
     ${HIVE_HOME}/bin/schematool -initSchema -dbType derby 2>&1 | tee ${HIVE_HOME}/logs/schema-init.log
     SCHEMA_INIT_EXIT_CODE=${PIPESTATUS[0]}
-    if [ $SCHEMA_INIT_EXIT_CODE -ne 0 ]; then
-        echo "WARNING: Échec de l'initialisation du schéma (code: $SCHEMA_INIT_EXIT_CODE)" >&2
-        echo "Tentative de nettoyage complet et réinitialisation..." >&2
-        # Nettoyer complètement
-        rm -rf "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.??* 2>/dev/null || true
-        sleep 2
-        # Réessayer
-        ${HIVE_HOME}/bin/schematool -initSchema -dbType derby 2>&1 | tee -a ${HIVE_HOME}/logs/schema-init.log
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
-            echo "ERROR: Impossible d'initialiser le schéma Derby après nettoyage" >&2
+    
+    if [ $SCHEMA_INIT_EXIT_CODE -eq 0 ]; then
+        echo "Schéma Derby initialisé avec succès"
+        break
+    else
+        # Vérifier si l'erreur est "Directory already exists"
+        if grep -qiE "(Directory.*already exists|XBM0J|metastore_db.*already exists)" ${HIVE_HOME}/logs/schema-init.log 2>/dev/null; then
+            echo "WARNING: Erreur 'Directory already exists' détectée" >&2
+            echo "Nettoyage complet du répertoire et nouvelle tentative..." >&2
+            # Supprimer complètement le répertoire
+            rm -rf "$METASTORE_DB_DIR"
+            sleep 2
+            # Continuer la boucle pour réessayer
+        else
+            echo "ERROR: Échec de l'initialisation du schéma (code: $SCHEMA_INIT_EXIT_CODE)" >&2
             echo "Consultez les logs: ${HIVE_HOME}/logs/schema-init.log" >&2
-            exit 1
+            if [ $SCHEMA_INIT_ATTEMPTS -ge $MAX_SCHEMA_INIT_ATTEMPTS ]; then
+                echo "ERROR: Impossible d'initialiser le schéma Derby après $MAX_SCHEMA_INIT_ATTEMPTS tentatives" >&2
+                exit 1
+            fi
         fi
     fi
-    echo "Schéma Derby initialisé avec succès"
-else
-    echo "Schéma Derby déjà initialisé (service.properties trouvé)"
+done
+
+# Vérification finale
+if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
+    echo "ERROR: Le schéma Derby n'a pas pu être initialisé" >&2
+    echo "Consultez les logs: ${HIVE_HOME}/logs/schema-init.log" >&2
+    exit 1
 fi
 
 # Start Hive Metastore in background and capture output
