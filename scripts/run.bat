@@ -119,8 +119,28 @@ echo   ⚠️  Vérification simplifiée
 set /a WARNINGS+=1
 echo.
 
-REM 7. Nettoyer les conteneurs existants (FORCÉ)
-echo [7/9] Nettoyage FORCÉ des conteneurs existants...
+REM 7. Vérifier si l'environnement est déjà lancé
+echo [7/9] Vérification de l'état actuel...
+set RUNNING_COUNT=0
+if not "!COMPOSE_CMD!"=="" (
+    for /f "tokens=*" %%i in ('docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2^>nul') do (
+        set /a RUNNING_COUNT+=1
+        echo   - %%i
+    )
+)
+
+if !RUNNING_COUNT! gtr 0 (
+    echo   ⚠️  Des conteneurs sont déjà en cours d'exécution
+    echo.
+    echo   → AUTO-RÉPARATION: Arrêt et nettoyage des conteneurs existants...
+    echo      (Pour garder les conteneurs existants, utilisez: !COMPOSE_CMD! ps)
+) else (
+    echo   ✅ Aucun conteneur en cours d'exécution
+)
+echo.
+
+REM 8. Nettoyer les conteneurs existants (FORCÉ)
+echo [8/9] Nettoyage FORCÉ des conteneurs existants...
 REM Arrêter TOUS les conteneurs du projet
 for /f "tokens=*" %%i in ('docker ps -a --filter "name=hbase-hive-learning-lab" --format "{{.ID}}" 2^>nul') do (
     docker stop %%i >nul 2>&1
@@ -139,8 +159,8 @@ timeout /t 3 /nobreak >nul
 echo   ✅ Nettoyage complet terminé
 echo.
 
-REM 8. Résumé des vérifications
-echo [8/9] Résumé des vérifications...
+REM 9. Résumé des vérifications
+echo [9/10] Résumé des vérifications...
 if !ERRORS! gtr 0 (
     echo   ❌ !ERRORS! erreur(s) bloquante(s) détectée(s)
     echo      → Corrigez les erreurs ci-dessus avant de continuer
@@ -159,8 +179,8 @@ if "!COMPOSE_CMD!"=="" (
     exit /b 1
 )
 
-REM 9. Lancer docker compose avec retry automatique
-echo [9/9] Lancement des conteneurs Docker...
+REM 10. Lancer docker compose avec retry automatique
+echo [10/10] Lancement des conteneurs Docker...
 echo   (Cela peut prendre 3-5 minutes pour démarrer tous les services)
 echo.
 

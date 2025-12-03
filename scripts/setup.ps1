@@ -104,6 +104,33 @@ Write-Host "TOUS LES PRÉREQUIS SONT OK" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Vérifier si l'environnement est déjà lancé
+Write-Host "Vérification de l'état actuel..." -ForegroundColor Yellow
+$runningContainers = @()
+try {
+    $psOutput = Invoke-Expression "$composeCmd ps --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+    if ($psOutput) {
+        $runningContainers = $psOutput | Where-Object { $_.State -eq "running" -or $_.State -eq "restarting" } | Select-Object -ExpandProperty Name
+    }
+    
+    if ($runningContainers.Count -eq 0) {
+        $runningContainers = docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>&1 | Where-Object { $_ -ne "" }
+    }
+    
+    if ($runningContainers.Count -gt 0) {
+        Write-Host "  ⚠️  Des conteneurs sont déjà en cours d'exécution:" -ForegroundColor Yellow
+        $runningContainers | ForEach-Object {
+            Write-Host "     - $_" -ForegroundColor White
+        }
+        Write-Host "  → Arrêt et nettoyage automatique..." -ForegroundColor Cyan
+    } else {
+        Write-Host "  ✅ Aucun conteneur en cours d'exécution" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "  ⚠️  Impossible de vérifier l'état" -ForegroundColor Yellow
+}
+Write-Host ""
+
 # Nettoyage complet et reconstruction automatique
 Write-Host "Nettoyage complet des conteneurs et volumes..." -ForegroundColor Yellow
 try {

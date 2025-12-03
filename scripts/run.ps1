@@ -209,8 +209,41 @@ try {
 }
 Write-Host ""
 
-# 7. Nettoyer les conteneurs existants (FORCÉ)
-Write-Host "[7/9] Nettoyage FORCÉ des conteneurs existants..." -ForegroundColor Yellow
+# 7. Vérifier si l'environnement est déjà lancé
+Write-Host "[7/9] Vérification de l'état actuel..." -ForegroundColor Yellow
+$runningContainers = @()
+try {
+    if (-not [string]::IsNullOrWhiteSpace($composeCmd)) {
+        # Vérifier avec docker-compose ps
+        $psOutput = Invoke-Expression "$composeCmd ps --format json" 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($psOutput) {
+            $runningContainers = $psOutput | Where-Object { $_.State -eq "running" -or $_.State -eq "restarting" } | Select-Object -ExpandProperty Name
+        }
+    }
+    
+    # Alternative: vérifier directement avec docker ps
+    if ($runningContainers.Count -eq 0) {
+        $runningContainers = docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>&1 | Where-Object { $_ -ne "" }
+    }
+    
+    if ($runningContainers.Count -gt 0) {
+        Write-Host "  ⚠️  Des conteneurs sont déjà en cours d'exécution:" -ForegroundColor Yellow
+        $runningContainers | ForEach-Object {
+            Write-Host "     - $_" -ForegroundColor White
+        }
+        Write-Host ""
+        Write-Host "  → AUTO-RÉPARATION: Arrêt et nettoyage des conteneurs existants..." -ForegroundColor Cyan
+        Write-Host "     (Pour garder les conteneurs existants, utilisez: $composeCmd ps)" -ForegroundColor Gray
+    } else {
+        Write-Host "  ✅ Aucun conteneur en cours d'exécution" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "  ⚠️  Impossible de vérifier l'état (continuation)" -ForegroundColor Yellow
+}
+Write-Host ""
+
+# Nettoyer les conteneurs existants (FORCÉ)
+Write-Host "[8/9] Nettoyage FORCÉ des conteneurs existants..." -ForegroundColor Yellow
 try {
     # Arrêter TOUS les conteneurs du projet
     docker ps -a --filter "name=hbase-hive-learning-lab" --format "{{.ID}}" | ForEach-Object {
@@ -233,8 +266,9 @@ try {
 }
 Write-Host ""
 
-# 8. Résumé des vérifications
-Write-Host "[8/9] Résumé des vérifications..." -ForegroundColor Yellow
+# 9. Résumé des vérifications
+Write-Host "[9/10] Résumé des vérifications..." -ForegroundColor Yellow
+
 if ($Errors -gt 0) {
     Write-Host "  ❌ $Errors erreur(s) bloquante(s) détectée(s)" -ForegroundColor Red
     Write-Host "     → Corrigez les erreurs ci-dessus avant de continuer" -ForegroundColor Red
@@ -253,8 +287,8 @@ if ([string]::IsNullOrWhiteSpace($composeCmd)) {
     exit 1
 }
 
-# 9. Lancer docker compose avec retry automatique
-Write-Host "[9/9] Lancement des conteneurs Docker..." -ForegroundColor Cyan
+# 10. Lancer docker compose avec retry automatique
+Write-Host "[10/10] Lancement des conteneurs Docker..." -ForegroundColor Cyan
 Write-Host "  (Cela peut prendre 3-5 minutes pour démarrer tous les services)" -ForegroundColor Gray
 Write-Host ""
 

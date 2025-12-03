@@ -79,6 +79,22 @@ echo TOUS LES PRÉREQUIS SONT OK
 echo ==========================================
 echo.
 
+REM Vérifier si l'environnement est déjà lancé
+echo Vérification de l'état actuel...
+set RUNNING_COUNT=0
+for /f "tokens=*" %%i in ('docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2^>nul') do (
+    set /a RUNNING_COUNT+=1
+    echo   - %%i
+)
+
+if !RUNNING_COUNT! gtr 0 (
+    echo   ⚠️  Des conteneurs sont déjà en cours d'exécution
+    echo   → Arrêt et nettoyage automatique...
+) else (
+    echo   ✅ Aucun conteneur en cours d'exécution
+)
+echo.
+
 REM Nettoyage complet et reconstruction automatique
 echo Nettoyage complet des conteneurs et volumes...
 !COMPOSE_CMD! down -v >nul 2>&1

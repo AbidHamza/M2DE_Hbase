@@ -189,8 +189,33 @@ else
 fi
 echo ""
 
-# 7. Nettoyer les conteneurs existants (FORCÉ)
-echo "[7/9] Nettoyage FORCÉ des conteneurs existants..."
+# 7. Vérifier si l'environnement est déjà lancé
+echo "[7/9] Vérification de l'état actuel..."
+RUNNING_CONTAINERS=""
+if [ -n "$COMPOSE_CMD" ]; then
+    # Vérifier avec docker-compose ps
+    RUNNING_CONTAINERS=$(eval "$COMPOSE_CMD ps --format json" 2>/dev/null | grep -o '"State":"running"' | wc -l || echo "0")
+    if [ "$RUNNING_CONTAINERS" = "0" ]; then
+        # Alternative: vérifier directement avec docker ps
+        RUNNING_CONTAINERS=$(docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>/dev/null | wc -l || echo "0")
+    fi
+else
+    RUNNING_CONTAINERS=$(docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2>/dev/null | wc -l || echo "0")
+fi
+
+if [ "$RUNNING_CONTAINERS" -gt 0 ]; then
+    echo "  ⚠️  Des conteneurs sont déjà en cours d'exécution:"
+    docker ps --filter "name=hbase-hive-learning-lab" --format "  - {{.Names}} ({{.Status}})" 2>/dev/null || true
+    echo ""
+    echo "  → AUTO-RÉPARATION: Arrêt et nettoyage des conteneurs existants..."
+    echo "     (Pour garder les conteneurs existants, utilisez: $COMPOSE_CMD ps)"
+else
+    echo "  ✅ Aucun conteneur en cours d'exécution"
+fi
+echo ""
+
+# 8. Nettoyer les conteneurs existants (FORCÉ)
+echo "[8/9] Nettoyage FORCÉ des conteneurs existants..."
 # Arrêter TOUS les conteneurs du projet
 docker ps -a --filter "name=hbase-hive-learning-lab" --format "{{.ID}}" 2>/dev/null | while read -r container_id; do
     [ -n "$container_id" ] && docker stop "$container_id" 2>/dev/null && docker rm -f "$container_id" 2>/dev/null
@@ -208,8 +233,8 @@ sleep 3
 echo "  ✅ Nettoyage complet terminé"
 echo ""
 
-# 8. Résumé des vérifications
-echo "[8/9] Résumé des vérifications..."
+# 9. Résumé des vérifications
+echo "[9/10] Résumé des vérifications..."
 if [ $ERRORS -gt 0 ]; then
     echo "  ❌ $ERRORS erreur(s) bloquante(s) détectée(s)"
     echo "     → Corrigez les erreurs ci-dessus avant de continuer"
@@ -228,8 +253,8 @@ if [ -z "$COMPOSE_CMD" ]; then
     exit 1
 fi
 
-# 9. Lancer docker compose avec retry automatique
-echo "[9/9] Lancement des conteneurs Docker..."
+# 10. Lancer docker compose avec retry automatique
+echo "[10/10] Lancement des conteneurs Docker..."
 echo "  (Cela peut prendre 3-5 minutes pour démarrer tous les services)"
 echo ""
 
@@ -244,6 +269,7 @@ while [ $RETRY -lt $MAX_RETRIES ] && [ $SUCCESS -eq 0 ]; do
         eval "$COMPOSE_CMD down -v" >/dev/null 2>&1 || true
         sleep 5
     fi
+    
     
     if eval "$COMPOSE_CMD up -d --build"; then
         SUCCESS=1
