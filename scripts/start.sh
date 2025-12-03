@@ -414,7 +414,7 @@ while [ $HIVE_CHECK_COUNT -lt $HIVE_MAX_CHECKS ]; do
     HIVE_LOGS=$(eval "$COMPOSE_CMD logs hive 2>&1" || echo "")
     
     # Détecter les erreurs Hive
-    if echo "$HIVE_METASTORE_LOGS $HIVE_LOGS" | grep -qiE "(Cannot find hadoop installation|HADOOP_HOME.*not.*set|HADOOP_CONF_DIR.*not.*exist|Hadoop binaries not found|hadoop.*command not found|ERROR.*JAVA_HOME|ERROR XBM0J|Directory.*metastore_db.*already exists|Database.*not found|Device or resource busy)" 2>/dev/null; then
+    if echo "$HIVE_METASTORE_LOGS $HIVE_LOGS" | grep -qiE "(Cannot find hadoop installation|HADOOP_HOME.*not.*set|HADOOP_CONF_DIR.*not.*exist|Hadoop binaries not found|hadoop.*command not found|ERROR.*JAVA_HOME|ERROR XBM0J|Directory.*metastore_db.*already exists|Database.*not found|Device or resource busy|Unable to instantiate.*SessionHiveMetaStoreClient|Unable to instantiate.*Metastore)" 2>/dev/null; then
         HIVE_ERRORS=1
         echo "  [ATTENTION] Erreurs Hive détectées dans les logs"
         echo "  [REPARATION] Reconstruction de l'image Hive..."

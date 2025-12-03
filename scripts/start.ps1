@@ -459,7 +459,7 @@ while ($hiveCheckCount -lt $hiveMaxChecks) {
     $hiveLogs = Invoke-Expression "$composeCmd logs hive 2>&1" | Out-String
     
     # Détecter les erreurs Hive (regex unifiée pour tous les patterns)
-    $hiveErrorPattern = "(?i)(Cannot find hadoop installation|HADOOP_HOME.*(not.*set|does not exist)|HADOOP_CONF_DIR.*(not.*exist|does not exist)|Hadoop binaries not found|hadoop.*command not found|ERROR.*JAVA_HOME|ERROR.*HADOOP_HOME|ERROR.*HADOOP_CONF_DIR|ERROR XBM0J|Directory.*metastore_db.*already exists|Database.*not found|Device or resource busy)"
+    $hiveErrorPattern = "(?i)(Cannot find hadoop installation|HADOOP_HOME.*(not.*set|does not exist)|HADOOP_CONF_DIR.*(not.*exist|does not exist)|Hadoop binaries not found|hadoop.*command not found|ERROR.*JAVA_HOME|ERROR.*HADOOP_HOME|ERROR.*HADOOP_CONF_DIR|ERROR XBM0J|Directory.*metastore_db.*already exists|Database.*not found|Device or resource busy|Unable to instantiate.*SessionHiveMetaStoreClient|Unable to instantiate.*Metastore)"
     $allHiveLogs = "$hiveMetastoreLogs $hiveLogs"
     if ($allHiveLogs -match $hiveErrorPattern) {
         
