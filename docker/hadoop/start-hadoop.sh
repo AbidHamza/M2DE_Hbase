@@ -1,15 +1,25 @@
 #!/bin/bash
 
-# Set JAVA_HOME dynamically - find where Java is actually installed
-export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+# Source Hadoop environment (sets JAVA_HOME)
+if [ -f "${HADOOP_HOME}/etc/hadoop/hadoop-env.sh" ]; then
+    source ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
+fi
+
+# Also set JAVA_HOME dynamically as fallback
+export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which java))))}
 export PATH=${JAVA_HOME}/bin:${PATH}
 
 # Verify JAVA_HOME
 echo "JAVA_HOME is set to: $JAVA_HOME"
 if [ ! -f "$JAVA_HOME/bin/java" ]; then
     echo "ERROR: JAVA_HOME is incorrect: $JAVA_HOME"
+    echo "ERROR: Java not found at $JAVA_HOME/bin/java"
     exit 1
 fi
+
+# Export JAVA_HOME to environment so SSH sessions inherit it
+echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc
+echo "export PATH=\${JAVA_HOME}/bin:\${PATH}" >> ~/.bashrc
 
 # Start SSH
 echo "Starting SSH service..."

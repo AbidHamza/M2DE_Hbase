@@ -35,6 +35,9 @@ COPY core-site.xml ${HADOOP_HOME}/etc/hadoop/
 COPY hdfs-site.xml ${HADOOP_HOME}/etc/hadoop/
 COPY mapred-site.xml ${HADOOP_HOME}/etc/hadoop/
 COPY yarn-site.xml ${HADOOP_HOME}/etc/hadoop/
+COPY hadoop-env.sh ${HADOOP_HOME}/etc/hadoop/
+RUN chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
+    sed -i 's/\r$//' ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
 # Format HDFS (with JAVA_HOME set)
 RUN export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java)))) && \
