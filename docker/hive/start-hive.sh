@@ -59,11 +59,19 @@ while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
             break
         fi
     else
-        # Fallback: try to ping the host
-        if ping -c 1 "$METASTORE_HOST" >/dev/null 2>&1; then
-            echo "Hive Metastore host is reachable (assuming ready)"
-            METASTORE_READY=1
-            break
+        # Fallback: try to check if hostname resolves (DNS check)
+        if command -v getent >/dev/null 2>&1; then
+            if getent hosts "$METASTORE_HOST" >/dev/null 2>&1; then
+                echo "Hive Metastore hostname resolves (assuming ready, but connection may fail)"
+                METASTORE_READY=1
+                break
+            fi
+        elif command -v nslookup >/dev/null 2>&1; then
+            if nslookup "$METASTORE_HOST" >/dev/null 2>&1; then
+                echo "Hive Metastore hostname resolves (assuming ready, but connection may fail)"
+                METASTORE_READY=1
+                break
+            fi
         fi
     fi
     

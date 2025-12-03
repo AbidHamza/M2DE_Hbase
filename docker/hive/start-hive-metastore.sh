@@ -98,8 +98,22 @@ else
     if [ -f "$HIVE_SITE_XML" ]; then
         # Sauvegarder l'original
         cp "$HIVE_SITE_XML" "$HIVE_SITE_XML.bak"
-        # Modifier create=false en create=true temporairement
-        sed -i 's/;create=false/;create=true/g' "$HIVE_SITE_XML"
+        # Modifier create=false en create=true temporairement (compatible Linux et macOS)
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            sed -i '' 's/;create=false/;create=true/g' "$HIVE_SITE_XML"
+        else
+            # Linux
+            sed -i 's/;create=false/;create=true/g' "$HIVE_SITE_XML"
+        fi
+        # Vérifier que la modification a fonctionné
+        if ! grep -q ";create=true" "$HIVE_SITE_XML" 2>/dev/null; then
+            echo "WARNING: Impossible de modifier hive-site.xml, restauration de l'original..." >&2
+            mv "$HIVE_SITE_XML.bak" "$HIVE_SITE_XML"
+        fi
+    else
+        echo "ERROR: hive-site.xml not found at $HIVE_SITE_XML" >&2
+        exit 1
     fi
     
     while [ $SCHEMA_INIT_ATTEMPTS -lt $MAX_SCHEMA_INIT_ATTEMPTS ]; do
@@ -110,9 +124,10 @@ else
         if [ -d "$METASTORE_DB_DIR" ] && [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
             echo "Nettoyage du contenu du répertoire avant initialisation..."
             find "$METASTORE_DB_DIR" -mindepth 1 -delete 2>/dev/null || {
-                rm -f "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.* 2>/dev/null || true
+                rm -rf "$METASTORE_DB_DIR"/* 2>/dev/null || true
+                find "$METASTORE_DB_DIR" -mindepth 1 -name ".*" -delete 2>/dev/null || true
             }
-            sleep 1
+            sleep 2
         fi
         
         # Initialiser le schéma
@@ -128,9 +143,10 @@ else
                 echo "WARNING: Erreur de base de données détectée" >&2
                 echo "Nettoyage du contenu du répertoire et nouvelle tentative..." >&2
                 find "$METASTORE_DB_DIR" -mindepth 1 -delete 2>/dev/null || {
-                    rm -f "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.* 2>/dev/null || true
+                    rm -rf "$METASTORE_DB_DIR"/* 2>/dev/null || true
+                    find "$METASTORE_DB_DIR" -mindepth 1 -name ".*" -delete 2>/dev/null || true
                 }
-                sleep 2
+                sleep 3
                 # Continuer la boucle pour réessayer
             else
                 echo "ERROR: Échec de l'initialisation du schéma (code: $SCHEMA_INIT_EXIT_CODE)" >&2
@@ -169,28 +185,39 @@ METASTORE_PID=$!
 
 # Function to check if Metastore is truly ready (not just port open, but responding)
 check_metastore_ready() {
-    # Method 1: Check port is listening
-    if ! nc -z localhost 9083 2>/dev/null && \
-       ! (command -v timeout >/dev/null 2>&1 && timeout 1 bash -c "echo > /dev/tcp/localhost/9083" 2>/dev/null); then
+    # Method 1: Check process is running (must be first)
+    if ! kill -0 $METASTORE_PID 2>/dev/null; then
         return 1
     fi
     
-    # Method 2: Check process is running
-    if ! kill -0 $METASTORE_PID 2>/dev/null; then
+    # Method 2: Check port is listening AND accepting connections
+    PORT_OPEN=0
+    if command -v nc >/dev/null 2>&1; then
+        if nc -z localhost 9083 2>/dev/null; then
+            PORT_OPEN=1
+        fi
+    elif command -v timeout >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
+        if timeout 1 bash -c "echo > /dev/tcp/localhost/9083" 2>/dev/null; then
+            PORT_OPEN=1
+        fi
+    fi
+    
+    if [ $PORT_OPEN -eq 0 ]; then
         return 1
     fi
     
     # Method 3: Check logs for successful startup (look for "Starting Hive Metastore Server" or similar)
     if [ -f "$LOG_FILE" ]; then
-        if grep -qiE "(Starting.*Metastore|Metastore.*started|listening on|bind.*9083)" "$LOG_FILE" 2>/dev/null; then
-            # Check for errors in logs
-            if grep -qiE "(ERROR|FATAL|Exception.*failed|Cannot.*start)" "$LOG_FILE" 2>/dev/null; then
+        if grep -qiE "(Starting.*Metastore|Metastore.*started|listening on|bind.*9083|ThriftBinary.*started)" "$LOG_FILE" 2>/dev/null; then
+            # Check for errors in logs - if found, consider not ready
+            if grep -qiE "(ERROR|FATAL|Exception.*failed|Cannot.*start|bind.*failed|Connection refused)" "$LOG_FILE" 2>/dev/null; then
                 return 1
             fi
             return 0
         fi
     fi
     
+    # If process is running and port is open but no startup message yet, wait a bit more
     return 1
 }
 
