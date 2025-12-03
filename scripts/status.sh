@@ -2,6 +2,11 @@
 # Script Bash pour vérifier l'état des services (Linux/Mac)
 # Usage: ./scripts/status.sh
 
+# Changer vers le répertoire du projet (peu importe où le projet est cloné)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
 # Détecter docker-compose V1 ou V2
 if command -v docker-compose &> /dev/null; then
     COMPOSE_CMD="docker-compose"

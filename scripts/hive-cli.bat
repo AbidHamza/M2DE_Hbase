@@ -2,6 +2,12 @@
 REM Script Batch pour ouvrir le CLI Hive (Windows)
 REM Usage: scripts\hive-cli.bat
 
+setlocal enabledelayedexpansion
+
+REM Changer vers le répertoire du projet (peu importe où le projet est cloné)
+set SCRIPT_DIR=%~dp0
+cd /d "!SCRIPT_DIR!.."
+
 REM Détecter docker-compose V1 ou V2
 docker-compose --version >nul 2>&1
 if not errorlevel 1 (

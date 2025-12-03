@@ -1,6 +1,11 @@
 # Script PowerShell pour vérifier l'état des services
 # Usage: .\scripts\status.ps1
 
+# Changer vers le répertoire du projet (peu importe où le projet est cloné)
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent $scriptDir
+Set-Location $projectRoot
+
 # Détecter docker-compose V1 ou V2
 if (Get-Command docker-compose -ErrorAction SilentlyContinue) {
     $composeCmd = "docker-compose"
