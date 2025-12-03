@@ -45,10 +45,43 @@ function Free-Port {
     return $false
 }
 
-# Fonction : Lancer Docker Desktop
+# Fonction : Lancer Docker Desktop (détection robuste du chemin)
 function Start-DockerDesktop {
-    $dockerDesktopPath = "${env:ProgramFiles}\Docker\Docker\Docker Desktop.exe"
-    if (Test-Path $dockerDesktopPath) {
+    # Essayer plusieurs emplacements possibles pour Docker Desktop
+    $possiblePaths = @(
+        "${env:ProgramFiles}\Docker\Docker\Docker Desktop.exe",
+        "${env:ProgramFiles(x86)}\Docker\Docker\Docker Desktop.exe",
+        "${env:LOCALAPPDATA}\Docker\Docker Desktop.exe",
+        "C:\Program Files\Docker\Docker\Docker Desktop.exe",
+        "C:\Program Files (x86)\Docker\Docker\Docker Desktop.exe"
+    )
+    
+    $dockerDesktopPath = $null
+    foreach ($path in $possiblePaths) {
+        if (Test-Path $path) {
+            $dockerDesktopPath = $path
+            break
+        }
+    }
+    
+    # Si pas trouvé, chercher dans le registre Windows
+    if (-not $dockerDesktopPath) {
+        try {
+            $regPath = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue | 
+                       Where-Object { $_.DisplayName -like "*Docker Desktop*" } | 
+                       Select-Object -First 1 -ExpandProperty InstallLocation
+            if ($regPath) {
+                $dockerDesktopPath = Join-Path $regPath "Docker Desktop.exe"
+                if (-not (Test-Path $dockerDesktopPath)) {
+                    $dockerDesktopPath = Join-Path $regPath "Docker\Docker Desktop.exe"
+                }
+            }
+        } catch {
+            # Ignorer les erreurs de registre
+        }
+    }
+    
+    if ($dockerDesktopPath -and (Test-Path $dockerDesktopPath)) {
         Start-Process $dockerDesktopPath
         Write-Host "  [INFO] Docker Desktop en cours de lancement..." -ForegroundColor Yellow
         Write-Host "  [INFO] Attente 30 secondes..." -ForegroundColor Yellow

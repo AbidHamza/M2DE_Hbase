@@ -53,8 +53,19 @@ docker info >nul 2>&1
 if errorlevel 1 (
     echo   [INFO] Docker Desktop n'est pas lancé
     echo   [INFO] Tentative de lancement...
+    
+    REM Essayer plusieurs emplacements possibles
+    set DOCKER_DESKTOP_PATH=
     if exist "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" (
-        start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+        set DOCKER_DESKTOP_PATH=%ProgramFiles%\Docker\Docker\Docker Desktop.exe
+    ) else if exist "%ProgramFiles(x86)%\Docker\Docker\Docker Desktop.exe" (
+        set DOCKER_DESKTOP_PATH=%ProgramFiles(x86)%\Docker\Docker\Docker Desktop.exe
+    ) else if exist "%LOCALAPPDATA%\Docker\Docker Desktop.exe" (
+        set DOCKER_DESKTOP_PATH=%LOCALAPPDATA%\Docker\Docker Desktop.exe
+    )
+    
+    if not "!DOCKER_DESKTOP_PATH!"=="" (
+        start "" "!DOCKER_DESKTOP_PATH!"
         echo      Docker Desktop en cours de lancement...
         echo      Attente 30 secondes...
         timeout /t 30 /nobreak >nul
@@ -75,8 +86,9 @@ if errorlevel 1 (
         exit /b 1
         :docker_ok
     ) else (
-        echo   [ERREUR] Docker Desktop non trouvé
-        echo   -^> Lancez Docker Desktop manuellement puis relancez ce script
+        echo   [INFO] Docker Desktop non trouve dans les emplacements standards
+        echo   [INFO] Lancez Docker Desktop manuellement puis relancez ce script
+        echo   -^> Ou installez Docker Desktop: https://www.docker.com/get-started
         exit /b 1
     )
 ) else (
