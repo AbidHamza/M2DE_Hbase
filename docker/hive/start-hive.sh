@@ -36,6 +36,55 @@ if ! command -v hadoop >/dev/null 2>&1; then
     exit 1
 fi
 
+# Wait for Hive Metastore to be ready before allowing Hive CLI to be used
+echo "Waiting for Hive Metastore to be ready..."
+METASTORE_HOST="hive-metastore"
+METASTORE_PORT=9083
+MAX_WAIT=180
+WAIT_COUNT=0
+METASTORE_READY=0
+
+while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
+    # Try to connect to Metastore
+    if command -v nc >/dev/null 2>&1; then
+        if nc -z "$METASTORE_HOST" "$METASTORE_PORT" 2>/dev/null; then
+            echo "Hive Metastore is ready on $METASTORE_HOST:$METASTORE_PORT"
+            METASTORE_READY=1
+            break
+        fi
+    elif command -v timeout >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
+        if timeout 2 bash -c "echo > /dev/tcp/$METASTORE_HOST/$METASTORE_PORT" 2>/dev/null; then
+            echo "Hive Metastore is ready on $METASTORE_HOST:$METASTORE_PORT"
+            METASTORE_READY=1
+            break
+        fi
+    else
+        # Fallback: try to ping the host
+        if ping -c 1 "$METASTORE_HOST" >/dev/null 2>&1; then
+            echo "Hive Metastore host is reachable (assuming ready)"
+            METASTORE_READY=1
+            break
+        fi
+    fi
+    
+    sleep 3
+    WAIT_COUNT=$((WAIT_COUNT + 3))
+    
+    # Show progress every 15 seconds
+    if [ $((WAIT_COUNT % 15)) -eq 0 ]; then
+        echo "Still waiting for Hive Metastore... ($WAIT_COUNT/$MAX_WAIT seconds)"
+    fi
+done
+
+if [ $METASTORE_READY -eq 0 ]; then
+    echo "WARNING: Hive Metastore did not become ready within $MAX_WAIT seconds" >&2
+    echo "Hive CLI may not work correctly until Metastore is ready" >&2
+    echo "Check Metastore logs: docker compose logs hive-metastore" >&2
+fi
+
+echo "Hive CLI container is ready"
+echo "You can now use: docker exec -it <container_name> hive"
+
 # Keep container running (for interactive use)
 tail -f /dev/null
 

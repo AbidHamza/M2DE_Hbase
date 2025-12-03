@@ -25,11 +25,20 @@ if command -v timeout >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
     fi
 fi
 
-# Method 4: Check logs for errors (if process running but port not responding, might be error)
+# Method 4: Check logs for successful startup AND absence of fatal errors
 LOG_FILE=${HIVE_HOME:-/opt/hive}/logs/metastore.log
 if [ -f "$LOG_FILE" ]; then
+    # Check for successful startup messages
+    if grep -qiE "(Starting.*Metastore|Metastore.*started|listening on|bind.*9083|ThriftBinary.*started)" "$LOG_FILE" 2>/dev/null; then
+        # But check for fatal errors - if found, consider unhealthy
+        if grep -qiE "(FATAL|ERROR.*Cannot.*start|Exception.*failed|bind.*failed|Unable to instantiate|Connection refused)" "$LOG_FILE" 2>/dev/null; then
+            exit 1
+        fi
+        # If we have startup message and no fatal errors, consider healthy
+        exit 0
+    fi
     # If there are fatal errors in logs, consider unhealthy
-    if grep -qiE "(FATAL|ERROR.*Cannot.*start|Exception.*failed|bind.*failed)" "$LOG_FILE" 2>/dev/null; then
+    if grep -qiE "(FATAL|ERROR.*Cannot.*start|Exception.*failed|bind.*failed|Unable to instantiate)" "$LOG_FILE" 2>/dev/null; then
         exit 1
     fi
 fi
