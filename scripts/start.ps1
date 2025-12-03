@@ -564,13 +564,6 @@ Write-Host "  - Hadoop Shell: docker exec -it $hadoopContainer bash" -Foreground
 Write-Host ""
 Write-Host "Pour arrêter l'environnement: .\scripts\stop.ps1" -ForegroundColor Yellow
 Write-Host ""
-Invoke-Expression "$composeCmd ps"
-
-Write-Host ""
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "ENVIRONNEMENT DÉMARRÉ" -ForegroundColor Green
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host ""
 Write-Host "Note: Les services peuvent prendre 2-3 minutes pour être opérationnels." -ForegroundColor Gray
 Write-Host "      Si un conteneur est 'unhealthy', attendez encore 1-2 minutes." -ForegroundColor Gray
 Write-Host ""

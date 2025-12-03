@@ -386,12 +386,6 @@ echo   - Hadoop Shell: docker exec -it %HADOOP_CONTAINER% bash
 echo.
 echo Pour arrêter l'environnement: scripts\stop.bat
 echo.
-echo.
-echo Interfaces Web:
-echo   - HDFS: http://localhost:9870
-echo   - YARN: http://localhost:8088
-echo   - HBase: http://localhost:16011
-echo.
 echo Note: Les services peuvent prendre 2-3 minutes pour être opérationnels.
 echo       Si un conteneur est 'unhealthy', attendez encore 1-2 minutes.
 echo.
