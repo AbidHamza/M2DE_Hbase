@@ -60,14 +60,13 @@ scripts\start.bat
 ### Tester HBase
 
 ```bash
-# Windows PowerShell
-.\scripts\hbase-shell.ps1
+# Accéder au shell HBase
+docker exec -it $(docker compose ps -q hbase) hbase shell
+```
 
-# Windows Batch
-scripts\hbase-shell.bat
-
-# Linux/Mac
-./scripts/hbase-shell.sh
+**Note :** Sur Windows PowerShell, utilisez :
+```powershell
+docker exec -it (docker compose ps -q hbase) hbase shell
 ```
 
 Dans le shell HBase, tapez :
@@ -80,14 +79,13 @@ Vous devriez voir la version de HBase affichée.
 ### Tester Hive
 
 ```bash
-# Windows PowerShell
-.\scripts\hive-cli.ps1
+# Accéder au CLI Hive
+docker exec -it $(docker compose ps -q hive) hive
+```
 
-# Windows Batch
-scripts\hive-cli.bat
-
-# Linux/Mac
-./scripts/hive-cli.sh
+**Note :** Sur Windows PowerShell, utilisez :
+```powershell
+docker exec -it (docker compose ps -q hive) hive
 ```
 
 Dans le CLI Hive, tapez :
