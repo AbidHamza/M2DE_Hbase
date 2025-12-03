@@ -12,6 +12,7 @@ fi
 # Gérer le répertoire metastore_db (peut exister mais être corrompu)
 METASTORE_DB_DIR="/opt/hive/metastore_db"
 METASTORE_DB_PARENT="/opt/hive"
+HIVE_SITE_XML="${HIVE_HOME}/conf/hive-site.xml"
 
 echo "Vérification du répertoire metastore_db..."
 
@@ -20,10 +21,13 @@ if [ -d "$METASTORE_DB_DIR" ]; then
     # Vérifier si c'est une base Derby valide (doit contenir service.properties)
     if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
         echo "WARNING: Répertoire metastore_db existe mais n'est pas une base Derby valide"
-        echo "Nettoyage complet du répertoire corrompu..."
-        # Supprimer complètement le répertoire (pas seulement son contenu)
-        rm -rf "$METASTORE_DB_DIR"
-        echo "Répertoire supprimé, sera recréé lors de l'initialisation"
+        echo "Nettoyage du contenu du répertoire corrompu (volume Docker, on ne peut pas supprimer le répertoire)..."
+        # Vider le contenu du répertoire (pas le répertoire lui-même car c'est un volume Docker)
+        find "$METASTORE_DB_DIR" -mindepth 1 -delete 2>/dev/null || {
+            # Si find échoue, essayer rm sur les fichiers individuels
+            rm -f "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.* 2>/dev/null || true
+        }
+        echo "Contenu du répertoire vidé, sera recréé lors de l'initialisation"
     else
         echo "Base Derby valide détectée (service.properties trouvé)"
     fi
@@ -84,42 +88,71 @@ echo "Vérification de l'initialisation du schéma Derby..."
 SCHEMA_INIT_ATTEMPTS=0
 MAX_SCHEMA_INIT_ATTEMPTS=3
 
-while [ $SCHEMA_INIT_ATTEMPTS -lt $MAX_SCHEMA_INIT_ATTEMPTS ]; do
-    # Vérifier si la base est déjà initialisée
-    if [ -f "$METASTORE_DB_DIR/service.properties" ]; then
-        echo "Schéma Derby déjà initialisé (service.properties trouvé)"
-        break
+# Vérifier si la base est déjà initialisée
+if [ -f "$METASTORE_DB_DIR/service.properties" ]; then
+    echo "Schéma Derby déjà initialisé (service.properties trouvé)"
+else
+    # La base n'existe pas ou est corrompue, on doit l'initialiser
+    # Modifier temporairement hive-site.xml pour utiliser create=true
+    echo "Modification temporaire de hive-site.xml pour permettre la création de la base..."
+    if [ -f "$HIVE_SITE_XML" ]; then
+        # Sauvegarder l'original
+        cp "$HIVE_SITE_XML" "$HIVE_SITE_XML.bak"
+        # Modifier create=false en create=true temporairement
+        sed -i 's/;create=false/;create=true/g' "$HIVE_SITE_XML"
     fi
     
-    SCHEMA_INIT_ATTEMPTS=$((SCHEMA_INIT_ATTEMPTS + 1))
-    echo "Tentative d'initialisation du schéma Derby (tentative $SCHEMA_INIT_ATTEMPTS/$MAX_SCHEMA_INIT_ATTEMPTS)..."
-    
-    # Initialiser le schéma
-    ${HIVE_HOME}/bin/schematool -initSchema -dbType derby 2>&1 | tee ${HIVE_HOME}/logs/schema-init.log
-    SCHEMA_INIT_EXIT_CODE=${PIPESTATUS[0]}
-    
-    if [ $SCHEMA_INIT_EXIT_CODE -eq 0 ]; then
-        echo "Schéma Derby initialisé avec succès"
-        break
-    else
-        # Vérifier si l'erreur est "Directory already exists"
-        if grep -qiE "(Directory.*already exists|XBM0J|metastore_db.*already exists)" ${HIVE_HOME}/logs/schema-init.log 2>/dev/null; then
-            echo "WARNING: Erreur 'Directory already exists' détectée" >&2
-            echo "Nettoyage complet du répertoire et nouvelle tentative..." >&2
-            # Supprimer complètement le répertoire
-            rm -rf "$METASTORE_DB_DIR"
-            sleep 2
-            # Continuer la boucle pour réessayer
+    while [ $SCHEMA_INIT_ATTEMPTS -lt $MAX_SCHEMA_INIT_ATTEMPTS ]; do
+        SCHEMA_INIT_ATTEMPTS=$((SCHEMA_INIT_ATTEMPTS + 1))
+        echo "Tentative d'initialisation du schéma Derby (tentative $SCHEMA_INIT_ATTEMPTS/$MAX_SCHEMA_INIT_ATTEMPTS)..."
+        
+        # Vérifier si le répertoire existe mais est vide ou corrompu
+        if [ -d "$METASTORE_DB_DIR" ] && [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
+            echo "Nettoyage du contenu du répertoire avant initialisation..."
+            find "$METASTORE_DB_DIR" -mindepth 1 -delete 2>/dev/null || {
+                rm -f "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.* 2>/dev/null || true
+            }
+            sleep 1
+        fi
+        
+        # Initialiser le schéma
+        ${HIVE_HOME}/bin/schematool -initSchema -dbType derby 2>&1 | tee ${HIVE_HOME}/logs/schema-init.log
+        SCHEMA_INIT_EXIT_CODE=${PIPESTATUS[0]}
+        
+        if [ $SCHEMA_INIT_EXIT_CODE -eq 0 ]; then
+            echo "Schéma Derby initialisé avec succès"
+            break
         else
-            echo "ERROR: Échec de l'initialisation du schéma (code: $SCHEMA_INIT_EXIT_CODE)" >&2
-            echo "Consultez les logs: ${HIVE_HOME}/logs/schema-init.log" >&2
-            if [ $SCHEMA_INIT_ATTEMPTS -ge $MAX_SCHEMA_INIT_ATTEMPTS ]; then
-                echo "ERROR: Impossible d'initialiser le schéma Derby après $MAX_SCHEMA_INIT_ATTEMPTS tentatives" >&2
-                exit 1
+            # Vérifier si l'erreur est "Directory already exists" ou "Database not found"
+            if grep -qiE "(Directory.*already exists|XBM0J|metastore_db.*already exists|Database.*not found)" ${HIVE_HOME}/logs/schema-init.log 2>/dev/null; then
+                echo "WARNING: Erreur de base de données détectée" >&2
+                echo "Nettoyage du contenu du répertoire et nouvelle tentative..." >&2
+                find "$METASTORE_DB_DIR" -mindepth 1 -delete 2>/dev/null || {
+                    rm -f "$METASTORE_DB_DIR"/* "$METASTORE_DB_DIR"/.* 2>/dev/null || true
+                }
+                sleep 2
+                # Continuer la boucle pour réessayer
+            else
+                echo "ERROR: Échec de l'initialisation du schéma (code: $SCHEMA_INIT_EXIT_CODE)" >&2
+                echo "Consultez les logs: ${HIVE_HOME}/logs/schema-init.log" >&2
+                if [ $SCHEMA_INIT_ATTEMPTS -ge $MAX_SCHEMA_INIT_ATTEMPTS ]; then
+                    echo "ERROR: Impossible d'initialiser le schéma Derby après $MAX_SCHEMA_INIT_ATTEMPTS tentatives" >&2
+                    # Restaurer l'original avant de quitter
+                    if [ -f "$HIVE_SITE_XML.bak" ]; then
+                        mv "$HIVE_SITE_XML.bak" "$HIVE_SITE_XML"
+                    fi
+                    exit 1
+                fi
             fi
         fi
+    done
+    
+    # Restaurer hive-site.xml avec create=false après initialisation réussie
+    if [ -f "$HIVE_SITE_XML.bak" ]; then
+        echo "Restauration de hive-site.xml avec create=false..."
+        mv "$HIVE_SITE_XML.bak" "$HIVE_SITE_XML"
     fi
-done
+fi
 
 # Vérification finale
 if [ ! -f "$METASTORE_DB_DIR/service.properties" ]; then
