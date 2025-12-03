@@ -76,9 +76,20 @@ export HIVE_HOME=/opt/hive
 export HIVE_CONF_DIR=${HIVE_HOME}/conf
 export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop
 
-# Verify HADOOP_CONF_DIR exists (created in Dockerfile)
+# Add Hadoop to PATH (Hive needs hadoop/hdfs commands)
+export PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
+
+# Verify HADOOP_HOME exists and has binaries
+if [ ! -d "$HADOOP_HOME" ] || [ ! -f "$HADOOP_HOME/bin/hadoop" ]; then
+    echo "ERROR: HADOOP_HOME does not exist or Hadoop binaries not found: $HADOOP_HOME" >&2
+    echo "ERROR: Hive requires Hadoop binaries to function" >&2
+    exit 1
+fi
+
+# Verify HADOOP_CONF_DIR exists
 if [ ! -d "$HADOOP_CONF_DIR" ]; then
-    echo "WARNING: HADOOP_CONF_DIR does not exist: $HADOOP_CONF_DIR" >&2
-    echo "WARNING: Hive may not be able to connect to Hadoop" >&2
+    echo "ERROR: HADOOP_CONF_DIR does not exist: $HADOOP_CONF_DIR" >&2
+    echo "ERROR: Hive cannot connect to Hadoop without configuration files" >&2
+    exit 1
 fi
 

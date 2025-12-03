@@ -30,14 +30,26 @@ COPY hive-env.sh ${HIVE_HOME}/conf/
 RUN chmod +x ${HIVE_HOME}/conf/hive-env.sh && \
     sed -i 's/\r$//' ${HIVE_HOME}/conf/hive-env.sh
 
-# Create Hadoop configuration directory for Hive (Hive needs Hadoop config but not Hadoop binaries)
-# Hive will use these configs to connect to Hadoop container via network
-RUN mkdir -p /opt/hadoop/etc/hadoop
+# Install Hadoop binaries (Hive needs hadoop/hdfs commands)
+ENV HADOOP_VERSION=3.3.4
+ENV HADOOP_HOME=/opt/hadoop
+
+# Download and install Hadoop (only binaries, not full installation)
+RUN wget -q https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+    && tar -xzf hadoop-${HADOOP_VERSION}.tar.gz \
+    && mv hadoop-${HADOOP_VERSION} ${HADOOP_HOME} \
+    && rm hadoop-${HADOOP_VERSION}.tar.gz
+
+# Create Hadoop configuration directory
+RUN mkdir -p ${HADOOP_HOME}/etc/hadoop
 
 # Copy minimal Hadoop config files needed by Hive
 # These point to the Hadoop container hostname 'hadoop'
-COPY core-site.xml /opt/hadoop/etc/hadoop/
-COPY hdfs-site.xml /opt/hadoop/etc/hadoop/
+COPY core-site.xml ${HADOOP_HOME}/etc/hadoop/
+COPY hdfs-site.xml ${HADOOP_HOME}/etc/hadoop/
+
+# Add Hadoop to PATH so Hive can find hadoop/hdfs commands
+ENV PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 
 # Copy startup scripts
 COPY start-hive-metastore.sh /start-hive-metastore.sh

@@ -403,10 +403,14 @@ while ($hiveCheckCount -lt $hiveMaxChecks) {
     if ($hiveMetastoreLogs -match "Cannot find hadoop installation" -or 
         $hiveMetastoreLogs -match "HADOOP_HOME.*not.*set" -or
         $hiveMetastoreLogs -match "HADOOP_CONF_DIR.*not.*exist" -or
+        $hiveMetastoreLogs -match "Hadoop binaries not found" -or
+        $hiveMetastoreLogs -match "hadoop.*command not found" -or
         $hiveMetastoreLogs -match "ERROR.*JAVA_HOME" -or
         $hiveLogs -match "Cannot find hadoop installation" -or
         $hiveLogs -match "HADOOP_HOME.*not.*set" -or
-        $hiveLogs -match "HADOOP_CONF_DIR.*not.*exist") {
+        $hiveLogs -match "HADOOP_CONF_DIR.*not.*exist" -or
+        $hiveLogs -match "Hadoop binaries not found" -or
+        $hiveLogs -match "hadoop.*command not found") {
         
         $hiveErrors = $true
         Write-Host "  [ATTENTION] Erreurs Hive détectées dans les logs" -ForegroundColor Yellow
