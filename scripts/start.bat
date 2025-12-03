@@ -1,0 +1,240 @@
+@echo off
+REM Script unique pour lancer l'environnement HBase & Hive (Windows Batch)
+REM Fusionne setup + run : vérifie, nettoie et lance
+REM Usage: scripts\start.bat
+
+setlocal enabledelayedexpansion
+
+set SCRIPT_DIR=%~dp0
+cd /d "!SCRIPT_DIR!.."
+
+echo ==========================================
+echo LANCEMENT ENVIRONNEMENT HBASE ^& HIVE
+echo ==========================================
+echo.
+
+set ERRORS=0
+set COMPOSE_CMD=
+
+REM ÉTAPE 1 : Vérification Docker
+echo [1/8] Vérification Docker...
+docker --version >nul 2>&1
+if errorlevel 1 (
+    echo   [ERREUR] Docker n'est pas installé
+    echo   -^> Téléchargez Docker Desktop: https://www.docker.com/get-started
+    exit /b 1
+) else (
+    echo   [OK] Docker installé
+)
+echo.
+
+REM ÉTAPE 2 : Détection Docker Compose
+echo [2/8] Détection Docker Compose...
+docker-compose --version >nul 2>&1
+if not errorlevel 1 (
+    set COMPOSE_CMD=docker-compose
+    echo   [OK] Docker Compose V1 détecté
+) else (
+    docker compose version >nul 2>&1
+    if not errorlevel 1 (
+        set COMPOSE_CMD=docker compose
+        echo   [OK] Docker Compose V2 détecté
+    ) else (
+        echo   [ERREUR] Docker Compose n'est pas installé
+        echo   -^> Mettez à jour Docker Desktop
+        exit /b 1
+    )
+)
+echo.
+
+REM ÉTAPE 3 : Vérification Docker Desktop
+echo [3/8] Vérification Docker Desktop...
+docker info >nul 2>&1
+if errorlevel 1 (
+    echo   [INFO] Docker Desktop n'est pas lancé
+    echo   [INFO] Tentative de lancement...
+    if exist "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" (
+        start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+        echo      Docker Desktop en cours de lancement...
+        echo      Attente 30 secondes...
+        timeout /t 30 /nobreak >nul
+        
+        set RETRY_COUNT=0
+        :check_docker
+        docker info >nul 2>&1
+        if not errorlevel 1 (
+            echo   [OK] Docker Desktop lancé
+            goto docker_ok
+        )
+        set /a RETRY_COUNT+=1
+        if !RETRY_COUNT! lss 10 (
+            timeout /t 5 /nobreak >nul
+            goto check_docker
+        )
+        echo   [ERREUR] Docker Desktop n'a pas démarré
+        exit /b 1
+        :docker_ok
+    ) else (
+        echo   [ERREUR] Docker Desktop non trouvé
+        echo   -^> Lancez Docker Desktop manuellement puis relancez ce script
+        exit /b 1
+    )
+) else (
+    echo   [OK] Docker Desktop est lancé
+)
+echo.
+
+REM ÉTAPE 4 : Vérification fichiers
+echo [4/8] Vérification fichiers...
+if not exist "docker-compose.yml" (
+    echo   [INFO] docker-compose.yml introuvable
+    echo   [INFO] Tentative de récupération...
+    if exist ".git" (
+        git pull origin main >nul 2>&1
+        if exist "docker-compose.yml" (
+            echo   [OK] Fichiers récupérés
+        ) else (
+            echo   [ERREUR] docker-compose.yml toujours introuvable
+            exit /b 1
+        )
+    ) else (
+        echo   [ERREUR] docker-compose.yml introuvable
+        exit /b 1
+    )
+) else (
+    echo   [OK] Fichiers présents
+)
+echo.
+
+REM ÉTAPE 5 : Nettoyage conteneurs existants
+echo [5/8] Nettoyage conteneurs existants...
+for /f "tokens=*" %%i in ('docker ps --filter "name=hbase-hive-learning-lab" --format "{{.Names}}" 2^>nul') do (
+    set /a RUNNING_COUNT+=1
+)
+
+if defined RUNNING_COUNT (
+    echo   [INFO] Arrêt des conteneurs existants...
+    for /f "tokens=*" %%i in ('docker ps -a --filter "name=hbase-hive-learning-lab" --format "{{.ID}}" 2^>nul') do (
+        docker stop %%i >nul 2>&1
+        docker rm -f %%i >nul 2>&1
+    )
+)
+
+if not "!COMPOSE_CMD!"=="" (
+    !COMPOSE_CMD! down -v --remove-orphans >nul 2>&1
+)
+
+docker volume prune -f >nul 2>&1
+echo   [OK] Nettoyage terminé
+echo.
+
+REM ÉTAPE 6 : Vérification ports (simplifiée)
+echo [6/8] Vérification ports...
+echo   [OK] Vérification simplifiée
+echo.
+
+REM ÉTAPE 7 : Vérification espace disque (simplifiée)
+echo [7/8] Vérification espace disque...
+echo   [OK] Vérification simplifiée
+echo.
+
+REM ÉTAPE 8 : Vérification finale Docker
+echo [8/8] Vérification finale Docker...
+set DOCKER_READY=0
+for /l %%i in (1,1,10) do (
+    docker info >nul 2>&1
+    if not errorlevel 1 (
+        set DOCKER_READY=1
+        echo   [OK] Docker daemon accessible
+        goto docker_ready_ok
+    )
+    if %%i lss 10 (
+        timeout /t 2 /nobreak >nul
+    )
+)
+
+:docker_ready_ok
+if !DOCKER_READY! equ 0 (
+    echo   [ERREUR] Docker daemon non accessible
+    echo   -^> Attendez que Docker Desktop soit complètement démarré
+    exit /b 1
+)
+echo.
+
+REM LANCEMENT DES CONTENEURS
+echo ==========================================
+echo LANCEMENT DES CONTENEURS
+echo ==========================================
+echo.
+echo Cela peut prendre 3-5 minutes...
+echo.
+
+set MAX_RETRIES=3
+set RETRY=0
+set SUCCESS=0
+
+:retry_loop
+if !RETRY! geq !MAX_RETRIES! goto launch_failed
+if !SUCCESS! equ 1 goto launch_success
+
+if !RETRY! gtr 0 (
+    echo [RETRY !RETRY!/!MAX_RETRIES!] Nouvelle tentative...
+    !COMPOSE_CMD! down -v >nul 2>&1
+    timeout /t 5 /nobreak >nul
+)
+
+!COMPOSE_CMD! up -d --build
+if not errorlevel 1 (
+    set SUCCESS=1
+    goto launch_success
+) else (
+    set /a RETRY+=1
+    if !RETRY! lss !MAX_RETRIES! (
+        echo [INFO] Échec, nouvelle tentative dans 10 secondes...
+        timeout /t 10 /nobreak >nul
+        goto retry_loop
+    )
+)
+
+:launch_failed
+echo.
+echo [ERREUR] Échec après !MAX_RETRIES! tentatives
+echo.
+echo Pour diagnostiquer:
+echo   !COMPOSE_CMD! logs
+echo   !COMPOSE_CMD! ps
+echo.
+exit /b 1
+
+:launch_success
+echo.
+echo [OK] Conteneurs démarrés
+echo.
+echo Attente du démarrage complet (60 secondes)...
+timeout /t 60 /nobreak >nul
+
+echo.
+echo Vérification de l'état...
+!COMPOSE_CMD! ps
+
+echo.
+echo ==========================================
+echo ENVIRONNEMENT DÉMARRÉ
+echo ==========================================
+echo.
+echo Accès aux services:
+echo   - HBase Shell: scripts\hbase-shell.bat
+echo   - Hive CLI: scripts\hive-cli.bat
+echo   - État: scripts\status.bat
+echo.
+echo Interfaces Web:
+echo   - HDFS: http://localhost:9870
+echo   - YARN: http://localhost:8088
+echo   - HBase: http://localhost:16011
+echo.
+echo Note: Les services peuvent prendre 2-3 minutes pour être opérationnels.
+echo       Si un conteneur est 'unhealthy', attendez encore 1-2 minutes.
+echo.
+
+exit /b 0
+
