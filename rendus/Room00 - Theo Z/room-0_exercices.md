@@ -21,17 +21,6 @@
 - Commandes théoriques comprises et listées
 
 ---
-
-## 👤 Auteur
-**Théo Zimmermann – M2 Data Engineering**
-
-Rendu dans :  
-`rendus/Room00 - Theo Z/`
-
-────────────────────────────────────────────────────────────
-📄 FICHIER : room-0_exercices.md
-────────────────────────────────────────────────────────────
-
 # Room 0 - Exercices (Théo Zimmermann)
 
 ## 🎯 Objectif de la Room 0
@@ -216,4 +205,5 @@ J’ai réussi :
 - Les opérations HDFS
 - La manipulation complète d’une table HBase
 - La compréhension de Hive
+
 
