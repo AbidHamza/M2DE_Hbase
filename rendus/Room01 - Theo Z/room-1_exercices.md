@@ -253,6 +253,3 @@ scan 'customers', {COLUMNS => 'info', LIMIT => 2}
 - Ajouter une famille `orders`
 - Utiliser des row keys structurées (ex : `CUST#FR#0001`)
 
----
-
-# 🎉 Room 1 terminée !
