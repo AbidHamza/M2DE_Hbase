@@ -1,23 +1,3 @@
-────────────────────────────────────────────────────────────
-📄 FICHIER : README.md
-────────────────────────────────────────────────────────────
-
-# Room 00 – Rendu par Théo Zimmermann
-
-Ce dossier contient mon travail pour la **Room 0 – Introduction à l’environnement Hadoop/HBase/Hive**.
-
----
-
-## 📁 Fichiers fournis
-
-### `room-0_exercices.md`
-→ Contient toutes les commandes exécutées et les résultats réels obtenus dans :
-- HDFS
-- HBase
-- (Hive théorique)
-
----
-
 ## ✔️ Résumé du travail effectué
 
 ### 🔹 HDFS
@@ -236,3 +216,4 @@ J’ai réussi :
 - Les opérations HDFS
 - La manipulation complète d’une table HBase
 - La compréhension de Hive
+
