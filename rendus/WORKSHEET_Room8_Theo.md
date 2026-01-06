@@ -31,30 +31,31 @@ Complétez le diagramme `diagrams/architecture-blank.mmd` en plaçant tous les c
 **Question 1 :** Pourquoi avez-vous placé HDFS en bas de l'architecture ?
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+HDFS est placé en bas car il constitue la couche de stockage sur laquelle reposent tous les autres composants.
+Hive et HBase n’y stockent pas directement les données mais les lisent et les écrivent via HDFS.
+Sans HDFS, les couches de calcul et d’accès ne peuvent pas fonctionner.
 
 **Question 2 :** Comment les clients HBase accèdent-ils aux données ? Tracez le flux complet.
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+Le client HBase (HBase Shell) contacte d’abord ZooKeeper pour localiser le RegionServer qui contient la donnée.
+Il communique ensuite directement avec le RegionServer pour lire ou écrire les données.
+Le RegionServer accède aux données via le MemStore, le WAL et les HFiles stockés dans HDFS.
 
 **Question 3 :** Comment les clients Hive accèdent-ils aux données ? Tracez le flux complet.
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+Le client Hive (Beeline) envoie la requête à HiveServer2, qui consulte le Hive Metastore pour obtenir le schéma.
+La requête est ensuite exécutée via YARN, qui lit les données dans HDFS.
+Le résultat final est renvoyé à HiveServer2, puis au client Hive.
+Flux :
+Client Hive (Beeline) → HiveServer2 → Hive Metastore → YARN → HDFS → YARN → HiveServer2 → Client Hive
 
 **Question 4 :** Quel est le rôle de ZooKeeper dans cette architecture ?
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+ZooKeeper assure la coordination des composants HBase et stocke les informations de configuration du cluster.
+Il gère l’élection du HBase Master et permet aux clients de localiser les RegionServers.
 
 ---
 
