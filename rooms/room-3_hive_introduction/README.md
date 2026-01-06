@@ -1,5 +1,34 @@
 # Room 3 : Introduction à Hive
 
+## Prérequis et Vérifications
+
+**Avant de commencer cette room, assurez-vous que :**
+
+1. **Vous avez complété les Rooms 0 et 1** (au minimum)
+   - Vous comprenez les concepts de base de Hadoop
+   - Vous savez utiliser HBase shell
+
+2. **L'environnement est démarré et fonctionnel**
+   ```bash
+   docker compose ps
+   ```
+   Les conteneurs `hive-metastore` et `hive` doivent être "Up" et "healthy".
+
+3. **Vous pouvez accéder au CLI Hive**
+   ```bash
+   docker exec -it $(docker compose ps -q hive) hive
+   ```
+   Si cette commande échoue, attendez 2-3 minutes après le démarrage (Hive prend du temps à démarrer).
+
+**Si vous rencontrez des problèmes :**
+- Attendez 2-3 minutes après le démarrage (Hive est plus lent que HBase)
+- Vérifiez les logs : `docker compose logs hive-metastore hive`
+- Consultez la Room 8 : Troubleshooting et Dépannage
+
+---
+
+# Room 3 : Introduction à Hive
+
 ## Objectifs de cette room
 
 - Comprendre le modèle de données Hive (tables, partitions, buckets)

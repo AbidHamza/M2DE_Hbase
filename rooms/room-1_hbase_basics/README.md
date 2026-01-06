@@ -1,5 +1,32 @@
 # Room 1 : Les bases de HBase
 
+## Prérequis et Vérifications
+
+**Avant de commencer cette room, assurez-vous que :**
+
+1. **Vous avez complété la Room 0** (Introduction)
+   - Vous savez accéder au shell HBase
+   - Vous avez testé les commandes de base
+
+2. **L'environnement est démarré et fonctionnel**
+   ```bash
+   docker compose ps
+   ```
+   Le conteneur `hbase` doit être "Up" et "healthy".
+
+3. **Vous pouvez accéder au shell HBase**
+   ```bash
+   docker exec -it $(docker compose ps -q hbase) hbase shell
+   ```
+   Si cette commande échoue, consultez la Room 8 (Troubleshooting).
+
+**Si vous rencontrez des problèmes :**
+- Vérifiez que HBase est démarré : `docker compose ps hbase`
+- Consultez les logs : `docker compose logs hbase`
+- Consultez la Room 8 : Troubleshooting et Dépannage
+
+---
+
 ##  Objectifs de cette room
 
 À la fin de cette room, vous saurez :

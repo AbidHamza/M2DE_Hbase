@@ -1,5 +1,38 @@
 # Room 0 : Introduction à l'environnement
 
+## Prérequis et Vérifications
+
+**Avant de commencer cette room, assurez-vous que :**
+
+1. **Docker est installé et fonctionnel**
+   ```bash
+   docker --version
+   docker compose version
+   ```
+   Si ces commandes échouent, consultez la Room 8 (Troubleshooting) ou le README principal.
+
+2. **L'environnement est démarré**
+   ```bash
+   # Depuis la racine du projet
+   ./scripts/start
+   # ou sur Windows PowerShell
+   .\scripts\start.ps1
+   ```
+   Attendez 3-5 minutes que tous les conteneurs soient "healthy".
+
+3. **Les conteneurs sont démarrés et sains**
+   ```bash
+   docker compose ps
+   ```
+   Tous les conteneurs doivent afficher "Up" et "healthy" (ou au moins "Up").
+
+**Si vous rencontrez des problèmes :**
+- Consultez la Room 8 : Troubleshooting et Dépannage
+- Vérifiez les logs : `docker compose logs`
+- Assurez-vous d'avoir au moins 4 GB de RAM disponible
+
+---
+
 ##  Objectifs de cette room
 
 À la fin de cette room, vous saurez :

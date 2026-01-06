@@ -734,6 +734,8 @@ Les **rooms** sont des parcours d'apprentissage guidés. Suivez-les dans l'ordre
 6. **Room 5** : Intégration HBase-Hive
 7. **Room 6** : Cas d'usage réels
 8. **Room 7** : Projet final
+9. **Room 8** : Troubleshooting et Dépannage (optionnel, à consulter en cas de problème)
+10. **Room 9** : Optimisation et Performance (optionnel, pour aller plus loin)
 
 **Comment travailler :**
 ```bash
