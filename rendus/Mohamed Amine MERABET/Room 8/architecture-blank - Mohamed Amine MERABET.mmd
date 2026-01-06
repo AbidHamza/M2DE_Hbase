@@ -1,28 +1,22 @@
 flowchart TB
 
-%% ===== Clients =====
+%% ===== Nodes =====
 ClientHive["Client Hive (Beeline)"]
 ClientHBase["Client HBase (HBase Shell)"]
 
-%% ===== Hive Layer =====
 HiveServer2["HiveServer2"]
 Metastore["Hive Metastore"]
 
-%% ===== HBase Layer =====
 HBaseMaster["HBase Master"]
 RegionServer1["HBase RegionServer 1"]
 RegionServer2["HBase RegionServer 2"]
 
-%% ===== Coordination =====
 ZooKeeper["ZooKeeper"]
-
-%% ===== Compute =====
 YARN["YARN (ResourceManager + NodeManagers)"]
 
-%% ===== Storage =====
 HDFS["HDFS (NameNode + DataNodes)"]
-HFiles["HFiles"]
 WAL["WAL"]
+HFiles["HFiles"]
 
 %% ===== Hive Flow =====
 ClientHive --> HiveServer2
@@ -30,7 +24,6 @@ HiveServer2 --> Metastore
 HiveServer2 --> YARN
 YARN --> HDFS
 HDFS --> HiveServer2
-HiveServer2 --> ClientHive
 
 %% ===== HBase Flow =====
 ClientHBase --> ZooKeeper
@@ -42,14 +35,26 @@ ClientHBase --> RegionServer2
 
 RegionServer1 --> WAL
 RegionServer2 --> WAL
-
 RegionServer1 --> HFiles
 RegionServer2 --> HFiles
 
 WAL --> HDFS
 HFiles --> HDFS
 
-%% ===== Master Coordination =====
+%% ===== Master =====
 HBaseMaster --> ZooKeeper
 HBaseMaster --> RegionServer1
 HBaseMaster --> RegionServer2
+
+%% ===== Link styles =====
+%% Hive (bleu)
+linkStyle 0,1,2,3,4 stroke:#1f77b4,stroke-width:2px;
+
+%% HBase accès (vert)
+linkStyle 5,6,7,8 stroke:#2ca02c,stroke-width:2px;
+
+%% HBase stockage (gris)
+linkStyle 9,10,11,12 stroke:#7f7f7f,stroke-width:2px;
+
+%% Coordination (violet)
+linkStyle 13,14,15 stroke:#9467bd,stroke-width:2px;
