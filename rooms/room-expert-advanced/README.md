@@ -6,6 +6,12 @@
 
 Cette room est **complètement indépendante** et ne nécessite **aucun environnement Docker**. Elle est conçue pour les étudiants qui veulent devenir experts en architecture, design et optimisation de systèmes HBase et Hive sans avoir besoin d'un environnement fonctionnel.
 
+**Pourquoi cette room existe :**
+- Permet d'apprendre les concepts avancés sans contraintes techniques
+- Focus sur la réflexion architecturale plutôt que l'exécution
+- Accessible même sans accès à un environnement Docker
+- Préparation aux entretiens techniques et projets professionnels
+
 Cette room se concentre sur :
 - La **conception architecturale** avancée
 - Les **patterns de design** professionnels
@@ -850,16 +856,33 @@ Requête de jointure entre deux grandes tables prenant 30 minutes.
 
 Pour valider cette room, vous devez :
 
-1. Avoir complété tous les exercices de réflexion
+1. Avoir complété tous les exercices de réflexion dans le WORKSHEET.md
 2. Avoir conçu au moins 2 architectures complètes (exercices de conception)
 3. Comprendre les patterns de design professionnels
-4. Être capable d'expliquer vos choix architecturaux
+4. Être capable d'expliquer vos choix architecturaux de manière claire et justifiée
 
 **Critères d'évaluation :**
 - Justification des choix architecturaux (40%)
+  - Choix pertinents selon les contraintes
+  - Explication claire des avantages/inconvénients
+  - Considération des alternatives
+  
 - Compréhension des concepts avancés (30%)
+  - Maîtrise des techniques d'optimisation
+  - Compréhension des patterns de design
+  - Application correcte des concepts
+  
 - Qualité des solutions proposées (20%)
+  - Solutions réalistes et implémentables
+  - Prise en compte des contraintes réelles
+  - Optimisations pertinentes
+  
 - Clarté et précision (10%)
+  - Explications structurées
+  - Vocabulaire technique approprié
+  - Présentation professionnelle
+
+**Note minimale pour validation :** 12/20
 
 ---
 
@@ -890,6 +913,13 @@ Cette room vous a donné les connaissances nécessaires pour :
 - Optimiser des systèmes existants
 - Résoudre des problèmes complexes
 - Appliquer les meilleures pratiques de l'industrie
+- Prendre des décisions architecturales éclairées
 
-Vous êtes maintenant prêt à travailler sur des projets professionnels avec HBase et Hive.
+**Prochaines étapes :**
+- Appliquer ces concepts dans vos projets pratiques
+- Expérimenter avec les patterns présentés
+- Continuer à apprendre avec les ressources complémentaires
+- Partager vos réflexions et solutions avec la communauté
+
+Vous êtes maintenant prêt à travailler sur des projets professionnels avec HBase et Hive et à prendre des décisions architecturales complexes en toute confiance.
 

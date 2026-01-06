@@ -243,11 +243,46 @@
 
 - 
 
+### Patterns de design que je retiens :
+
+- 
+
 ### Questions restantes :
+
+- 
+
+### Comment j'appliquerai ces connaissances :
 
 - 
 
 ### Prochaines étapes :
 
+- 
+
+---
+
+## Auto-évaluation
+
+### Ma compréhension des concepts (1-5) :
+
+- Architecture HBase avancée : ___/5
+- Architecture Hive avancée : ___/5
+- Patterns de design : ___/5
+- Optimisation : ___/5
+- Résolution de problèmes : ___/5
+
+### Points forts identifiés :
+
+- 
+
+### Points à améliorer :
+
+- 
+
+### Prêt pour des projets professionnels ?
+
+- Oui / Non / Partiellement
+
+**Justification :**
 - 
 
