@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# Script universel de démarrage - Détecte automatiquement l'OS et exécute la logique appropriée
+# Usage: ./scripts/start
+# Compatible: Linux, macOS, Windows (Git Bash, WSL, PowerShell)
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT" || exit 1
+
+# Détection de l'OS avec gestion d'erreur
+detect_os() {
+    local uname_output
+    uname_output=$(uname -s 2>/dev/null || echo "UNKNOWN")
+    
+    case "$uname_output" in
+        Linux*)
+            echo "linux"
+            ;;
+        Darwin*)
+            echo "macos"
+            ;;
+        CYGWIN*|MINGW32*|MSYS*|MINGW*)
+            echo "windows"
+            ;;
+        *)
+            echo "unknown"
+            ;;
+    esac
+}
+
+OS=$(detect_os)
+
+# Exécuter le script approprié selon l'OS avec gestion d'erreur robuste
+case "$OS" in
+    linux|macos)
+        # Linux/macOS - Utiliser start.sh
+        if [ -f "$SCRIPT_DIR/start.sh" ]; then
+            bash "$SCRIPT_DIR/start.sh" || {
+                echo "Erreur: Échec de l'exécution de start.sh"
+                exit 1
+            }
+        else
+            echo "Erreur: start.sh introuvable dans $SCRIPT_DIR"
+            echo "Vérifiez que le fichier existe et que vous êtes dans le bon répertoire."
+            exit 1
+        fi
+        ;;
+    windows)
+        # Windows - Utiliser PowerShell si disponible, sinon batch
+        if command -v powershell.exe &> /dev/null 2>&1; then
+            if [ -f "$SCRIPT_DIR/start.ps1" ]; then
+                powershell.exe -ExecutionPolicy Bypass -File "$SCRIPT_DIR/start.ps1" || {
+                    echo "Erreur: Échec de l'exécution de start.ps1"
+                    exit 1
+                }
+            elif [ -f "$SCRIPT_DIR/start.bat" ]; then
+                cmd.exe /c "$SCRIPT_DIR\start.bat" || {
+                    echo "Erreur: Échec de l'exécution de start.bat"
+                    exit 1
+                }
+            else
+                echo "Erreur: Aucun script Windows trouvé dans $SCRIPT_DIR"
+                exit 1
+            fi
+        elif [ -f "$SCRIPT_DIR/start.bat" ]; then
+            cmd.exe /c "$SCRIPT_DIR\start.bat" || {
+                echo "Erreur: Échec de l'exécution de start.bat"
+                exit 1
+            }
+        else
+            echo "Erreur: Aucun script Windows trouvé dans $SCRIPT_DIR"
+            echo "Fichiers disponibles dans $SCRIPT_DIR:"
+            ls -la "$SCRIPT_DIR" 2>/dev/null || dir "$SCRIPT_DIR" 2>/dev/null || echo "Impossible de lister les fichiers"
+            exit 1
+        fi
+        ;;
+    *)
+        echo "OS non reconnu: $OS"
+        echo ""
+        echo "Utilisez directement le script approprié:"
+        echo "  - Linux/Mac: ./scripts/start.sh"
+        echo "  - Windows PowerShell: .\scripts\start.ps1"
+        echo "  - Windows CMD: scripts\start.bat"
+        exit 1
+        ;;
+esac

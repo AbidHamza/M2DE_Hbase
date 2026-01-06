@@ -24,9 +24,130 @@ Avant de commencer, vérifiez que vous avez :
 
 ---
 
+## Alternative : Installation Sans Docker
+
+> **Note importante** : Cette section est destinée aux étudiants qui **ne peuvent pas** ou **ne souhaitent pas** utiliser Docker. Si vous avez Docker disponible, nous vous recommandons fortement de l'utiliser car c'est la méthode la plus simple et la plus fiable.
+
+### Pourquoi Utiliser Docker est Recommandé
+
+- **Installation automatique** : Tout est pré-configuré et fonctionne immédiatement
+- **Pas de conflits** : L'environnement est isolé, pas d'impact sur votre système
+- **Compatible** : Fonctionne de la même manière sur Windows, Mac et Linux
+- **Facile à réinitialiser** : Un simple `docker compose down` et vous repartez de zéro
+- **Support complet** : Tous les scripts et guides sont optimisés pour Docker
+
+### Si Vous Ne Pouvez Pas Utiliser Docker
+
+Si vous n'avez pas Docker ou ne pouvez pas l'installer, voici les alternatives possibles :
+
+#### Option 1 : Installation Manuelle (Avancé)
+
+Vous devrez installer manuellement :
+
+1. **Java 8 JDK** (requis pour Hadoop, HBase et Hive)
+2. **Hadoop 3.3.4** (HDFS + YARN)
+3. **Zookeeper 3.7**
+4. **HBase 2.5.0**
+5. **Hive 3.1.3**
+6. **PostgreSQL** (pour le metastore Hive)
+
+**Difficulté** : **Très élevée** - Nécessite une bonne compréhension de la configuration système et des fichiers de configuration XML.
+
+**Temps estimé** : 4-6 heures de configuration minimum
+
+**Ressources nécessaires** :
+- Système Linux ou macOS (Windows sans WSL est très compliqué)
+- Minimum 8 GB RAM (recommandé 16 GB)
+- 20+ GB d'espace disque
+- Connaissance avancée de la ligne de commande et de la configuration système
+
+**Documentation** :
+- Guide Hadoop : https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
+- Guide HBase : https://hbase.apache.org/book.html#quickstart
+- Guide Hive : https://cwiki.apache.org/confluence/display/Hive/GettingStarted
+
+#### Option 2 : Machines Virtuelles Pré-configurées
+
+Vous pouvez utiliser des machines virtuelles pré-configurées disponibles en ligne :
+
+- **Cloudera QuickStart VM** : https://www.cloudera.com/downloads/quickstart_vms.html
+  - Contient Hadoop, HBase, Hive pré-installés
+  - Disponible pour VirtualBox ou VMware
+  - Taille : ~10-15 GB
+  
+- **Hortonworks Sandbox** : Disponible via archives (maintenant Cloudera)
+  - Alternative à Cloudera
+
+**Difficulté** : **Moyenne** - Nécessite VirtualBox ou VMware
+
+**Avantages** :
+- Tout est pré-configuré
+- Peut fonctionner sur Windows, Mac ou Linux
+- Ne nécessite pas Docker
+
+**Inconvénients** :
+- Configuration différente de cet environnement de cours
+- Les scripts et exemples du projet peuvent ne pas fonctionner directement
+- Nécessite beaucoup de RAM (8-16 GB)
+
+#### Option 3 : Environnements Cloud (Payants)
+
+Services cloud qui offrent Hadoop/HBase/Hive :
+
+- **Amazon EMR** (AWS)
+- **Azure HDInsight**
+- **Google Cloud Dataproc**
+
+**Difficulté** : **Faible** (mais nécessite un compte cloud)
+
+**Coût** : Payant (généralement quelques dollars/heure)
+
+**Avantages** :
+- Pas d'installation locale
+- Scalable
+- Professionnel
+
+#### Option 4 : Utiliser un Ordinateur avec Docker
+
+Si vous avez accès à un autre ordinateur ou à un laboratoire informatique :
+
+- Utiliser les ordinateurs du laboratoire de l'école
+- Demander de l'aide pour installer Docker sur votre machine
+- Utiliser Docker via un service cloud (Docker Hub + machine distante)
+
+### Limitations Sans Docker
+
+Si vous choisissez de ne pas utiliser Docker :
+
+1. **Les scripts fournis ne fonctionneront pas** - Vous devrez adapter ou créer vos propres scripts
+2. **Configuration manuelle requise** - Tous les fichiers de configuration doivent être créés/modifiés manuellement
+3. **Problèmes de compatibilité** - Les exemples du cours peuvent ne pas fonctionner directement
+4. **Support limité** - L'équipe pédagogique peut avoir plus de difficultés à vous aider
+5. **Temps de configuration important** - Plusieurs heures nécessaires au lieu de quelques minutes
+
+### Ressources pour Installation Manuelle
+
+Si vous choisissez l'installation manuelle, voici les guides officiels :
+
+- **Hadoop** : https://hadoop.apache.org/docs/stable/
+- **HBase** : https://hbase.apache.org/book.html
+- **Hive** : https://cwiki.apache.org/confluence/display/Hive/Home
+
+### Recommandation
+
+**Nous recommandons fortement d'utiliser Docker** car :
+- C'est gratuit et fonctionne sur tous les systèmes
+- L'installation prend 10-15 minutes au lieu de plusieurs heures
+- Tout est testé et fonctionne ensemble
+- Le support est complet
+
+Si vous rencontrez des problèmes avec Docker, consultez la section "Résolution de Problèmes" de ce README.
+
+---
+
 ### Étape 1 : Installer Docker
 
-Docker est **obligatoire** pour faire fonctionner cet environnement. Voici comment l'installer selon votre système :
+Docker est **recommandé** pour faire fonctionner cet environnement facilement. Voici comment l'installer selon votre système :
 
 #### Windows
 
@@ -272,6 +393,7 @@ M2DE_Hbase/
 │   └── sensors/             # Données de capteurs
 │
 └── rooms/                    # VOS TRAVAUX ICI
+    ├── room-architecture-hbase-hive-independent/
     ├── room-0_introduction/
     ├── room-1_hbase_basics/
     ├── room-2_hbase_advanced/
@@ -603,6 +725,7 @@ Ouvrez votre navigateur :
 
 Les **rooms** sont des parcours d'apprentissage guidés. Suivez-les dans l'ordre :
 
+0. **Room Architecture** : Comprendre l'architecture HBase + Hive (indépendante de Docker, recommandée en premier)
 1. **Room 0** : Introduction
 2. **Room 1** : HBase Basics
 3. **Room 2** : HBase Advanced
@@ -866,6 +989,7 @@ M2DE_Hbase/
 │   └── sensors/
 │
 └── rooms/                    # VOS TRAVAUX ICI
+    ├── room-architecture-hbase-hive-independent/
     ├── room-0_introduction/
     ├── room-1_hbase_basics/
     ├── room-2_hbase_advanced/

@@ -8,7 +8,6 @@
 -  Comprendre ce que fait chaque commande
 -  Créer vos premiers fichiers et tables
 
-** Temps estimé :** 1-2 heures (prenez votre temps !)
 
 ---
 

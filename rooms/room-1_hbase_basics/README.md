@@ -9,7 +9,6 @@
 -  Utiliser des filtres de base pour interroger vos données
 -  Structurer vos données efficacement
 
-** Temps estimé :** 2-3 heures (prenez votre temps pour bien comprendre !)
 
 ---
 
