@@ -1,0 +1,77 @@
+graph TB
+    subgraph "Couche Client"
+        direction LR
+        ClientHBase["Client HBase<br/>(HBase Shell)"]
+        ClientHive["Client Hive<br/>(Beeline)"]
+    end
+    
+    subgraph "Couche Accès"
+        direction TB
+        HBaseMaster["HBase Master"]
+        RegionServer1["RegionServer 1"]
+        RegionServer2["RegionServer 2"]
+        HiveServer2["HiveServer2"]
+    end
+    
+    subgraph "Couche Métadonnées"
+        direction LR
+        Metastore["Hive Metastore"]
+        ZooKeeper["ZooKeeper"]
+    end
+    
+    subgraph "Couche Calcul"
+        direction TB
+        YARN["YARN<br/>(ResourceManager + NodeManagers)"]
+    end
+    
+    subgraph "Couche Stockage"
+        direction TB
+        HDFS["HDFS<br/>(NameNode + DataNodes)"]
+        HFiles["HFiles<br/>(dans HDFS)"]
+        WAL["WAL<br/>(Write-Ahead Log)"]
+    end
+    
+    %% Flux clients HBase
+    ClientHBase -->|"Opérations admin"| HBaseMaster
+    ClientHBase -->|"Lectures/Écritures"| RegionServer1
+    ClientHBase -->|"Lectures/Écritures"| RegionServer2
+    
+    %% Flux clients Hive
+    ClientHive -->|"Requêtes HiveQL"| HiveServer2
+    
+    %% Flux HBase Master
+    HBaseMaster -.->|"Coordination"| ZooKeeper
+    HBaseMaster -.->|"Gestion régions"| RegionServer1
+    HBaseMaster -.->|"Gestion régions"| RegionServer2
+    
+    %% Flux RegionServers
+    RegionServer1 -->|"Écriture données"| HFiles
+    RegionServer1 -->|"Journal modifications"| WAL
+    RegionServer2 -->|"Écriture données"| HFiles
+    RegionServer2 -->|"Journal modifications"| WAL
+    HFiles -->|"Stockage physique"| HDFS
+    WAL -->|"Stockage physique"| HDFS
+    
+    %% Flux Hive
+    HiveServer2 -->|"Consultation schéma"| Metastore
+    HiveServer2 -->|"Soumission tâches"| YARN
+    YARN -->|"Lecture données"| HDFS
+    YARN -->|"Retour résultats"| HiveServer2
+    
+    %% Flux ZooKeeper
+    RegionServer1 -.->|"Enregistrement"| ZooKeeper
+    RegionServer2 -.->|"Enregistrement"| ZooKeeper
+    
+    %% Styles
+    classDef clientStyle fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef accessStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef metadataStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef computeStyle fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef storageStyle fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    
+    class ClientHBase,ClientHive clientStyle
+    class HBaseMaster,RegionServer1,RegionServer2,HiveServer2 accessStyle
+    class Metastore,ZooKeeper metadataStyle
+    class YARN computeStyle
+    class HDFS,HFiles,WAL storageStyle
+

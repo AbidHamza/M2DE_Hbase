@@ -248,10 +248,61 @@ try {
 Write-Host ""
 
 # ==========================================
-# ÉTAPE 6 : Libération ports occupés
+# ÉTAPE 6 : Vérification RAM
 # ==========================================
-Write-Host "[6/10] Vérification ports..." -ForegroundColor Yellow
-$ports = @(9000, 9870, 16011, 2181)
+Write-Host "[6/12] Vérification RAM..." -ForegroundColor Yellow
+try {
+    $totalRAM = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
+    if ($totalRAM -lt 4) {
+        Write-Host "  [ATTENTION] Moins de 4GB de RAM disponible ($totalRAM GB)" -ForegroundColor Yellow
+        Write-Host "  [INFO] Les conteneurs peuvent ne pas démarrer correctement" -ForegroundColor Yellow
+        Write-Host "  [INFO] Fermez d'autres applications pour libérer de la RAM" -ForegroundColor Yellow
+        $continue = Read-Host "  Continuer quand même ? (o/N)"
+        if ($continue -ne "o" -and $continue -ne "O") {
+            Write-Host "  [INFO] Arrêt du script" -ForegroundColor Yellow
+            exit 1
+        }
+        $Warnings++
+    } else {
+        Write-Host "  [OK] RAM suffisante: $totalRAM GB" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "  [INFO] Vérification RAM impossible" -ForegroundColor Yellow
+    $Warnings++
+}
+Write-Host ""
+
+# ==========================================
+# ÉTAPE 7 : Vérification connexion Internet
+# ==========================================
+Write-Host "[7/12] Vérification connexion Internet..." -ForegroundColor Yellow
+try {
+    $ping = Test-Connection -ComputerName 8.8.8.8 -Count 1 -Quiet -ErrorAction SilentlyContinue
+    if (-not $ping) {
+        $ping = Test-Connection -ComputerName google.com -Count 1 -Quiet -ErrorAction SilentlyContinue
+    }
+    if ($ping) {
+        Write-Host "  [OK] Connexion Internet disponible" -ForegroundColor Green
+    } else {
+        throw "Pas de connexion"
+    }
+} catch {
+    Write-Host "  [ATTENTION] Pas de connexion Internet détectée" -ForegroundColor Yellow
+    Write-Host "  [INFO] Le téléchargement des images Docker peut échouer" -ForegroundColor Yellow
+    $continue = Read-Host "  Continuer quand même ? (o/N)"
+    if ($continue -ne "o" -and $continue -ne "O") {
+        Write-Host "  [INFO] Arrêt du script" -ForegroundColor Yellow
+        exit 1
+    }
+    $Warnings++
+}
+Write-Host ""
+
+# ==========================================
+# ÉTAPE 8 : Libération ports occupés
+# ==========================================
+Write-Host "[8/12] Vérification ports..." -ForegroundColor Yellow
+$ports = @(9000, 9870, 16011, 2181, 10000, 10002, 16020, 16030)
 $portConflicts = 0
 foreach ($port in $ports) {
     $connection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
@@ -269,9 +320,9 @@ if ($portConflicts -eq 0) {
 Write-Host ""
 
 # ==========================================
-# ÉTAPE 7 : Vérification espace disque
+# ÉTAPE 9 : Vérification espace disque
 # ==========================================
-Write-Host "[7/10] Vérification espace disque..." -ForegroundColor Yellow
+Write-Host "[9/12] Vérification espace disque..." -ForegroundColor Yellow
 try {
     $disk = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Root -eq (Get-Location).Drive.Root }
     $freeGB = [math]::Round($disk.Free / 1GB, 2)
@@ -290,9 +341,9 @@ try {
 Write-Host ""
 
 # ==========================================
-# ÉTAPE 8 : Vérification finale Docker
+# ÉTAPE 10 : Vérification finale Docker
 # ==========================================
-Write-Host "[8/10] Vérification finale Docker..." -ForegroundColor Yellow
+Write-Host "[10/12] Vérification finale Docker..." -ForegroundColor Yellow
 $dockerReady = $false
 for ($i = 1; $i -le 10; $i++) {
     docker info 2>&1 | Out-Null
@@ -375,9 +426,9 @@ Write-Host "[OK] Conteneurs démarrés" -ForegroundColor Green
 Write-Host ""
 
 # ==========================================
-# ÉTAPE 9 : Vérification JAVA_HOME dans les logs
+# ÉTAPE 11 : Vérification JAVA_HOME dans les logs
 # ==========================================
-Write-Host "[9/10] Vérification JAVA_HOME..." -ForegroundColor Yellow
+Write-Host "[11/12] Vérification JAVA_HOME..." -ForegroundColor Yellow
 Start-Sleep -Seconds 30
 
 $javaHomeErrors = $false
@@ -445,9 +496,9 @@ if ($javaHomeErrors) {
 Write-Host ""
 
 # ==========================================
-# ÉTAPE 10 : Vérification Hive dans les logs
+# ÉTAPE 12 : Vérification Hive dans les logs
 # ==========================================
-Write-Host "[10/10] Vérification Hive..." -ForegroundColor Yellow
+Write-Host "[12/12] Vérification Hive..." -ForegroundColor Yellow
 Start-Sleep -Seconds 20
 
 $hiveErrors = $false

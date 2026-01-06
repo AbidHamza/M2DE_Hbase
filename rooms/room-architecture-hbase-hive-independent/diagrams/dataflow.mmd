@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Client as Client (Beeline)
+    participant HS2 as HiveServer2
+    participant MS as Metastore
+    participant YARN as YARN
+    participant HDFS as HDFS
+    
+    Note over Client,HDFS: Requête: SELECT city, COUNT(*) FROM customers WHERE status='active' GROUP BY city;
+    
+    Client->>HS2: 1. Envoie requête HiveQL
+    HS2->>MS: 2. Consulte schéma table 'customers'
+    MS-->>HS2: 3. Retourne schéma et emplacement fichiers
+    HS2->>HS2: 4. Traduit requête en tâches MapReduce/Tez
+    HS2->>YARN: 5. Soumet tâches pour exécution
+    YARN->>YARN: 6. Alloue ressources (CPU, mémoire)
+    YARN->>HDFS: 7. Lit données depuis fichiers
+    HDFS-->>YARN: 8. Retourne données
+    YARN->>YARN: 9. Exécute MapReduce (Map + Reduce)
+    YARN->>YARN: 10. Agrège résultats (GROUP BY)
+    YARN-->>HS2: 11. Retourne résultats finaux
+    HS2-->>Client: 12. Retourne résultats au client
+    
+    Note over Client,HDFS: Résultat: Liste des villes avec nombre de clients actifs
+

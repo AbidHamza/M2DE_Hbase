@@ -393,6 +393,7 @@ M2DE_Hbase/
 │   └── sensors/             # Données de capteurs
 │
 └── rooms/                    # VOS TRAVAUX ICI
+    ├── room-architecture-hbase-hive-independent/
     ├── room-0_introduction/
     ├── room-1_hbase_basics/
     ├── room-2_hbase_advanced/
@@ -724,6 +725,7 @@ Ouvrez votre navigateur :
 
 Les **rooms** sont des parcours d'apprentissage guidés. Suivez-les dans l'ordre :
 
+0. **Room Architecture** : Comprendre l'architecture HBase + Hive (indépendante de Docker, recommandée en premier)
 1. **Room 0** : Introduction
 2. **Room 1** : HBase Basics
 3. **Room 2** : HBase Advanced
@@ -987,6 +989,7 @@ M2DE_Hbase/
 │   └── sensors/
 │
 └── rooms/                    # VOS TRAVAUX ICI
+    ├── room-architecture-hbase-hive-independent/
     ├── room-0_introduction/
     ├── room-1_hbase_basics/
     ├── room-2_hbase_advanced/

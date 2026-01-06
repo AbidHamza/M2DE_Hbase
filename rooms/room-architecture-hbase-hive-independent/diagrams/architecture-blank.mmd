@@ -1,0 +1,48 @@
+graph TB
+    subgraph "Couche Client"
+        direction LR
+        ClientHBase["Client HBase<br/>(HBase Shell)"]
+        ClientHive["Client Hive<br/>(Beeline)"]
+    end
+    
+    subgraph "Couche Accès"
+        direction TB
+        HBaseMaster["HBase Master"]
+        RegionServer1["RegionServer 1"]
+        RegionServer2["RegionServer 2"]
+        HiveServer2["HiveServer2"]
+    end
+    
+    subgraph "Couche Métadonnées"
+        direction LR
+        Metastore["Hive Metastore"]
+        ZooKeeper["ZooKeeper"]
+    end
+    
+    subgraph "Couche Calcul"
+        direction TB
+        YARN["YARN<br/>(ResourceManager + NodeManagers)"]
+    end
+    
+    subgraph "Couche Stockage"
+        direction TB
+        HDFS["HDFS<br/>(NameNode + DataNodes)"]
+        HFiles["HFiles"]
+        WAL["WAL<br/>(Write-Ahead Log)"]
+    end
+    
+    %% TODO: Placer les composants et tracer les flux
+    %% Instructions:
+    %% 1. Placez chaque composant dans la bonne zone
+    %% 2. Tracez les flux avec des flèches (-->)
+    %% 3. Ajoutez des labels sur les flèches si nécessaire
+    %% 4. Utilisez les styles suivants pour les différents types de flux:
+    %%    - Flux de données: -->
+    %%    - Flux de contrôle: -.->
+    %%    - Flux de métadonnées: ==>>
+    
+    %% Exemples de syntaxe:
+    %% ClientHBase --> RegionServer1
+    %% RegionServer1 --> HDFS
+    %% HBaseMaster -.-> ZooKeeper
+
