@@ -71,51 +71,51 @@ Complétez les étapes suivantes en indiquant ce qui se passe à chaque étape l
 **Étape 1 :** Le client (Beeline) envoie la requête à __________
 
 **Réponse de l'étudiant :**
-_________________________________
+HiveServer2
 
 **Étape 2 :** __________ consulte __________ pour connaître le schéma de la table `customers`
 
 **Réponse de l'étudiant :**
-_________________________________
+HiveServer2 consulte le Hive Metastore
 
 **Étape 3 :** __________ traduit la requête en __________
 
 **Réponse de l'étudiant :**
-_________________________________
+HiveServer2 traduit la requête en tâches de calcul
 
 **Étape 4 :** Les tâches sont soumises à __________ pour exécution
 
 **Réponse de l'étudiant :**
-_________________________________
+YARN
 
 **Étape 5 :** __________ alloue les ressources (CPU, mémoire) sur les __________
 
 **Réponse de l'étudiant :**
-_________________________________
+YARN alloue les ressources sur les NodeManagers
 
 **Étape 6 :** Les tâches lisent les données depuis __________
 
 **Réponse de l'étudiant :**
-_________________________________
+HDFS
 
 **Étape 7 :** Les résultats intermédiaires sont __________
 
 **Réponse de l'étudiant :**
-_________________________________
+traités et agrégés (GROUP BY)
 
 **Étape 8 :** Le résultat final est retourné au __________
 
 **Réponse de l'étudiant :**
-_________________________________
+Client Hive (Beeline)
 
 ### Question complémentaire
 
 **Question :** Pourquoi Hive ne peut-il pas exécuter directement la requête sans passer par YARN ?
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+Hive ne fait pas le calcul lui-même.
+YARN est nécessaire pour répartir et exécuter les tâches sur le cluster.
+Sans YARN, Hive ne peut pas utiliser les ressources distribuées.
 
 ---
 
@@ -130,11 +130,9 @@ _________________________________
 **Question :** HBase ou Hive ? Justifiez votre choix.
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
-_________________________________
-_________________________________
+HBase est utilisé pour accéder rapidement aux dernières mesures d’un capteur grâce à la clé de ligne.
+Hive est utilisé pour analyser les tendances sur les 30 derniers jours avec des requêtes analytiques.
+Les deux outils sont donc complémentaires dans ce cas d’usage.
 
 ### Cas 2 : Logs applicatifs
 
@@ -146,11 +144,9 @@ _________________________________
 **Question :** HBase ou Hive ? Justifiez votre choix.
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
-_________________________________
-_________________________________
+HBase est utilisé pour rechercher rapidement les logs d’un utilisateur sur une courte période.
+Hive est utilisé pour analyser les patterns d’erreurs sur un grand volume de logs.
+Les logs sont stockés de manière fiable dans HDFS et exploités par les deux outils.
 
 ### Cas 3 : Base de données clients
 
@@ -162,11 +158,9 @@ _________________________________
 **Question :** HBase ou Hive ? Justifiez votre choix.
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
-_________________________________
-_________________________________
+Hive est le plus adapté car les besoins sont principalement analytiques (rapports par ville ou segment).
+Les mises à jour sont peu fréquentes et peuvent être gérées par des traitements batch.
+HBase n’est pas nécessaire car l’accès temps réel par clé n’est pas prioritaire.
 
 ---
 
@@ -180,67 +174,61 @@ Pour chaque affirmation, indiquez si elle est vraie ou fausse et **justifiez vot
 
 **Énoncé :** HBase stocke les données directement dans HDFS sous forme de fichiers CSV.
 
-**Réponse (Vrai/Faux) :** __________
+**Réponse (Vrai/Faux) :** Faux
 
 **Justification :**
-_________________________________
-_________________________________
-_________________________________
+HBase stocke les données dans HDFS sous forme de HFiles, pas en fichiers CSV.
+Les HFiles sont des fichiers binaires optimisés pour HBase.
 
 ### Affirmation 2
 
 **Énoncé :** HiveServer2 et Metastore sont deux noms pour le même composant.
 
-**Réponse (Vrai/Faux) :** __________
+**Réponse (Vrai/Faux) :** Faux
 
 **Justification :**
-_________________________________
-_________________________________
-_________________________________
+HiveServer2 exécute les requêtes Hive et gère les connexions clients.
+Le Metastore stocke uniquement les métadonnées des tables Hive.
 
 ### Affirmation 3
 
 **Énoncé :** Les clients HBase communiquent toujours avec HBase Master pour lire des données.
 
-**Réponse (Vrai/Faux) :** __________
+**Réponse (Vrai/Faux) :** Faux
 
 **Justification :**
-_________________________________
-_________________________________
-_________________________________
+Les clients HBase communiquent directement avec les RegionServers pour lire les données.
+Le HBase Master sert uniquement à la coordination et aux opérations administratives.
 
 ### Affirmation 4
 
 **Énoncé :** YARN orchestre les tâches de calcul mais ne stocke pas les données.
 
-**Réponse (Vrai/Faux) :** __________
+**Réponse (Vrai/Faux) :** Vrai
 
 **Justification :**
-_________________________________
-_________________________________
-_________________________________
+YARN gère et orchestre l’exécution des tâches de calcul sur le cluster.
+Le stockage des données est assuré par HDFS, pas par YARN.
 
 ### Affirmation 5
 
 **Énoncé :** Hive peut interroger des tables HBase en créant une table externe.
 
-**Réponse (Vrai/Faux) :** __________
+**Réponse (Vrai/Faux) :** Vrai
 
 **Justification :**
-_________________________________
-_________________________________
-_________________________________
+Hive peut accéder aux données HBase via des tables externes.
+Cela permet d’interroger HBase avec HiveQL.
 
 ### Affirmation 6
 
 **Énoncé :** ZooKeeper est optionnel pour HBase.
 
-**Réponse (Vrai/Faux) :** __________
+**Réponse (Vrai/Faux) :** Faux
 
 **Justification :**
-_________________________________
-_________________________________
-_________________________________
+ZooKeeper est indispensable au fonctionnement de HBase.
+Il assure la coordination et l’élection du HBase Master.
 
 ---
 
@@ -251,23 +239,20 @@ _________________________________
 **Question 1 :** Quelle est la différence principale entre HBase et Hive selon vous ?
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+HBase permet un accès rapide aux données ligne par ligne en temps réel.
+Hive est destiné à l’analyse de grandes quantités de données avec des requêtes de type SQL.
 
 **Question 2 :** Pourquoi HBase utilise-t-il HDFS pour le stockage au lieu de stocker directement sur le disque local ?
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+HDFS permet le stockage distribué et la réplication des données.
+Cela assure la tolérance aux pannes et la scalabilité, ce qu’un disque local ne permet pas.
 
 **Question 3 :** Dans quels cas utiliseriez-vous HBase et Hive ensemble ?
 
 **Réponse de l'étudiant :**
-_________________________________
-_________________________________
-_________________________________
+HBase est utilisé pour l’accès rapide et en temps réel aux données.
+Hive est utilisé pour l’analyse globale et les requêtes analytiques sur ces mêmes données.
 
 ---
 
@@ -275,9 +260,7 @@ _________________________________
 
 Utilisez cet espace pour noter vos questions, vos difficultés, ou vos observations :
 
-_________________________________
-_________________________________
-_________________________________
-_________________________________
-_________________________________
+Comprendre le rôle précis de chaque composant aide à mieux lire les schémas d’architecture.
+La distinction entre stockage, calcul et accès est essentielle pour éviter les confusions.
+Les flux de données entre Hive, HBase, HDFS et YARN sont plus clairs une fois l’architecture comprise.
 
