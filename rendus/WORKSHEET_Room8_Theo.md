@@ -1,8 +1,8 @@
 # Worksheet : Exercices Architecture HBase + Hive
 
-**Nom de l'étudiant :** _________________________________
+**Nom de l'étudiant :** ZIMMERMANN Théo
 
-**Date :** _________________________________
+**Date :** 6 Janvier 2026
 
 ---
 
