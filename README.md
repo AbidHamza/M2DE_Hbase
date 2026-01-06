@@ -736,6 +736,7 @@ Les **rooms** sont des parcours d'apprentissage guidés. Suivez-les dans l'ordre
 8. **Room 7** : Projet final
 9. **Room 8** : Troubleshooting et Dépannage (optionnel, à consulter en cas de problème)
 10. **Room 9** : Optimisation et Performance (optionnel, pour aller plus loin)
+11. **Room Expert** : Maîtrise Avancée (indépendante, sans environnement requis, pour devenir expert)
 
 **Comment travailler :**
 ```bash
